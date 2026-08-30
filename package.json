@@ -1,0 +1,27 @@
+{
+  "name": "laundry-delivery-system",
+  "version": "1.0.0",
+  "description": "Laundry Delivery System - Web Application using Node.js & Express",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "test": "node tests/test_api.js"
+  },
+  "keywords": [
+    "laundry",
+    "delivery",
+    "express",
+    "nodejs"
+  ],
+  "author": "COMP252 Team",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^18.0.5",
+    "express": "^4.21.2",
+    "morgan": "^1.10.0",
+    "mysql2": "^3.24.5"
+  }
+}
