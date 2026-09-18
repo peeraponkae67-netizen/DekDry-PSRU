@@ -1,0 +1,1292 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DEKDRY - บริการซักอบรีดออนไลน์ รับ-ส่งถึงหอพัก สะอาด รวดเร็ว @ PSRU</title>
+  <meta name="description"
+    content="DEKDRY บริการซักอบรีดสำหรับชาว มรพส. พิบูลสงคราม รับ-ส่งผ้าถึงหอพัก สะอาด หอมสดชื่น รวดเร็วทันใจ">
+  <!-- Google Fonts: Prompt & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/booking.css">
+</head>
+
+<body>
+
+
+
+  <!-- Navbar -->
+  <header class="site-navbar">
+    <div class="nav-wrap">
+      <a href="#" class="logo-wrap" onclick="switchAppView('landing'); return false;">
+        <div class="logo-badge">🧺</div>
+        <div class="logo-text">Dek<span>Dry</span></div>
+      </a>
+
+      <!-- Right Navigation Group -->
+      <div style="display:flex; align-items:center; gap:1.5rem;">
+        <nav>
+          <ul class="nav-links">
+            <li><a href="#" class="nav-link" onclick="switchAppView('pricing'); return false;">อัตราค่าบริการ</a></li>
+            <li><a href="#faq" class="nav-link" onclick="switchAppView('landing')">ช่วยเหลือ</a></li>
+          </ul>
+        </nav>
+
+        <!-- Right Actions: Auth & CTA -->
+        <div class="nav-actions">
+          <div id="nav-auth-container">
+            <button class="btn btn-secondary btn-sm" onclick="openAuthModal('login')">เข้าสู่ระบบ</button>
+          </div>
+          <button class="btn btn-primary" onclick="switchAppView('order')">
+            สั่งจองตอนนี้ &rsaquo;
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================================
+       MAIN LANDING PAGE VIEW
+  ======================================================== -->
+  <main id="app-view-landing" class="app-view-panel active" style="padding:0; max-width:100%;">
+
+    <!-- 1. HERO SECTION -->
+    <section class="hero-section">
+      <div class="hero-container">
+        <!-- Hero Content (Left) -->
+        <div class="hero-text-side">
+          <div class="hero-promo-tag">
+            <span>🎉</span> โปรนักศึกษาใหม่ เริ่มต้นเพียง ฿35/กก. | ส่งฟรีหอใน มรพส. ทุกตึก
+          </div>
+
+          <h1 class="hero-main-title">
+            DekDry <span>@ PSRU</span><br>
+            คุ้มค่า ได้พัก เพราะเราซักให้
+          </h1>
+
+          <p class="hero-subtitle">
+            บริการซักอบรีดออนไลน์สำหรับชาว <strong>มรพส. (พิบูลสงคราม)</strong> — ไรเดอร์เข้ารับผ้าถึงหอพัก ทั้ง
+            <strong>วิทยาเขตทะเลแก้ว</strong> และ <strong>วิทยาเขตวังจันทน์</strong> เสื้อผ้าสะอาด หอมสดชื่น
+            รวดเร็วทันใจ
+          </p>
+
+          <div class="hero-cta-group">
+            <button class="btn-hero-primary" onclick="goToOrderPage('standard')">
+              🧺 สั่งซักผ้าตอนนี้เลย &rsaquo;
+            </button>
+            <a href="#" class="btn-hero-secondary" onclick="switchAppView('pricing'); return false;">
+              อัตราค่าบริการ นศ. &rsaquo;
+            </a>
+          </div>
+
+          <!-- Trust Checkmarks -->
+          <ul class="hero-trust-list">
+            <li class="trust-item">
+              <span class="check">✓</span> แยกซักถังเดี่ยวเฉพาะคุณ ไม่รวมผ้ากับคนอื่น 100%
+            </li>
+            <li class="trust-item">
+              <span class="check">✓</span> มีบริการรีดชุดนักศึกษา เสื้อช็อป กระโปรงพลีทอัดกลีบ
+            </li>
+            <li class="trust-item">
+              <span class="check">✓</span> อบแห้งด้วยความร้อนฆ่าเชื้อ พร้อมพับใส่ถุงซีลสุญญากาศ
+            </li>
+            <li class="trust-item">
+              <span class="check">✓</span> นัดรับ-ส่งสะดวก ใต้ตึกหอพัก / จุด Drop-Point ในมอ
+            </li>
+          </ul>
+        </div>
+
+        <!-- Hero Visual (Right) -->
+        <div class="hero-media-wrap">
+          <div class="hero-media-box">
+            <div class="floating-pill top-left">
+              <span>✨</span> สะอาด หอมสดชื่น 99.9%
+            </div>
+
+            <div class="hero-image-inner">
+              <div style="font-size:5.5rem; margin-bottom:1rem;">🧺</div>
+              <div style="font-weight:800; font-size:1.2rem; color:#0369a1; text-align:center;">
+                ผ้าสะอาด รีดเรียบ<br>
+                <span style="font-size:0.9rem; font-weight:500; color:#475569;">ส่งตรงถึงหอพัก มรพส. ตรงเวลา</span>
+              </div>
+            </div>
+
+            <div class="floating-pill bottom-right">
+              <span>🛵</span> ไรเดอร์เข้ารับถึงหอพัก
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. SECTION: HOW IT WORKS (ขั้นตอนการให้บริการซักรีดของเรา) -->
+    <section class="section" id="how-it-works">
+      <div class="section-header">
+        <span class="section-badge">How It Works</span>
+        <h2 class="section-title">ขั้นตอนการให้บริการซักรีดชาว PSRU</h2>
+        <p class="section-desc">ง่าย สะดวก เพียง 4 ขั้นตอน เสื้อผ้าของคุณก็จะสะอาด หอมสดชื่น พร้อมใช้งาน</p>
+      </div>
+
+      <div class="steps-grid">
+        <!-- Step 1 -->
+        <div class="step-card">
+          <div class="step-circle-img">
+            <span>📱</span>
+            <div class="step-num-badge">1</div>
+          </div>
+          <h3 class="step-title">สั่งจองผ่านเว็บ</h3>
+          <p class="step-desc">เลือกวิทยาเขต (ทะเลแก้ว/วังจันทน์) และแพ็กเกจที่ต้องการ</p>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="step-card">
+          <div class="step-circle-img">
+            <span>🛵</span>
+            <div class="step-num-badge">2</div>
+          </div>
+          <h3 class="step-title">ไรเดอร์รับผ้าถึงหอ</h3>
+          <p class="step-desc">นัดรับใต้ตึกหอพักใน หรือจุด Drop-Point ในมอที่คุณสะดวก</p>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="step-card">
+          <div class="step-circle-img">
+            <span>🧼</span>
+            <div class="step-num-badge">3</div>
+          </div>
+          <h3 class="step-title">ซักอบรีดมาตรฐาน</h3>
+          <p class="step-desc">แยกถังซักเฉพาะ อบฆ่าเชื้อ พร้อมรีดชุด นศ./เสื้อช็อป เรียบเนียน</p>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="step-card">
+          <div class="step-circle-img">
+            <span>✨</span>
+            <div class="step-num-badge">4</div>
+          </div>
+          <h3 class="step-title">ส่งคืนผ้าสะอาด</h3>
+          <p class="step-desc">แพ็กถุงซีลกันฝุ่น นำส่งคืนถึงหอพักตรงเวลานัดหมาย</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. SECTION: WHY CHOOSE US & STATS -->
+    <section class="section bg-light" id="why-us">
+      <div class="why-container">
+        <!-- Left text -->
+        <div class="why-left">
+          <span class="section-badge">Why DekDry @ PSRU</span>
+          <h2>ทำไมเด็กหอ มรพส. ต้องใช้บริการกับเรา</h2>
+          <p>
+            ชีวิตในมหาลัยมีทั้งเรียน กิจกรรม และอ่านหนังสือสอบ
+            ไม่ต้องเสียเวลาแย่งเครื่องซักผ้าหยอดเหรียญหรือตากผ้าตอนฝนตก DekDry พร้อมดูแลเสื้อผ้าให้คุณแบบครบวงจร
+            ราคานักศึกษาสบายกระเป๋า
+          </p>
+          <button class="btn btn-primary" onclick="goToOrderPage('standard')" style="padding:0.8rem 1.5rem;">
+            เริ่มสั่งซักผ้ากับเราวันนี้
+          </button>
+        </div>
+
+        <!-- Right Stats (2x2 Grid) -->
+        <div class="stats-grid-2x2">
+          <div class="stat-box-modern">
+            <div class="stat-number">25,000+</div>
+            <div class="stat-text">ชิ้นเสื้อผ้านักศึกษาและบุคลากรที่ซักสะอาดแล้ว</div>
+          </div>
+
+          <div class="stat-box-modern">
+            <div class="stat-number">2 วิทยาเขต</div>
+            <div class="stat-text">ครอบคลุมทั้ง มรพส. ทะเลแก้ว และ มรพส. วังจันทน์</div>
+          </div>
+
+          <div class="stat-box-modern">
+            <div class="stat-number">4.9 / 5</div>
+            <div class="stat-text">คะแนนความพึงพอใจจากนักศึกษาหอพัก มรพส.</div>
+          </div>
+
+          <div class="stat-box-modern">
+            <div class="stat-number">100%</div>
+            <div class="stat-text">รับประกันแยกซักถังเดี่ยว ไม่ซักรวมกับใคร</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. SECTION: COVERAGE / PROVINCES (วิทยาเขตที่ให้บริการ) -->
+    <section class="section" id="coverage">
+      <div class="section-header">
+        <span class="section-badge">Campus Coverage</span>
+        <h2 class="section-title">วิทยาเขตที่ให้บริการ (มรพส.)</h2>
+        <p class="section-desc">รับ-ส่งฟรีถึงหอพักและอาคารเรียนภายในมหาวิทยาลัยราชภัฏพิบูลสงคราม</p>
+      </div>
+
+      <div class="cities-grid">
+        <!-- PSRU Thalaykaew -->
+        <div class="city-card">
+          <div class="city-img-box" style="background: linear-gradient(135deg, #0284c7, #0369a1);">
+            <span>🏛️</span>
+          </div>
+          <div class="city-info">
+            <div class="city-tag">วิทยาเขตหลัก (มอนอก)</div>
+            <h3 class="city-name">มรพส. ทะเลแก้ว</h3>
+            <p style="font-size:0.85rem; color:#64748b; margin-top:0.3rem;">หอพักนักศึกษาชาย-หญิง, อาคารกิจกรรม, ทุกคณะ,
+              โซนเคหะ & ประตู 1-3</p>
+          </div>
+        </div>
+
+        <!-- PSRU Wangchan -->
+        <div class="city-card">
+          <div class="city-img-box" style="background: linear-gradient(135deg, #0d9488, #0f766e);">
+            <span>🏫</span>
+          </div>
+          <div class="city-info">
+            <div class="city-tag">วิทยาเขตในเมือง (มอใน)</div>
+            <h3 class="city-name">มรพส. วังจันทน์</h3>
+            <p style="font-size:0.85rem; color:#64748b; margin-top:0.3rem;">หอพักนักศึกษา, อาคารเรียน,
+              สำนักงานอธิการบดี, ชุมชนรอบมอใน</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. SECTION: TESTIMONIALS (ประสบการณ์ลูกค้าของเรา) -->
+    <section class="section bg-light" id="reviews">
+      <div class="section-header">
+        <span class="section-badge">Testimonials</span>
+        <h2 class="section-title">ประสบการณ์ลูกค้าของเรา</h2>
+        <p class="section-desc">ความประทับใจจริงจากลูกค้าและนักศึกษาที่ใช้งาน DekDry เป็นประจำ</p>
+      </div>
+
+      <div class="testimonials-grid">
+        <!-- Review 1 -->
+        <div class="review-card">
+          <div>
+            <div class="review-stars">★★★★★</div>
+            <p class="review-text">
+              "บริการเร็วและตรงเวลามาก เป็น Life Saver ในช่วงงานยุ่ง เสื้อผ้าพับเรียบเนียน มีการแพ็กแยกถุงเรียบร้อย
+              ไม่ต้องเสียเวลาซักรีดเองอีกต่อไป คุ้มค่ามากครับ"
+            </p>
+          </div>
+          <div class="reviewer">
+            <div class="reviewer-avatar">👨‍💼</div>
+            <div>
+              <div class="reviewer-name">คุณธนภพ, สุขุมวิท</div>
+              <div class="reviewer-sub">พนักงานบริษัทเอกชน (Verified User)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Review 2 -->
+        <div class="review-card">
+          <div>
+            <div class="review-stars">★★★★★</div>
+            <p class="review-text">
+              "ส่งซักผ้านวมและเสื้อสูทผ้าไหม ประทับใจมาก กลิ่นหอมฟลอรัลติดทนนาน ไรเดอร์สุภาพ
+              โทรแจ้งก่อนเข้ารับและส่งมอบเสมอ ใช้งานมา 6 เดือนแล้วไม่เคยมีปัญหาเลยค่ะ"
+            </p>
+          </div>
+          <div class="reviewer">
+            <div class="reviewer-avatar">👩‍💼</div>
+            <div>
+              <div class="reviewer-name">คุณศิริขวัญ, พระราม 9</div>
+              <div class="reviewer-sub">เจ้าของธุรกิจ (Verified User)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Review 3 -->
+        <div class="review-card">
+          <div>
+            <div class="review-stars">★★★★★</div>
+            <p class="review-text">
+              "บริการซักด่วนแบบเร่งด่วนทำได้จริงตามที่การันตี เสื้อนักศึกษาขาวสะอาด รีดคมกริบ
+              รับ-ส่งถึงหน้าหอพักตรงเวลา สะดวกและประทับใจมากครับ"
+            </p>
+          </div>
+          <div class="reviewer">
+            <div class="reviewer-avatar">👨‍🎓</div>
+            <div>
+              <div class="reviewer-name">คุณกวีวัฒน์ (นศ. มรพส.)</div>
+              <div class="reviewer-sub">หอพักใน มรพส. (Verified User)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. SECTION: FAQ & CONTACT SUPPORT BOX -->
+    <section class="section" id="faq">
+      <div class="section-header">
+        <span class="section-badge">FAQ & Support</span>
+        <h2 class="section-title">คำถามที่พบบ่อย</h2>
+        <p class="section-desc">มีข้อสงสัยเกี่ยวกับการใช้งาน? เราได้รวบรวมคำตอบไว้ให้คุณแล้ว</p>
+      </div>
+
+      <div class="faq-container">
+        <!-- FAQ Accordion List -->
+        <div class="faq-list">
+          <div class="faq-item active">
+            <button class="faq-question" onclick="toggleFaq(this)">
+              <span>ซักสะอาดแค่ไหน มีการแยกผ้าหรือไม่?</span>
+              <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-answer">
+              DekDry แยกถังซักเฉพาะของลูกค้าแต่ละท่าน ไม่มีการซักรวมกับผู้อื่น 100% พร้อมคัดแยกผ้าขาว-ผ้าสี
+              และใช้น้ำยาฆ่าเชื้อเกรดพรีเมียมที่ถนอมเนื้อผ้า
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+              <span>ระยะเวลาในการรับ-ส่งผ้านานเท่าใด?</span>
+              <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-answer">
+              บริการมาตรฐานใช้เวลา 24-36 ชั่วโมง และเรามีบริการด่วนพิเศษ (Express) รับและส่งคืนภายใน 6 ชั่วโมง
+              สำหรับงานเร่งด่วน
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+              <span>ชำระเงินผ่านช่องทางใดได้บ้าง?</span>
+              <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-answer">
+              รองรับการสแกน PromptPay QR Code, บัตรเครดิต/เดบิต และบริการเก็บเงินปลายทาง (Cash on Delivery)
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+              <span>หากไม่อยู่ห้องขณะไรเดอร์ไปส่งผ้า ทำอย่างไรได้บ้าง?</span>
+              <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-answer">
+              คุณสามารถระบุในช่องหมายเหตุใหักฝากถุงผ้าไว้กับนิติบุคคลคอนโด เจ้าหน้าที่รักษาความปลอดภัย
+              หรือนัดหมายเวลาจัดส่งใหม่ได้ทันที
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+              <span>มีการรับประกันกรณีผ้าสูญหายหรือเสียหายหรือไม่?</span>
+              <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-answer">
+              เรามีนโยบายรับประกันชดเชยค่าเสียหายสูงสุดตามมูลค่าจริงภายใต้เงื่อนไขการให้บริการมาตรฐาน
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Support Box (Right) -->
+        <div class="support-box">
+          <div class="support-avatars">
+            <span>👩‍💼</span>
+            <span>👨‍💼</span>
+            <span>👩‍💻</span>
+          </div>
+          <h3 class="support-title">สอบถามเพิ่มเติมได้ที่นี่!</h3>
+          <p class="support-sub">ทีมงานแอดมินพร้อมตอบคำถามไว <strong>ภายใน 5 นาที</strong></p>
+
+          <a href="https://line.me" target="_blank" class="contact-btn btn-line">
+            <span>💬</span> พูดคุยกับทีมงานผ่าน LINE
+          </a>
+
+          <a href="https://facebook.com" target="_blank" class="contact-btn btn-fb">
+            <span>🌐</span> Facebook Messenger
+          </a>
+
+          <button class="contact-btn btn-tel" onclick="showToast('📞 ศูนย์บริการลูกค้า DekDry โทร: 055-123-456')">
+            <span>📞</span> โทรติดต่อ 055-123-456
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================================
+       6-STEP ORDERING VIEW (WASHDROP COMPLIANT ORDER FLOW)
+  ======================================================== -->
+  <section id="app-view-order" class="app-view-panel" style="padding: 2.5rem 1rem 5rem;">
+    <form id="order-flow-form">
+      <div class="booking-flow-container">
+
+        <!-- Left Column: Steps 1 to 6 -->
+        <div class="order-steps-left">
+
+          <!-- STEP 1: เลือกบริการ -->
+          <div class="step-section-card">
+            <h2 class="step-section-heading">1. เลือกวิทยาเขต & บริการ (PSRU Campus)</h2>
+
+            <div class="city-capsule-toggle" style="margin-bottom:1.5rem; justify-content:flex-start;">
+              <div class="capsule-box" style="background:#f1f5f9;">
+                <button type="button" class="capsule-btn active" id="order-city-bkk"
+                  onclick="setOrderRegion('psru_tk')">🏛️ PSRU ทะเลแก้ว</button>
+                <button type="button" class="capsule-btn" id="order-city-cnx" onclick="setOrderRegion('psru_wc')">🏫
+                  PSRU วังจันทน์</button>
+              </div>
+            </div>
+
+            <!-- Option 1: แบบประหยัด -->
+            <div class="service-plan-option" id="plan-opt-economy" onclick="selectOrderPlan('economy')">
+              <div class="plan-check-mark">✓</div>
+              <div class="plan-info-left">
+                <span class="plan-badge" style="background:#dcfce7; color:#15803d;">🍃 ประหยัดกว่า</span>
+                <div class="plan-title">แบบประหยัด — 2 วัน (ชุดอยู่หอ/ทั่วไป)</div>
+                <div class="plan-sub">🕒 เร็วที่สุด: วันพรุ่งนี้, 12:00 - 16:00</div>
+              </div>
+              <div class="plan-price-right">
+                <div class="price-num">฿35</div>
+                <div class="price-unit">/ กก.</div>
+              </div>
+            </div>
+
+            <!-- Option 2: แบบมาตรฐาน -->
+            <div class="service-plan-option selected" id="plan-opt-standard" onclick="selectOrderPlan('standard')">
+              <div class="plan-check-mark">✓</div>
+              <div class="plan-info-left">
+                <span class="plan-badge" style="background:#fef3c7; color:#b45309;">⭐ ยอดนิยมเด็กหอ</span>
+                <div class="plan-title">แบบมาตรฐาน — วันถัดไป (ซัก-อบ-พับหอม)</div>
+                <div class="plan-sub">🕒 เร็วที่สุด: วันพรุ่งนี้, 10:00 - 12:00</div>
+              </div>
+              <div class="plan-price-right">
+                <div class="price-num">฿49</div>
+                <div class="price-unit">/ กก.</div>
+              </div>
+            </div>
+
+            <!-- Option 3: แบบเร่งด่วน -->
+            <div class="service-plan-option" id="plan-opt-express" onclick="selectOrderPlan('express')">
+              <div class="plan-check-mark">✓</div>
+              <div class="plan-info-left">
+                <span class="plan-badge" style="background:#ffedd5; color:#c2410c;">⚡ เร็วที่สุด (ด่วน 4-6 ชม.)</span>
+                <div class="plan-title">แบบเร่งด่วน — วันเดียวกัน (ทันใส่สอบ/กิจกรรม)</div>
+                <div class="plan-sub">🕒 เร็วที่สุด: วันนี้, 14:00 - 18:00</div>
+              </div>
+              <div class="plan-price-right">
+                <div class="price-num">฿69</div>
+                <div class="price-unit">/ กก.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 2: เลือกเวลาสำหรับการรับส่งเสื้อผ้า -->
+          <div class="step-section-card">
+            <h2 class="step-section-heading">2. เลือกเวลาสำหรับการรับส่งเสื้อผ้าของคุณ</h2>
+
+            <!-- Pickup Schedule -->
+            <div style="font-weight:700; font-size:0.95rem; margin-bottom:0.75rem; color:#0369a1;">
+              📅 Collection tomorrow (ศ. 2 ต.ค. 2026)
+            </div>
+
+            <div class="date-tabs-row">
+              <div class="date-tab-btn selected" onclick="selectPickupDate(this)">
+                <div class="day-name">ศ.</div>
+                <div class="day-num">2</div>
+              </div>
+              <div class="date-tab-btn" onclick="selectPickupDate(this)">
+                <div class="day-name">ส.</div>
+                <div class="day-num">3</div>
+              </div>
+              <div class="date-tab-btn" onclick="selectPickupDate(this)">
+                <div class="day-name">อา.</div>
+                <div class="day-num">4</div>
+              </div>
+              <div class="date-tab-btn" onclick="selectPickupDate(this)">
+                <div class="day-name">จ.</div>
+                <div class="day-num">5</div>
+              </div>
+              <div class="date-tab-btn" onclick="selectPickupDate(this)">
+                <div class="day-name">อ.</div>
+                <div class="day-num">6</div>
+              </div>
+            </div>
+
+            <div style="font-size:0.85rem; font-weight:700; color:#64748b; margin-bottom:0.4rem;">ช่วงเช้า</div>
+            <div class="time-slot-option selected" onclick="selectTimeSlot(this, 'pickup')">
+              <span>🕒 10:00 — 12:00</span>
+              <span style="color:#0284c7; font-weight:800;">✓</span>
+            </div>
+
+            <div style="font-size:0.85rem; font-weight:700; color:#64748b; margin:0.75rem 0 0.4rem;">ช่วงบ่าย & ค่ำ
+            </div>
+            <div class="time-slot-option" onclick="selectTimeSlot(this, 'pickup')">
+              <span>🕒 12:00 — 14:00</span>
+              <span></span>
+            </div>
+            <div class="time-slot-option" onclick="selectTimeSlot(this, 'pickup')">
+              <span>🕒 14:00 — 16:00</span>
+              <span
+                style="font-size:0.75rem; color:#15803d; background:#dcfce7; padding:0.1rem 0.5rem; border-radius:999px; font-weight:700;">+30
+                bonus points</span>
+            </div>
+            <div class="time-slot-option" onclick="selectTimeSlot(this, 'pickup')">
+              <span>🕒 16:00 — 18:00</span>
+              <span
+                style="font-size:0.75rem; color:#15803d; background:#dcfce7; padding:0.1rem 0.5rem; border-radius:999px; font-weight:700;">+15
+                bonus points</span>
+            </div>
+
+            <!-- Handover Options for Campus -->
+            <div class="handover-radio-list">
+              <label class="handover-radio-item">
+                <input type="radio" name="pickup-handover" value="guard" checked>
+                <span>🏢 ใต้ตึกหอพักนักศึกษา (ป้อม รปภ. / โต๊ะนิติหอใน มรพส.)</span>
+              </label>
+              <label class="handover-radio-item">
+                <input type="radio" name="pickup-handover" value="lobby">
+                <span>📍 จุด Drop-Point ในมอ (หน้า 7-Eleven / อาคารกิจกรรม / ใต้ตึกคณะ)</span>
+              </label>
+              <label class="handover-radio-item">
+                <input type="radio" name="pickup-handover" value="direct">
+                <span>👤 นัดรับโดยตรงกับนักศึกษา / อาจารย์</span>
+              </label>
+            </div>
+
+            <!-- Return Schedule -->
+            <div
+              style="font-weight:700; font-size:0.95rem; margin:1.5rem 0 0.75rem; color:#0369a1; border-top:1px solid #f1f5f9; padding-top:1.25rem;">
+              🚚 Return on ส. 3 ต.ค. 2026
+            </div>
+            <div class="time-slot-option selected" onclick="selectTimeSlot(this, 'return')">
+              <span>🕒 10:00 — 12:00</span>
+              <span style="color:#0284c7; font-weight:800;">✓</span>
+            </div>
+            <div class="time-slot-option" onclick="selectTimeSlot(this, 'return')">
+              <span>🕒 14:00 — 16:00</span>
+              <span></span>
+            </div>
+            <div class="time-slot-option" onclick="selectTimeSlot(this, 'return')">
+              <span>🕒 16:00 — 18:00</span>
+              <span></span>
+            </div>
+          </div>
+
+          <!-- STEP 3: ระบุรายละเอียด -->
+          <div class="step-section-card">
+            <h2 class="step-section-heading">3. ระบุรายละเอียดการซัก</h2>
+
+            <!-- Weight -->
+            <div class="form-group" style="margin-bottom:1.5rem;">
+              <label class="form-label" style="font-size:0.95rem;">ใส่น้ำหนักเสื้อผ้าของคุณคร่าวๆ (กก.):</label>
+              <div style="display:flex; align-items:center; gap:0.75rem;">
+                <input type="number" id="order-weight-input" class="form-control"
+                  style="width:120px; font-size:1.2rem; font-weight:800;" min="1" max="100" value="1"
+                  oninput="updateOrderFlowTotals()">
+                <span style="font-weight:700; color:#475569;">กิโลกรัม (กก.)</span>
+              </div>
+              <p style="font-size:0.78rem; color:#64748b; margin-top:0.35rem;">
+                * นี่เป็นการประเมินน้ำหนักคร่าวๆ ทางร้านจะชั่งน้ำหนักจริงต่อหน้านักศึกษา/ตอนรับผ้า
+              </p>
+            </div>
+
+            <!-- Ironing Options -->
+            <div style="font-weight:700; font-size:0.9rem; margin-bottom:0.5rem;">ตั้งค่าการพับและรีดผ้า:</div>
+            <div class="pref-grid-selector">
+              <div class="pref-option-pill selected" onclick="selectPrefPill(this, 'iron')">
+                <span style="font-weight:700;">พับผ้า</span>
+                <span style="font-size:0.75rem; color:#15803d;">ฟรี</span>
+              </div>
+              <div class="pref-option-pill" onclick="selectPrefPill(this, 'iron')">
+                <span style="font-weight:700;">รีดชุด นศ. / เสื้อผ้า</span>
+                <span style="font-size:0.75rem; color:#0284c7;">+15 บาท/ชิ้น</span>
+              </div>
+              <div class="pref-option-pill" onclick="selectPrefPill(this, 'iron')">
+                <span style="font-weight:700;">รีด - ส่งไม้แขวนเอง</span>
+                <span style="font-size:0.75rem; color:#0284c7;">+15 บาท/ชิ้น</span>
+              </div>
+              <div class="pref-option-pill" onclick="selectPrefPill(this, 'iron')">
+                <span style="font-weight:700;">รีด - ซื้อไม้แขวน</span>
+                <span style="font-size:0.75rem; color:#0284c7;">+20 บาท/ชิ้น</span>
+              </div>
+            </div>
+
+            <!-- Softener Options -->
+            <div style="font-weight:700; font-size:0.9rem; margin:1rem 0 0.5rem;">น้ำยาปรับผ้านุ่ม:</div>
+            <div class="pref-grid-selector">
+              <div class="pref-option-pill" onclick="selectPrefPill(this, 'softener')">
+                <span style="font-weight:700;">ไม่ใช้น้ำยาปรับผ้านุ่ม</span>
+                <span style="font-size:0.75rem; color:#15803d;">ฟรี</span>
+              </div>
+              <div class="pref-option-pill selected" onclick="selectPrefPill(this, 'softener')">
+                <span style="font-weight:700;">กลิ่นอ่อนโยน</span>
+                <span style="font-size:0.75rem; color:#15803d;">ฟรี</span>
+              </div>
+              <div class="pref-option-pill" onclick="selectPrefPill(this, 'softener')">
+                <span style="font-weight:700;">กลิ่นพรีเมียม Downy®</span>
+                <span style="font-size:0.75rem; color:#0284c7;">+10 บาท/กก.</span>
+              </div>
+            </div>
+
+            <!-- Temperature Options -->
+            <div style="font-weight:700; font-size:0.9rem; margin:1rem 0 0.5rem;">อุณหภูมิการซัก:</div>
+            <div class="pref-grid-selector">
+              <div class="pref-option-pill selected" onclick="selectPrefPill(this, 'temp')">
+                <span style="font-weight:700;">น้ำเย็น — 30°C</span>
+                <span style="font-size:0.75rem; color:#15803d;">ฟรี</span>
+              </div>
+              <div class="pref-option-pill" onclick="selectPrefPill(this, 'temp')">
+                <span style="font-weight:700;">น้ำอุ่น — 60°C</span>
+                <span style="font-size:0.75rem; color:#0284c7;">+10 บาท/กก.</span>
+              </div>
+              <div class="pref-option-pill" onclick="selectPrefPill(this, 'temp')">
+                <span style="font-weight:700;">น้ำร้อน — 90°C</span>
+                <span style="font-size:0.75rem; color:#0284c7;">+15 บาท/กก.</span>
+              </div>
+            </div>
+
+            <!-- Drying Options -->
+            <div style="font-weight:700; font-size:0.9rem; margin:1rem 0 0.5rem;">วิธีทำผ้าให้แห้ง:</div>
+            <div class="pref-grid-selector">
+              <div class="pref-option-pill selected" onclick="selectPrefPill(this, 'dry')">
+                <span style="font-weight:700;">เครื่องอบผ้า (อุณหภูมิต่ำ)</span>
+                <span style="font-size:0.75rem; color:#15803d;">ฟรี</span>
+              </div>
+              <div class="pref-option-pill" onclick="selectPrefPill(this, 'dry')">
+                <span style="font-weight:700;">แขวนตากในอากาศเย็น</span>
+                <span style="font-size:0.75rem; color:#0284c7;">+10 บาท/กก.</span>
+              </div>
+            </div>
+
+            <div style="margin-top:1rem;">
+              <label style="display:flex; align-items:center; gap:0.5rem; font-size:0.85rem; cursor:pointer;">
+                <input type="checkbox" id="chk-bedding">
+                <span>ฉันมีเครื่องนอน / ผ้าห่ม / ผ้านวมหอพัก ที่ต้องการซักเพิ่ม (+฿80)</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- STEP 4: ข้อมูลติดต่อของท่าน -->
+          <div class="step-section-card">
+            <h2 class="step-section-heading">4. ข้อมูลติดต่อของท่าน (PSRU Student / Staff)</h2>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="order-cust-name">ชื่อ-นามสกุล / รหัสนักศึกษา *</label>
+                <input type="text" id="order-cust-name" class="form-control" value="นายพีรพล แก้วพูลสุข (นศ. 65123456)"
+                  required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="order-cust-phone">เบอร์โทรศัพท์มือถือ *</label>
+                <input type="tel" id="order-cust-phone" class="form-control" value="081-999-8877" required>
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label" for="order-cust-email">อีเมล (สำหรับรับใบแจ้งราคาและใบเสร็จ) *</label>
+              <input type="email" id="order-cust-email" class="form-control" value="peerapol.k@psru.ac.th" required>
+            </div>
+          </div>
+
+          <!-- STEP 5: คุณพักอาศัยอยู่ที่ไหน -->
+          <div class="step-section-card">
+            <h2 class="step-section-heading">5. สถานที่นัดรับ-ส่งผ้าภายใน มรพส. / หอพัก</h2>
+            <div class="form-group">
+              <label class="form-label" for="order-cust-address">ระบุหอพัก / อาคารเรียน / คณะ / บ้านพักอาจารย์
+                อย่างละเอียด *</label>
+              <textarea id="order-cust-address" rows="3" class="form-control" required
+                placeholder="ระบุตึกหอพัก / ห้องพัก / จุดนัดรับ...">หอพักนักศึกษาหญิง อาคาร 2 ห้อง 314 มหาวิทยาลัยราชภัฏพิบูลสงคราม (ทะเลแก้ว)</textarea>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label" for="order-cust-note">คำสั่งพิเศษเพิ่มเติมให้ไรเดอร์เมื่อมาส่ง:</label>
+              <input type="text" id="order-cust-note" class="form-control"
+                placeholder="เช่น นัดรับหน้า 7-Eleven ใต้อาคารกิจกรรม">
+            </div>
+          </div>
+
+          <!-- STEP 6: การชำระค่าบริการ -->
+          <div class="step-section-card">
+            <h2 class="step-section-heading">6. คุณต้องการชำระค่าบริการอย่างไร?</h2>
+            <p style="font-size:0.85rem; color:#64748b; margin-bottom:1.25rem;">
+              * น้องๆ นศ. ไม่ต้องชำระเงินจนกว่าผ้าจะได้รับการชั่งน้ำหนักจริงตอนรับผ้า จากนั้นสามารถสแกน PromptPay
+              จ่ายได้ทันที
+            </p>
+
+            <div class="handover-radio-list" style="border:none; padding-top:0;">
+              <label class="handover-radio-item"
+                style="padding:0.75rem; border:1.5px solid var(--border); border-radius:var(--radius-sm);">
+                <input type="radio" name="order-payment-method" value="PROMPTPAY" checked>
+                <div>
+                  <strong>โอนจ่าย / พร้อมเพย์ QR (PromptPay)</strong>
+                  <div style="font-size:0.78rem; color:#64748b;">สแกนจ่ายง่ายผ่าน K PLUS, SCB Easy, Krungthai NEXT</div>
+                </div>
+              </label>
+
+              <label class="handover-radio-item"
+                style="padding:0.75rem; border:1.5px solid var(--border); border-radius:var(--radius-sm);">
+                <input type="radio" name="order-payment-method" value="COD">
+                <div>
+                  <strong>เงินสด ณ ตอนส่งสินค้า (COD)</strong>
+                  <div style="font-size:0.78rem; color:#64748b;">เตรียมเงินสดพอดีส่งให้ไรเดอร์ตอนรับผ้าคืน</div>
+                </div>
+              </label>
+            </div>
+
+            <div style="margin-top:1.5rem; font-size:0.8rem; color:#64748b; line-height:1.6;">
+              <label style="display:flex; align-items:flex-start; gap:0.5rem; cursor:pointer;">
+                <input type="checkbox" required checked style="margin-top:0.25rem;">
+                <span>ข้าพเจ้ายอมรับ <a href="#" style="color:#0284c7;">เงื่อนไขการบริการ DekDry @ PSRU</a></span>
+              </label>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right Column: Sticky Order Summary Box -->
+        <div class="order-summary-right">
+          <div class="sticky-summary-card">
+            <div class="summary-header-blue">
+              <span>📋</span> สรุปคำสั่งซื้อ (PSRU)
+            </div>
+
+            <div class="summary-body-wrap">
+              <div class="summary-line-row">
+                <span>รับเสื้อผ้า:</span>
+                <strong id="summary-flow-pickup">พรุ่งนี้ · ศ. 2 ต.ค.</strong>
+              </div>
+              <div class="summary-line-row">
+                <span>ส่งเสื้อผ้า:</span>
+                <strong id="summary-flow-return">ส. 3 ต.ค.</strong>
+              </div>
+              <div class="summary-line-row">
+                <span>น้ำหนักโดยประมาณ:</span>
+                <strong id="summary-flow-weight">1 กก.</strong>
+              </div>
+              <div class="summary-line-row">
+                <span>บริการซักผ้า:</span>
+                <strong id="summary-flow-service-price">49 บาท</strong>
+              </div>
+              <div class="summary-line-row">
+                <span>บริการรับส่งผ้า:</span>
+                <strong style="color:#15803d;">ฟรี (หอใน มรพส.)</strong>
+              </div>
+            </div>
+
+            <div class="summary-total-banner">
+              <div class="total-label">ยอดรวมโดยประมาณ</div>
+              <div class="total-value" id="summary-flow-total">80 บาท</div>
+              <div class="total-note">บริการใน มรพส. มีค่าใช้จ่ายขั้นต่ำเพียง 80 บาท</div>
+            </div>
+
+            <div style="padding:1.25rem;">
+              <button type="submit" class="btn-tier-order"
+                style="padding:0.95rem; font-size:1.1rem; border-radius:var(--radius-md);">
+                🚀 ยืนยันการสั่งจองตอนนี้ &rsaquo;
+              </button>
+              <div style="text-align:center; font-size:0.75rem; color:#64748b; margin-top:0.6rem;">
+                🔒 ส่งตรงถึงหอพัก ไรเดอร์ มรพส. ดูแลอย่างดี
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </form>
+  </section>
+
+  <!-- ========================================================
+       PRICING VIEW PANEL (PSRU CAMPUS LAUNDRY)
+  ======================================================== -->
+  <section id="app-view-pricing" class="app-view-panel" style="padding: 3rem 1rem 5rem;">
+    <div class="pricing-view-container">
+      <h1 class="pricing-title-main">อัตราค่าบริการ (PSRU Campus)</h1>
+
+      <!-- City Toggle Switcher -->
+      <div class="city-capsule-toggle">
+        <div class="capsule-box">
+          <button type="button" class="capsule-btn active" id="btn-city-bkk" onclick="setPricingCity('psru_tk')">🏛️
+            PSRU ทะเลแก้ว (มอนอก)</button>
+          <button type="button" class="capsule-btn" id="btn-city-cnx" onclick="setPricingCity('psru_wc')">🏫 PSRU
+            วังจันทน์ (มอใน)</button>
+        </div>
+      </div>
+
+      <!-- 3 Tier Pricing Cards -->
+      <div class="pricing-tier-grid">
+
+        <!-- Tier 1: แบบประหยัด -->
+        <div class="pricing-tier-card">
+          <div class="tier-top-pill pill-economy">🍃 ประหยัดกว่า</div>
+          <div>
+            <div class="tier-plan-name">แบบประหยัด (ชุดอยู่หอ/ทั่วไป)</div>
+            <h2 class="tier-speed-title">2 วัน</h2>
+            <div class="tier-price-wrap">
+              <span class="tier-currency">฿</span>
+              <span class="tier-amount" id="price-economy">35</span>
+              <span class="tier-unit">/ กก.</span>
+            </div>
+
+            <ul class="tier-features-list">
+              <li class="tier-feature-item">
+                <span class="tier-check-icon">✓</span>
+                <span>ไรเดอร์เข้ารับผ้าถึงหอพักใน 2-4 ชม.</span>
+              </li>
+              <li class="tier-feature-item">
+                <span class="tier-check-icon">✓</span>
+                <span>รีดชุด นศ. เพียง 15 บาท ต่อชิ้น</span>
+              </li>
+              <li class="tier-feature-item">
+                <span class="tier-check-icon">✓</span>
+                <span>บริการรับส่งฟรีหอพักใน มรพส. ทุกโซน</span>
+              </li>
+            </ul>
+          </div>
+
+          <button type="button" class="btn-tier-order" onclick="goToOrderPage('economy')">
+            สั่งจองตอนนี้ &rsaquo;
+          </button>
+        </div>
+
+        <!-- Tier 2: แบบมาตรฐาน -->
+        <div class="pricing-tier-card" style="border-color:#38bdf8; box-shadow:0 10px 25px -5px rgba(2,132,199,0.12);">
+          <div class="tier-top-pill pill-standard">⭐ ยอดนิยมเด็กหอ</div>
+          <div>
+            <div class="tier-plan-name">แบบมาตรฐาน (ซัก-อบ-พับหอม)</div>
+            <h2 class="tier-speed-title">วันถัดไป</h2>
+            <div class="tier-price-wrap">
+              <span class="tier-currency">฿</span>
+              <span class="tier-amount" id="price-standard">49</span>
+              <span class="tier-unit">/ กก.</span>
+            </div>
+
+            <ul class="tier-features-list">
+              <li class="tier-feature-item">
+                <span class="tier-check-icon">✓</span>
+                <span>ไรเดอร์เข้ารับผ้าภายใน 1-2 ชั่วโมง</span>
+              </li>
+              <li class="tier-feature-item">
+                <span class="tier-check-icon">✓</span>
+                <span>รีดชุด นศ. / เสื้อช็อป 15 บาท ต่อชิ้น</span>
+              </li>
+              <li class="tier-feature-item">
+                <span class="tier-check-icon">✓</span>
+                <span>บริการรับส่งฟรีหอพักใน มรพส. ทุกโซน</span>
+              </li>
+            </ul>
+          </div>
+
+          <button type="button" class="btn-tier-order" onclick="goToOrderPage('standard')">
+            สั่งจองตอนนี้ &rsaquo;
+          </button>
+        </div>
+
+        <!-- Tier 3: แบบเร่งด่วน -->
+        <div class="pricing-tier-card">
+          <div class="tier-top-pill pill-express">⚡ เร็วที่สุด</div>
+          <div>
+            <div class="tier-plan-name">แบบเร่งด่วน (ด่วน 4-6 ชม.)</div>
+            <h2 class="tier-speed-title">วันเดียวกัน</h2>
+            <div class="tier-price-wrap">
+              <span class="tier-currency">฿</span>
+              <span class="tier-amount" id="price-express">69</span>
+              <span class="tier-unit">/ กก.</span>
+            </div>
+
+            <ul class="tier-features-list">
+              <li class="tier-feature-item">
+                <span class="tier-check-icon">✓</span>
+                <span>ทันใส่สอบ / มีกิจกรรมด่วนในมอ</span>
+              </li>
+              <li class="tier-feature-item">
+                <span class="tier-check-icon">✓</span>
+                <span>รีดด่วนพิเศษ 20 บาท ต่อชิ้น</span>
+              </li>
+              <li class="tier-feature-item">
+                <span class="tier-check-icon">✓</span>
+                <span>บริการรับส่งด่วนถึงจุดนัดพบในมอ</span>
+              </li>
+            </ul>
+          </div>
+
+          <button type="button" class="btn-tier-order" onclick="goToOrderPage('express')">
+            สั่งจองตอนนี้ &rsaquo;
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Minimum order notice -->
+      <div class="pricing-min-notice">
+        บริการสำหรับชาว มรพส. มีค่าใช้จ่ายขั้นต่ำเพียง 80 บาท
+      </div>
+
+      <!-- Delivery info text below -->
+      <div class="delivery-service-block">
+        <h2 class="delivery-service-title">บริการรับส่งผ้าภายใน มรพส. (PSRU)</h2>
+        <p class="delivery-service-text">
+          เราให้บริการรับ-ส่งฟรีสำหรับ นักศึกษา บุคลากร และอาจารย์ทุกคนที่อยู่ในหอพัก มรพส. ทะเลแก้ว และ มรพส. วังจันทน์
+          (สำหรับหอพักนอกรอบรั้วมอ ส่งฟรีเมื่อสั่งครบ 120 บาท)
+        </p>
+      </div>
+    </div>
+  </section>
+
+
+
+  <!-- VIEW: RIDER WORKFLOW -->
+  <section id="app-view-rider" class="app-view-panel">
+    <div id="rider-profile-bar"></div>
+    <div style="margin-bottom:1.25rem; display:flex; justify-content:space-between; align-items:center;">
+      <h2 style="font-size:1.3rem; font-weight:800;">📋 งานรับ-ส่งผ้าที่ต้องดำเนินการ (Rider Task List)</h2>
+      <button class="btn btn-secondary btn-sm" onclick="loadRiderView()">🔄 รีเฟรชงาน</button>
+    </div>
+    <div id="rider-tasks-list"></div>
+  </section>
+
+  <!-- VIEW: LAUNDRY STAFF WORKSTATION -->
+  <section id="app-view-staff" class="app-view-panel">
+    <div
+      style="margin-bottom:1.5rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+      <div>
+        <h2 style="font-size:1.4rem; font-weight:800;">🧼 กระดานงานซักรีด (Laundry Workstation Kanban)</h2>
+        <p style="font-size:0.85rem; color:var(--muted);">จัดการคิวงานซัก อบ รีด และตรวจสอบคุณภาพ (QC) ก่อนส่งมอบ</p>
+      </div>
+      <button class="btn btn-secondary btn-sm" onclick="loadStaffView()">🔄 รีเฟรชกระดาน</button>
+    </div>
+    <div class="kanban-board" id="staff-kanban-board"></div>
+  </section>
+
+  <!-- VIEW: ADMIN CONSOLE -->
+  <section id="app-view-admin" class="app-view-panel">
+    <div
+      style="margin-bottom:1.5rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+      <div>
+        <h2 style="font-size:1.4rem; font-weight:800;">📊 แดชบอร์ดผู้ดูแลระบบ (Admin Console)</h2>
+        <p style="font-size:0.85rem; color:var(--muted);">ภาพรวมรายได้ ยอดคำสั่งซื้อ และการจัดการข้อมูลระบบ</p>
+      </div>
+      <button class="btn btn-secondary btn-sm" onclick="loadAdminView()">🔄 อัปเดตข้อมูล</button>
+    </div>
+    <div class="stats-grid-2x2" id="admin-stats-grid" style="margin-bottom:1.5rem;"></div>
+
+    <div class="card">
+      <div
+        style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1rem;">
+        <h3 class="card-title" style="margin-bottom:0;">📦 รายการคำสั่งซื้อทั้งหมด (All Orders)</h3>
+        <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+          <input type="text" id="admin-search-input" class="form-control" style="width:200px;" placeholder="ค้นหา..."
+            onkeyup="filterAdminTable()">
+          <select id="admin-filter-status" class="form-select" style="width:160px;" onchange="filterAdminTable()">
+            <option value="ALL">ทุกสถานะ</option>
+            <option value="ORDER_PLACED">สั่งออเดอร์แล้ว</option>
+            <option value="IN_WASHING">กำลังซัก/รีด</option>
+            <option value="WASHED_READY">ซักเสร็จพร้อมส่ง</option>
+            <option value="OUT_FOR_DELIVERY">กำลังนำส่งลูกค้า</option>
+            <option value="DELIVERED">จัดส่งสำเร็จ</option>
+          </select>
+        </div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>ลูกค้า</th>
+              <th>บริการ</th>
+              <th>ยอดชำระ</th>
+              <th>สถานะ</th>
+              <th>ไรเดอร์</th>
+              <th>จัดการสถานะ</th>
+            </tr>
+          </thead>
+          <tbody id="admin-orders-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================
+       MODAL 1: BOOKING MODAL (ฟอร์มสั่งซักผ้า)
+  ======================================================== -->
+  <div class="modal-overlay" id="booking-modal">
+    <div class="modal-box" style="max-width: 750px;">
+      <div class="modal-header">
+        <h3 class="modal-title">🧺 สั่งบริการซักรีด DekDry</h3>
+        <button class="modal-close" onclick="closeBookingModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="booking-form">
+          <!-- Step 1: Services -->
+          <div style="margin-bottom:1.25rem;">
+            <div style="font-weight:800; font-size:1rem; margin-bottom:0.75rem;">1. เลือกบริการซักรีด:</div>
+            <div class="services-grid" id="services-grid"></div>
+          </div>
+
+          <!-- Step 2: Preferences -->
+          <div
+            style="margin-bottom:1.25rem; background:#f8fafc; padding:1rem; border-radius:var(--radius-md); border:1px solid var(--border);">
+            <div style="font-weight:800; font-size:0.95rem; margin-bottom:0.6rem;">2. ปรับแต่งการดูแลผ้า:</div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="pref-detergent">สูตรน้ำยาซักผ้า:</label>
+                <select id="pref-detergent" class="form-select">
+                  <option value="สูตรอ่อนโยนสำหรับผิวแพ้ง่าย (Hypoallergenic)">สูตรอ่อนโยน ผิวแพ้ง่าย</option>
+                  <option value="สูตรมาตรฐานพรีเมียม ขจัดคราบฝังลึก" selected>สูตรมาตรฐานพรีเมียม</option>
+                  <option value="สูตรไฮยีน ฆ่าเชื้อแบคทีเรีย 99.9%">สูตรไฮยีน ฆ่าเชื้อ 99.9%</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="pref-softener">กลิ่นน้ำยาปรับผ้านุ่ม:</label>
+                <select id="pref-softener" class="form-select">
+                  <option value="กลิ่นดาวน์นี่ ฟลอรัล (Floral Passion)" selected>กลิ่นดาวน์นี่ ฟลอรัล</option>
+                  <option value="กลิ่นบลู การ์เด้น หอมสดชื่น (Fresh Blue)">กลิ่นบลู การ์เด้น สดชื่น</option>
+                  <option value="ไม่ใส่น้ำยาปรับผ้านุ่ม">ไม่ใส่น้ำยาปรับผ้านุ่ม</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label" for="pref-pack">รูปแบบการส่งมอบ:</label>
+              <select id="pref-pack" class="form-select">
+                <option value="พับใส่ถุงซีลสุญญากาศกันฝุ่น" selected>พับเรียบร้อยในถุงซีลสุญญากาศ</option>
+                <option value="ใส่ไม้แขวนพร้อมถุงคลุมเสื้อผ้า">ใส่ไม้แขวนพร้อมถุงคลุมเสื้อผ้า</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Step 3: Customer Info & Address -->
+          <div style="margin-bottom:1.25rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+              <div style="font-weight:800; font-size:0.95rem;">3. ข้อมูลผู้สั่งและที่อยู่รับผ้า:</div>
+              <div style="display:flex; gap:0.3rem;">
+                <button type="button" class="btn-chip" onclick="fillAddress('condo')">🏢 คอนโด ลุมพินี</button>
+                <button type="button" class="btn-chip" onclick="fillAddress('home')">🏡 บ้านเดี่ยว บางนา</button>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="cust-name">ชื่อ-นามสกุล *</label>
+                <input type="text" id="cust-name" class="form-control" value="คุณวิภา สว่างวงศ์" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="cust-phone">เบอร์ติดต่อ *</label>
+                <input type="tel" id="cust-phone" class="form-control" value="089-123-4567" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="cust-address">ที่อยู่สำหรับเข้ารับและส่งมอบผ้า *</label>
+              <textarea id="cust-address" rows="2" class="form-control"
+                required>คอนโด ไอดีโอ โมบิ สุขุมวิท 66 ตึก B ชั้น 18 ห้อง 1805 ถนนสุขุมวิท บางนา กทม.</textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="cust-note">หมายเหตุถึงไรเดอร์:</label>
+              <input type="text" id="cust-note" class="form-control" placeholder="เช่น ฝากไว้ที่นิติบุคคล">
+            </div>
+          </div>
+
+          <!-- Step 4: Summary & Payment -->
+          <div style="border-top:1px solid var(--border); padding-top:1rem; margin-top:1rem;">
+            <div id="summary-items-list" style="margin-bottom:0.75rem;"></div>
+            <div
+              style="display:flex; justify-content:space-between; font-size:0.9rem; color:var(--muted); margin-bottom:0.3rem;">
+              <span>ค่าบริการซักรีด:</span>
+              <span id="summary-subtotal">฿0</span>
+            </div>
+            <div
+              style="display:flex; justify-content:space-between; font-size:0.9rem; color:var(--muted); margin-bottom:0.3rem;">
+              <span>ค่าจัดส่ง:</span>
+              <span>฿40</span>
+            </div>
+            <div
+              style="display:flex; justify-content:space-between; font-size:0.9rem; color:var(--success); margin-bottom:0.5rem;">
+              <span>ส่วนลดโปรโมชั่น (สั่งครบ 500.-):</span>
+              <span id="summary-discount">-฿0</span>
+            </div>
+            <div
+              style="display:flex; justify-content:space-between; font-size:1.3rem; font-weight:900; border-top:2px dashed var(--border); padding-top:0.75rem; margin-bottom:1rem;">
+              <span>ยอดชำระสุทธิ:</span>
+              <span id="summary-total" style="color:var(--primary);">฿0</span>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block" style="font-size:1.05rem; padding:0.85rem;">
+              🚀 ยืนยันการสั่งซักผ้า (สร้างออเดอร์)
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       MODAL 2: AUTH MODAL (Login / Register with bcrypt)
+  ======================================================== -->
+  <div class="modal-overlay" id="auth-modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title" id="auth-modal-title">🔐 เข้าสู่ระบบ</h3>
+        <button class="modal-close" onclick="closeAuthModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="auth-tabs" style="display:flex; border-bottom:1.5px solid var(--border); margin-bottom:1rem;">
+          <button type="button" class="auth-tab active" id="tab-auth-login" onclick="toggleAuthTab('login')"
+            style="flex:1; padding:0.6rem; border:none; background:none; font-weight:700; cursor:pointer;">เข้าสู่ระบบ</button>
+          <button type="button" class="auth-tab" id="tab-auth-register" onclick="toggleAuthTab('register')"
+            style="flex:1; padding:0.6rem; border:none; background:none; font-weight:700; cursor:pointer;">สมัครสมาชิก</button>
+        </div>
+
+        <form id="login-form">
+          <div class="form-group">
+            <label class="form-label" for="login-username">ชื่อผู้ใช้ (Username) หรือ อีเมล:</label>
+            <input type="text" id="login-username" class="form-control" placeholder="กรอกชื่อผู้ใช้หรืออีเมล" required>
+          </div>
+          <div class="form-group">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+              <label class="form-label" for="login-password" style="margin-bottom:0;">รหัสผ่าน (Password):</label>
+              <a href="#" onclick="showToast('หากลืมรหัสผ่าน กรุณาติดต่อผู้ดูแลระบบเพื่อรีเซ็ต', 'info'); return false;"
+                style="font-size:0.8rem; color:#64748b; text-decoration:none; border-bottom:1px dashed #94a3b8; padding-bottom:1px;">ลืมรหัสผ่าน</a>
+            </div>
+            <input type="password" id="login-password" class="form-control" placeholder="กรอกรหัสผ่าน" required>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1.5rem; gap:1rem;">
+            <div style="font-size:0.85rem; color:#64748b;">
+              ยังไม่มีบัญชี? <a href="#" onclick="toggleAuthTab('register'); return false;"
+                style="color:var(--primary); font-weight:600; text-decoration:none;">สมัครสมาชิก</a>
+            </div>
+            <button type="submit" class="btn btn-primary" style="padding:0.6rem 1.6rem;">เข้าสู่ระบบ</button>
+          </div>
+        </form>
+
+        <form id="register-form" style="display:none;">
+          <div class="form-group">
+            <label class="form-label" for="reg-username">ชื่อผู้ใช้ (Username) *</label>
+            <input type="text" id="reg-username" class="form-control" placeholder="กรอกชื่อผู้ใช้" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-email">อีเมล *</label>
+            <input type="email" id="reg-email" class="form-control" placeholder="example@email.com" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="reg-name">ชื่อ-นามสกุล *</label>
+              <input type="text" id="reg-name" class="form-control" placeholder="กรอกชื่อ-นามสกุล" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="reg-phone">เบอร์โทรศัพท์ *</label>
+              <input type="tel" id="reg-phone" class="form-control" placeholder="08x-xxx-xxxx" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-address">ที่อยู่ / หอพักจัดส่ง:</label>
+            <input type="text" id="reg-address" class="form-control" placeholder="เช่น หอพักใน มรพส. ตึก 1 ห้อง 305">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="reg-password">รหัสผ่าน *</label>
+              <input type="password" id="reg-password" class="form-control" placeholder="อย่างน้อย 6 ตัวอักษร"
+                minlength="6" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="reg-confirm-password">ยืนยันรหัสผ่าน *</label>
+              <input type="password" id="reg-confirm-password" class="form-control" placeholder="กรอกรหัสผ่านอีกครั้ง"
+                minlength="6" required>
+            </div>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1.5rem; gap:1rem;">
+            <div style="font-size:0.85rem; color:#64748b;">
+              มีบัญชีอยู่แล้ว? <a href="#" onclick="toggleAuthTab('login'); return false;"
+                style="color:var(--primary); font-weight:600; text-decoration:none;">เข้าสู่ระบบ</a>
+            </div>
+            <button type="submit" class="btn btn-success" style="padding:0.6rem 1.6rem;">สมัครสมาชิก</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       MODAL 3: PAYMENT MODAL
+  ======================================================== -->
+  <div class="modal-overlay" id="payment-modal">
+    <div class="modal-box" style="max-width: 440px;">
+      <div class="modal-header">
+        <h3 class="modal-title">📱 สแกนชำระเงิน PromptPay QR</h3>
+        <button class="modal-close" onclick="closePaymentModal()">&times;</button>
+      </div>
+      <div class="modal-body" style="text-align:center;">
+        <div
+          style="background:#f8fafc; border:1px dashed #cbd5e1; border-radius:var(--radius-md); padding:1.5rem; margin-bottom:1rem;">
+          <div style="font-weight:800; font-size:0.9rem; color:#0369a1; margin-bottom:0.5rem;">Thai QR Payment /
+            พร้อมเพย์</div>
+          <div
+            style="width:160px; height:160px; background:white; margin:0 auto 0.75rem; border:2px solid #0f172a; border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:center; font-size:4.5rem;">
+            🏁
+          </div>
+          <div style="font-size:0.8rem; color:var(--muted);">ยอดชำระสุทธิ:</div>
+          <div style="font-size:1.75rem; font-weight:900; color:var(--primary);" id="modal-pay-amount">฿0</div>
+        </div>
+        <button type="button" id="btn-confirm-pay" class="btn btn-primary btn-block" style="padding:0.8rem;">
+          ยืนยันการชำระเงิน
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Professional Footer -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <div class="logo-wrap">
+          <div class="logo-badge">🧺</div>
+          <div class="logo-text">Dek<span>Dry</span></div>
+        </div>
+        <p class="footer-brand-desc">
+          DekDry บริการซักอบรีดออนไลน์สำหรับชาว มรพส. พิบูลสงคราม รับ-ส่งผ้าถึงหอพัก สะอาด ปลอดภัย ด้วยมาตรฐานอบฆ่าเชื้อ
+        </p>
+      </div>
+
+      <div class="footer-col">
+        <h4>บริการของเรา</h4>
+        <ul>
+          <li><a href="#" onclick="openBookingModal(); return false;">ซัก อบ พับ (Wash & Fold)</a></li>
+          <li><a href="#" onclick="openBookingModal(); return false;">ซัก อบ รีด (Wash, Dry & Iron)</a></li>
+          <li><a href="#" onclick="openBookingModal(); return false;">ซักแห้งพรีเมียม (Dry Clean)</a></li>
+          <li><a href="#" onclick="openBookingModal(); return false;">ซักผ้านวม & เครื่องนอน</a></li>
+          <li><a href="#" onclick="openBookingModal(); return false;">สปารองเท้า & กระเป๋า</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>พื้นที่ให้บริการ</h4>
+        <ul>
+          <li><a href="#coverage">กรุงเทพมหานคร และปริมณฑล</a></li>
+          <li><a href="#coverage">เชียงใหม่ (นิมมาน / ตัวเมือง)</a></li>
+          <li><a href="#coverage">พัทยา & ชลบุรี (เร็วๆ นี้)</a></li>
+          <li><a href="#coverage">ภูเก็ต (เร็วๆ นี้)</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>ระบบการทำงาน</h4>
+        <ul>
+          <li><a href="#" onclick="switchAppView('rider'); return false;">พนักงานจัดส่ง (Rider)</a></li>
+          <li><a href="#" onclick="switchAppView('staff'); return false;">โรงงานซักรีด (Staff)</a></li>
+          <li><a href="#" onclick="switchAppView('admin'); return false;">ผู้จัดการร้าน (Admin)</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div>© 2026 DekDry Laundry Delivery System. All rights reserved. (PSRU Software Engineering Project)</div>
+      <div style="display:flex; gap:1.25rem;">
+        <a href="#" style="color:#64748b; text-decoration:none;">นโยบายความเป็นส่วนตัว</a>
+        <a href="#" style="color:#64748b; text-decoration:none;">เงื่อนไขการให้บริการ</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- JavaScript -->
+  <script src="js/app.js"></script>
+</body>
+
+</html>
