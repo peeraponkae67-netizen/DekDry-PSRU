@@ -81,8 +81,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   updateOrderFlowTotals();
 });
 
-// ฟังก์ชันสลับหน้า (Landing, Rider, Staff, Admin)
+// ฟังก์ชันสลับหน้า (Landing, Order, Pricing, Tracking, Rider, Staff, Admin)
 window.switchAppView = function (viewName) {
+  if ((viewName === 'order' || viewName === 'tracking') && !state.currentUser) {
+    window.pendingAppView = viewName;
+    showToast(`กรุณาเข้าสู่ระบบก่อน${viewName === 'order' ? 'สั่งจองบริการ' : 'ตรวจสอบสถานะผ้า'} 🔐`, 'info');
+    openAuthModal('login');
+    return;
+  }
+
   state.currentAppView = viewName;
 
   document.querySelectorAll('.role-pill-btn').forEach(b => {
@@ -95,7 +102,9 @@ window.switchAppView = function (viewName) {
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
-  if (viewName === 'rider') loadRiderView();
+  if (viewName === 'order') prefillCustomerForms();
+  else if (viewName === 'tracking') loadTrackingView();
+  else if (viewName === 'rider') loadRiderView();
   else if (viewName === 'staff') loadStaffView();
   else if (viewName === 'admin') loadAdminView();
 };
@@ -127,6 +136,13 @@ window.setPricingCity = function (campus) {
 
 // Navigate directly to 6-Step Order Flow and select plan
 window.goToOrderPage = function (planKey = 'standard') {
+  if (!state.currentUser) {
+    window.pendingOrderPlan = planKey;
+    window.pendingAppView = 'order';
+    showToast('กรุณาเข้าสู่ระบบก่อนสั่งจองบริการ 🔐', 'info');
+    openAuthModal('login');
+    return;
+  }
   switchAppView('order');
   if (typeof selectOrderPlan === 'function') {
     selectOrderPlan(planKey);
@@ -135,6 +151,13 @@ window.goToOrderPage = function (planKey = 'standard') {
 
 // Booking Modal
 window.openBookingModal = function (tier = null) {
+  if (!state.currentUser) {
+    window.pendingBookingModalTier = tier;
+    showToast('กรุณาเข้าสู่ระบบก่อนสั่งจองบริการ 🔐', 'info');
+    openAuthModal('login');
+    return;
+  }
+
   if (tier && state.services.length > 0) {
     state.cart = {};
     if (tier === 'economy') {
@@ -148,9 +171,32 @@ window.openBookingModal = function (tier = null) {
   }
 
   document.getElementById('booking-modal').classList.add('active');
+  prefillCustomerForms();
   renderServicesGrid();
   updateCartSummary();
 };
+
+// เติมข้อมูลลูกค้าอัตโนมัติเมื่อเข้าสู่ระบบ
+function prefillCustomerForms() {
+  if (!state.currentUser) return;
+  const u = state.currentUser;
+
+  const orderName = document.getElementById('order-cust-name');
+  const orderPhone = document.getElementById('order-cust-phone');
+  const orderEmail = document.getElementById('order-cust-email');
+  const orderAddr = document.getElementById('order-cust-address');
+  if (orderName && (!orderName.value || orderName.value === '')) orderName.value = u.name || '';
+  if (orderPhone && (!orderPhone.value || orderPhone.value === '')) orderPhone.value = u.phone || '';
+  if (orderEmail && (!orderEmail.value || orderEmail.value === '')) orderEmail.value = u.email || '';
+  if (orderAddr && (!orderAddr.value || orderAddr.value === '')) orderAddr.value = u.address || '';
+
+  const custName = document.getElementById('cust-name');
+  const custPhone = document.getElementById('cust-phone');
+  const custAddr = document.getElementById('cust-address');
+  if (custName && (!custName.value || custName.value === '')) custName.value = u.name || '';
+  if (custPhone && (!custPhone.value || custPhone.value === '')) custPhone.value = u.phone || '';
+  if (custAddr && (!custAddr.value || custAddr.value === '')) custAddr.value = u.address || '';
+}
 
 window.closeBookingModal = function () {
   document.getElementById('booking-modal').classList.remove('active');
@@ -344,7 +390,8 @@ function openPaymentModal(orderData) {
         closePaymentModal();
         closeBookingModal();
         showToast('🎉 สั่งซักผ้าสำเร็จ! ไรเดอร์กำลังเตรียมเข้ารับผ้า', 'success');
-        switchAppView('landing');
+        switchAppView('tracking');
+        loadTrackingView(res.data ? res.data.id : null);
       }
     } catch (err) {
       showToast('เกิดข้อผิดพลาดในการเชื่อมต่อ', 'error');
@@ -582,7 +629,8 @@ function setupOrderFlowForm() {
       const res = await API.createOrder(orderData);
       if (res.success) {
         showToast('🎉 บันทึกคำสั่งซื้อสำเร็จเรียบร้อย!', 'success');
-        switchAppView('landing');
+        switchAppView('tracking');
+        loadTrackingView(res.data ? res.data.id : null);
       } else {
         showToast(res.message || 'ไม่สามารถสร้างคำสั่งซื้อได้', 'error');
       }
@@ -680,6 +728,29 @@ window.logoutUser = function () {
   showToast('ออกจากระบบเรียบร้อย 👋');
 };
 
+function onAuthSuccess(user) {
+  state.currentUser = user;
+  localStorage.setItem('dekdry_user', JSON.stringify(state.currentUser));
+  renderAuthNavbar();
+  closeAuthModal();
+  prefillCustomerForms();
+
+  if (window.pendingOrderPlan) {
+    const plan = window.pendingOrderPlan;
+    window.pendingOrderPlan = null;
+    window.pendingAppView = null;
+    goToOrderPage(plan);
+  } else if (window.pendingBookingModalTier !== undefined && window.pendingBookingModalTier !== null) {
+    const tier = window.pendingBookingModalTier;
+    window.pendingBookingModalTier = null;
+    openBookingModal(tier);
+  } else if (window.pendingAppView) {
+    const next = window.pendingAppView;
+    window.pendingAppView = null;
+    switchAppView(next);
+  }
+}
+
 function setupAuthForms() {
   document.getElementById('login-form').onsubmit = async (e) => {
     e.preventDefault();
@@ -688,11 +759,8 @@ function setupAuthForms() {
       password: document.getElementById('login-password').value
     });
     if (res.success) {
-      state.currentUser = res.data.user;
-      localStorage.setItem('dekdry_user', JSON.stringify(state.currentUser));
-      renderAuthNavbar();
-      closeAuthModal();
-      showToast(`ยินดีต้อนรับคุณ ${state.currentUser.name} 🎉`);
+      showToast(`ยินดีต้อนรับคุณ ${res.data.user.name} 🎉`);
+      onAuthSuccess(res.data.user);
     } else {
       showToast(res.message, 'error');
     }
@@ -719,17 +787,306 @@ function setupAuthForms() {
     });
     if (res.success) {
       showToast(res.message, 'success');
-      state.currentUser = res.data;
-      localStorage.setItem('dekdry_user', JSON.stringify(state.currentUser));
-      renderAuthNavbar();
-      closeAuthModal();
+      onAuthSuccess(res.data);
     } else {
       showToast(res.message, 'error');
     }
   };
 }
 
+// ==========================================
+// Order Tracking View (เช็คสถานะผ้า & ขั้นตอนการทำงาน 7 ขั้น)
+// ==========================================
+const TRACKING_STEPS_FLOW = [
+  { key: 'ORDER_PLACED', stepNum: 1, title: 'รับคำสั่งซื้อ', icon: '📝', desc: 'ระบบบันทึกคำสั่งซื้อของคุณเรียบร้อยแล้ว' },
+  { key: 'RIDER_ASSIGNED', stepNum: 2, title: 'จัดสรรไรเดอร์', icon: '🛵', desc: 'ไรเดอร์ได้รับมอบหมายงานและกำลังเดินทางไปรับผ้า' },
+  { key: 'PICKED_UP', stepNum: 3, title: 'รับผ้าเข้าร้าน', icon: '🧺', desc: 'ไรเดอร์รับผ้าจากคุณเรียบร้อย กำลังนำส่งเข้าโรงซัก มรพส.' },
+  { key: 'IN_WASHING', stepNum: 4, title: 'กำลังซัก/อบ/รีด', icon: '🧼', desc: 'ผ้ากำลังอยู่ในกระบวนการซัก อบ และรีดตามโปรแกรมที่คุณเลือก' },
+  { key: 'WASHED_READY', stepNum: 5, title: 'ซักเสร็จพร้อมส่ง', icon: '✨', desc: 'ผ้าผ่านการซักรีดและตรวจสอบคุณภาพ (QC) พร้อมนำส่ง' },
+  { key: 'OUT_FOR_DELIVERY', stepNum: 6, title: 'กำลังนำส่ง', icon: '🚚', desc: 'ไรเดอร์กำลังนำส่งผ้าสะอาดกลับไปยังจุดนัดพบ/หอพัก' },
+  { key: 'DELIVERED', stepNum: 7, title: 'จัดส่งสำเร็จ', icon: '🎉', desc: 'ผ้าสะอาดส่งถึงมือคุณเรียบร้อยแล้ว ขอบคุณที่ใช้บริการ DekDry' }
+];
 
+async function loadTrackingView(targetOrderId = null) {
+  if (!state.currentUser) {
+    window.pendingAppView = 'tracking';
+    showToast('กรุณาเข้าสู่ระบบก่อนตรวจสอบสถานะผ้า 🔐', 'info');
+    openAuthModal('login');
+    return;
+  }
+
+  const searchInput = document.getElementById('tracking-search-input');
+  const quickContainer = document.getElementById('user-orders-quick-container');
+  const quickChips = document.getElementById('user-orders-chips');
+  const contentEl = document.getElementById('tracking-content');
+  if (!contentEl) return;
+
+  try {
+    const res = await API.getOrders();
+    if (!res.success) {
+      contentEl.innerHTML = '<div class="card" style="text-align:center; padding:2.5rem; color:#ef4444;">ไม่สามารถโหลดข้อมูลคำสั่งซื้อได้</div>';
+      return;
+    }
+
+    state.orders = res.data || [];
+
+    // Filter orders belonging to the logged-in user
+    const isSpecialRole = ['admin', 'rider', 'staff'].includes(state.currentUser.role);
+    const userOrders = isSpecialRole
+      ? state.orders
+      : state.orders.filter(o => 
+          o.userId === state.currentUser.id || 
+          (o.customer && (o.customer.phone === state.currentUser.phone || o.customer.name === state.currentUser.name))
+        );
+
+    let activeOrderId = targetOrderId;
+    if (!activeOrderId && searchInput && searchInput.value.trim()) {
+      activeOrderId = searchInput.value.trim().toUpperCase();
+    }
+    if (!activeOrderId && userOrders.length > 0) {
+      activeOrderId = userOrders[0].id;
+    }
+
+    // Render Quick Chips for user orders
+    if (quickContainer && quickChips) {
+      if (userOrders.length > 0) {
+        quickContainer.style.display = 'block';
+        quickChips.innerHTML = userOrders.map(o => {
+          const stLabel = STATUS_CONFIG[o.status] ? STATUS_CONFIG[o.status].label : o.status;
+          const isActive = activeOrderId === o.id;
+          return `
+            <button type="button" class="order-chip-btn ${isActive ? 'active' : ''}" onclick="selectTrackingOrder('${o.id}')">
+              <span>📦 <strong>${o.id}</strong></span>
+              <span style="font-size:0.75rem; opacity:0.85;">(${stLabel})</span>
+            </button>
+          `;
+        }).join('');
+      } else {
+        quickContainer.style.display = 'none';
+      }
+    }
+
+    if (activeOrderId) {
+      if (searchInput) searchInput.value = activeOrderId;
+      renderTrackingDetails(activeOrderId);
+    } else {
+      if (searchInput) searchInput.value = '';
+      contentEl.innerHTML = `
+        <div class="card" style="text-align:center; padding:3.5rem 1.5rem; background:white; border-radius:16px;">
+          <div style="font-size:3.5rem; margin-bottom:1rem;">🧺</div>
+          <h3 style="font-weight:800; font-size:1.3rem; color:#0f172a; margin-bottom:0.5rem;">ยังไม่มีประวัติคำสั่งซื้อของคุณ (${state.currentUser.name})</h3>
+          <p style="color:#64748b; font-size:0.95rem; margin-bottom:1.5rem;">สั่งบริการซักอบรีด DekDry ตอนนี้ เพื่อเริ่มติดตามสถานะผ้าแบบเรียลไทม์ได้ทันที</p>
+          <button class="btn btn-primary" onclick="switchAppView('order')">🚀 สั่งจองบริการซักผ้าตอนนี้ &rsaquo;</button>
+        </div>
+      `;
+    }
+  } catch (err) {
+    console.error('loadTrackingView error:', err);
+    if (contentEl) {
+      contentEl.innerHTML = '<div class="card" style="text-align:center; padding:2rem; color:#ef4444;">เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์</div>';
+    }
+  }
+}
+
+window.handleTrackingSearch = function (e) {
+  if (e) e.preventDefault();
+  const searchInput = document.getElementById('tracking-search-input');
+  if (!searchInput) return;
+  const orderId = searchInput.value.trim().toUpperCase();
+  if (!orderId) {
+    showToast('กรุณากรอกเลขออเดอร์คำสั่งซื้อ เช่น ORD-2026-001', 'error');
+    return;
+  }
+  selectTrackingOrder(orderId);
+};
+
+window.selectTrackingOrder = function (orderId) {
+  const searchInput = document.getElementById('tracking-search-input');
+  if (searchInput) searchInput.value = orderId;
+
+  document.querySelectorAll('.order-chip-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.innerText.includes(orderId));
+  });
+
+  renderTrackingDetails(orderId);
+};
+
+function renderTrackingDetails(orderId) {
+  const contentEl = document.getElementById('tracking-content');
+  if (!contentEl) return;
+
+  const order = state.orders.find(o => o.id.toUpperCase() === orderId.toUpperCase());
+  if (!order) {
+    contentEl.innerHTML = `
+      <div class="card" style="text-align:center; padding:3.5rem 1.5rem; background:white; border-radius:16px; border:1px dashed #cbd5e1;">
+        <div style="font-size:3rem; margin-bottom:0.75rem;">🔍</div>
+        <h3 style="font-weight:800; font-size:1.25rem; color:#0f172a; margin-bottom:0.5rem;">ไม่พบเลขออเดอร์ "${orderId}" ในระบบ</h3>
+        <p style="color:#64748b; font-size:0.92rem; max-width:500px; margin:0 auto 1.25rem auto;">
+          กรุณาตรวจสอบความถูกต้องของเลขออเดอร์คำสั่งซื้อ หรือเลือกจากรายการคำสั่งซื้อในบัญชีของคุณด้านบน
+        </p>
+      </div>
+    `;
+    return;
+  }
+
+  // Security Check: Customer can only check their own orders
+  const isSpecialRole = state.currentUser && ['admin', 'rider', 'staff'].includes(state.currentUser.role);
+  const isOwner = state.currentUser && (
+    order.userId === state.currentUser.id || 
+    (order.customer && (order.customer.phone === state.currentUser.phone || order.customer.name === state.currentUser.name))
+  );
+
+  if (!isSpecialRole && !isOwner) {
+    contentEl.innerHTML = `
+      <div class="card" style="text-align:center; padding:3.5rem 1.5rem; background:#fff1f2; border-radius:16px; border:1px solid #fecdd3;">
+        <div style="font-size:3rem; margin-bottom:0.75rem;">🔒</div>
+        <h3 style="font-weight:800; font-size:1.25rem; color:#e11d48; margin-bottom:0.5rem;">ไม่อนุญาตให้เข้าถึงออเดอร์ "${orderId}"</h3>
+        <p style="color:#475569; font-size:0.92rem; max-width:520px; margin:0 auto 1.25rem auto;">
+          เลขออเดอร์นี้ไม่ใช่คำสั่งซื้อในบัญชีของคุณ (${state.currentUser.name}) เพื่อความปลอดภัยและความเป็นส่วนตัวของลูกค้า กรุณาตรวจสอบเฉพาะออเดอร์ของตนเอง
+        </p>
+      </div>
+    `;
+    return;
+  }
+
+  const currentStatus = order.status;
+  const statusInfo = STATUS_CONFIG[currentStatus] || { label: currentStatus, icon: '📦', cls: '' };
+
+  // Step indices
+  const stepKeys = TRACKING_STEPS_FLOW.map(s => s.key);
+  const currentStepIndex = stepKeys.indexOf(currentStatus);
+  const effectiveIndex = currentStepIndex >= 0 ? currentStepIndex : 0;
+
+  const currentStepObj = TRACKING_STEPS_FLOW[effectiveIndex] || TRACKING_STEPS_FLOW[0];
+
+  const stepperHtml = TRACKING_STEPS_FLOW.map((step, idx) => {
+    let stateClass = 'upcoming';
+    let iconContent = step.icon;
+
+    if (idx < effectiveIndex) {
+      stateClass = 'completed';
+      iconContent = '✓';
+    } else if (idx === effectiveIndex) {
+      stateClass = 'active';
+    }
+
+    return `
+      <div class="tracking-step ${stateClass}">
+        <div class="step-icon-circle">${iconContent}</div>
+        <div class="step-title">${step.title}</div>
+      </div>
+    `;
+  }).join('');
+
+  const formattedDate = order.createdAt ? new Date(order.createdAt).toLocaleString('th-TH', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
+  const riderInfo = order.assignedRider || { name: 'กำลังรอการจัดสรรไรเดอร์', phone: '-', vehicle: '-' };
+  const itemsText = (order.items || []).map(i => `${i.serviceName || i.serviceId} x ${i.quantity}`).join(', ') || 'บริการซักอบรีดมาตรฐาน';
+
+  contentEl.innerHTML = `
+    <div class="tracking-card">
+      <!-- Header Banner -->
+      <div class="tracking-header-bar">
+        <div>
+          <div style="font-size:0.85rem; opacity:0.9; margin-bottom:0.25rem;">เลขออเดอร์คำสั่งซื้อ</div>
+          <div style="font-size:1.4rem; font-weight:800; letter-spacing:0.5px;">${order.id}</div>
+          <div style="font-size:0.8rem; opacity:0.85; margin-top:0.2rem;">สั่งเมื่อ: ${formattedDate}</div>
+        </div>
+        <div style="text-align:right;">
+          <span class="status-badge ${statusInfo.cls}" style="font-size:0.95rem; padding:0.45rem 1rem; border-radius:99px; background:white; color:#0369a1; font-weight:800; box-shadow:0 2px 5px rgba(0,0,0,0.15);">
+            ${statusInfo.icon} ${statusInfo.label}
+          </span>
+          <div style="font-size:0.85rem; margin-top:0.4rem; color:rgba(255,255,255,0.9);">
+            ยอดชำระ: <strong style="font-size:1.1rem; color:#fef08a;">฿${order.totalAmount || 0}</strong> (${order.paymentMethod === 'PROMPTPAY' ? 'พร้อมเพย์' : 'เงินสด'})
+          </div>
+        </div>
+      </div>
+
+      <!-- 7-Step Progress Stepper -->
+      <div class="tracking-stepper-wrapper">
+        <div style="text-align:center; margin-bottom:1.5rem;">
+          <div style="font-size:1.15rem; font-weight:800; color:#0f172a;">
+            ขั้นตอนปัจจุบัน: <span style="color:#0284c7;">${currentStepObj.title}</span> ${currentStepObj.icon}
+          </div>
+          <p style="font-size:0.9rem; color:#64748b; margin-top:0.35rem;">
+            ${currentStepObj.desc}
+          </p>
+        </div>
+
+        <div class="tracking-stepper">
+          ${stepperHtml}
+        </div>
+      </div>
+
+      <!-- Order & Delivery Information Grid -->
+      <div class="tracking-details-grid">
+        <!-- Customer & Location -->
+        <div class="tracking-info-card">
+          <h4>👤 ข้อมูลผู้สั่งและสถานที่รับ-ส่ง</h4>
+          <div class="tracking-info-row">
+            <span class="label">ชื่อลูกค้า:</span>
+            <span class="value">${order.customer.name || '-'}</span>
+          </div>
+          <div class="tracking-info-row">
+            <span class="label">เบอร์โทรศัพท์:</span>
+            <span class="value">📞 ${order.customer.phone || '-'}</span>
+          </div>
+          <div class="tracking-info-row">
+            <span class="label">สถานที่จัดส่ง:</span>
+            <span class="value" style="max-width:180px;">${order.customer.address || '-'}</span>
+          </div>
+          ${order.customer.note ? `
+          <div class="tracking-info-row">
+            <span class="label">หมายเหตุเพิ่มเติม:</span>
+            <span class="value" style="max-width:180px; color:#64748b;">${order.customer.note}</span>
+          </div>
+          ` : ''}
+        </div>
+
+        <!-- Rider Details -->
+        <div class="tracking-info-card">
+          <h4>🛵 ข้อมูลไรเดอร์ผู้ดูแลงาน</h4>
+          <div class="tracking-info-row">
+            <span class="label">ชื่อไรเดอร์:</span>
+            <span class="value">${riderInfo.name}</span>
+          </div>
+          <div class="tracking-info-row">
+            <span class="label">เบอร์ติดต่อ:</span>
+            <span class="value">${riderInfo.phone !== '-' ? '📞 ' + riderInfo.phone : 'รอจัดสรร'}</span>
+          </div>
+          <div class="tracking-info-row">
+            <span class="label">พาหนะ / โซน:</span>
+            <span class="value">${riderInfo.vehicle || 'มรพส. Delivery Rider'}</span>
+          </div>
+          <div class="tracking-info-row">
+            <span class="label">ความปลอดภัย:</span>
+            <span class="value" style="color:#10b981;">🛡️ ผ่านการยืนยันตัวตน</span>
+          </div>
+        </div>
+
+        <!-- Laundry Specs & Preferences -->
+        <div class="tracking-info-card">
+          <h4>🧼 ตัวเลือกและโปรแกรมการซัก</h4>
+          <div class="tracking-info-row">
+            <span class="label">รายการบริการ:</span>
+            <span class="value" style="max-width:180px;">${itemsText}</span>
+          </div>
+          <div class="tracking-info-row">
+            <span class="label">น้ำยาปรับผ้านุ่ม:</span>
+            <span class="value">${order.preferences?.softener || 'กลิ่นอ่อนโยน'}</span>
+          </div>
+          <div class="tracking-info-row">
+            <span class="label">การรีด / พับ:</span>
+            <span class="value">${order.preferences?.packaging || 'พับมาตรฐาน'}</span>
+          </div>
+          <div class="tracking-info-row">
+            <span class="label">อุณหภูมิน้ำ / อบผ้า:</span>
+            <span class="value">${order.preferences?.temperature || '30°C'} / ${order.preferences?.drying || 'เครื่องอบ'}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
 
 // ==========================================
 // Rider View

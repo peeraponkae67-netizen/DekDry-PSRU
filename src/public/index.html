@@ -35,6 +35,7 @@
         <nav>
           <ul class="nav-links">
             <li><a href="#" class="nav-link" onclick="switchAppView('pricing'); return false;">อัตราค่าบริการ</a></li>
+            <li><a href="#" class="nav-link" onclick="switchAppView('tracking'); return false;">เช็คสถานะผ้า</a></li>
             <li><a href="#faq" class="nav-link" onclick="switchAppView('landing')">ช่วยเหลือ</a></li>
           </ul>
         </nav>
@@ -929,6 +930,54 @@
   </section>
 
 
+
+  <!-- ========================================================
+       VIEW: ORDER STATUS TRACKING (ติดตามสถานะผ้า)
+  ======================================================== -->
+  <section id="app-view-tracking" class="app-view-panel">
+    <div style="max-width: 1050px; margin: 0 auto; padding: 2rem 1rem;">
+      <div style="text-align: center; margin-bottom: 2rem;">
+        <span class="badge" style="background:#e0f2fe; color:#0284c7; font-size:0.85rem; font-weight:700; padding:0.35rem 0.85rem; border-radius:99px; margin-bottom:0.75rem; display:inline-block;">
+          ✨ ระบบติดตามสถานะผ้าแบบเรียลไทม์ (Live Order Tracking)
+        </span>
+        <h1 style="font-size: 2rem; font-weight: 800; color: #0f172a; margin-bottom: 0.5rem;">
+          🧺 ตรวจสอบสถานะผ้า (ขั้นตอนการทำงาน)
+        </h1>
+        <p style="font-size: 0.95rem; color: #64748b;">
+          ติดตามขั้นตอนการซัก อบ รีด และการรับ-ส่งของไรเดอร์ใน มรพส. ได้ทุกขั้นตอนแบบเรียลไทม์
+        </p>
+      </div>
+
+      <!-- Order Search Input Card -->
+      <div class="card" style="margin-bottom: 2rem; background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+        <form id="tracking-search-form" onsubmit="handleTrackingSearch(event)">
+          <label style="display: block; font-size: 0.9rem; font-weight: 700; color: #334155; margin-bottom: 0.5rem;">
+            🔍 กรอกเลขออเดอร์คำสั่งซื้อของคุณ (Order ID) เพื่อตรวจสอบสถานะ:
+          </label>
+          <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <input type="text" id="tracking-search-input" class="form-control" placeholder="ตัวอย่าง: ORD-2026-001" style="flex: 1; min-width: 240px; padding: 0.75rem 1rem; border-radius: 8px; border: 1.5px solid #cbd5e1; font-weight: 700; font-size: 1rem; text-transform: uppercase;" required>
+            <button type="submit" class="btn btn-primary" style="padding: 0.75rem 1.5rem; font-weight: 700; font-size: 0.95rem;">
+              🔍 ตรวจสอบสถานะ
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="loadTrackingView()" title="รีเฟรชข้อมูล" style="padding: 0.75rem 1rem;">
+              🔄 รีเฟรช
+            </button>
+          </div>
+        </form>
+
+        <!-- User's Orders Quick Chips -->
+        <div id="user-orders-quick-container" style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px dashed #e2e8f0; display: none;">
+          <div style="font-size: 0.85rem; font-weight: 700; color: #475569; margin-bottom: 0.5rem;">
+            📋 รายการคำสั่งซื้อในบัญชีของคุณ (คลิกเพื่อดูสถานะ):
+          </div>
+          <div id="user-orders-chips" style="display: flex; gap: 0.5rem; flex-wrap: wrap;"></div>
+        </div>
+      </div>
+
+      <!-- Live Tracking Content Area -->
+      <div id="tracking-content"></div>
+    </div>
+  </section>
 
   <!-- VIEW: RIDER WORKFLOW -->
   <section id="app-view-rider" class="app-view-panel">

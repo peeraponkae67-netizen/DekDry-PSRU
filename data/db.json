@@ -197,6 +197,17 @@
       "address": "หอพักใน มรพส. ตึก 1",
       "role": "customer",
       "createdAt": "2026-10-01T13:37:31.769Z"
+    },
+    {
+      "id": 19,
+      "username": "user_1790866341222",
+      "email": "user_1790866341222@psru.ac.th",
+      "password": "$2b$10$96HAhmS4zf4/XrIA7LFEme2sBs4G5L22oFrguwNjukOjyXbtWHGFm",
+      "name": "นักศึกษา มรพส.",
+      "phone": "0812345678",
+      "address": "หอพักใน มรพส. ตึก 1",
+      "role": "customer",
+      "createdAt": "2026-10-01T14:52:21.296Z"
     }
   ],
   "services": [
@@ -268,6 +279,124 @@
     }
   ],
   "orders": [
+    {
+      "id": "ORD-2026-684",
+      "userId": 1,
+      "createdAt": "2026-10-01T14:43:20.803Z",
+      "customer": {
+        "name": "นายพีรพล แก้วพูลสุข (นศ. 65123456)",
+        "phone": "081-999-8877",
+        "email": "peerapol.k@psru.ac.th",
+        "address": "หอพักนักศึกษาหญิง อาคาร 2 ห้อง 314 มหาวิทยาลัยราชภัฏพิบูลสงคราม (ทะเลแก้ว)",
+        "note": "[วิทยาเขต: มรพส. ทะเลแก้ว] [จุดรับผ้า: 🏢 ใต้ตึกหอพักนักศึกษา (ป้อม รปภ. / โต๊ะนิติหอใน มรพส.)] "
+      },
+      "items": [
+        {
+          "serviceId": "srv_express",
+          "serviceName": "บริการด่วนพิเศษ 4-6 ชม. (Express Campus)",
+          "quantity": 1,
+          "unit": "กก.",
+          "pricePerUnit": 69,
+          "subtotal": 69
+        }
+      ],
+      "preferences": {
+        "detergent": "มาตรฐาน DekDry",
+        "softener": "กลิ่นอ่อนโยน",
+        "packaging": "พับผ้า",
+        "temperature": "น้ำเย็น — 30°C",
+        "drying": "เครื่องอบผ้า (อุณหภูมิต่ำ)",
+        "bedding": "ไม่มี"
+      },
+      "subtotal": 69,
+      "deliveryFee": 40,
+      "discount": 0,
+      "totalAmount": 109,
+      "paymentStatus": "PAID",
+      "paymentMethod": "PROMPTPAY",
+      "paymentTime": "2026-10-01T14:43:20.803Z",
+      "status": "RIDER_ASSIGNED",
+      "timeline": [
+        {
+          "status": "ORDER_PLACED",
+          "title": "สั่งออเดอร์สำเร็จ",
+          "description": "ระบบบันทึกรายการคำสั่งซื้อเรียบร้อยแล้ว",
+          "timestamp": "2026-10-01T14:43:20.803Z"
+        },
+        {
+          "status": "RIDER_ASSIGNED",
+          "title": "จัดสรรไรเดอร์รับส่งผ้า",
+          "description": "ไรเดอร์ นายวรเชษฐ์ ส่งตรงเวลา กำลังเตรียมตัวเข้ารับผ้า",
+          "timestamp": "2026-10-01T14:43:21.803Z"
+        }
+      ],
+      "assignedRider": {
+        "id": "RIDER-02",
+        "name": "นายวรเชษฐ์ ส่งตรงเวลา",
+        "phone": "084-555-6677",
+        "vehicle": "ยามาฮ่า แกรนด์ ฟีลาโน่ ทะเบียน 2ขค-4567"
+      },
+      "estimatedDelivery": "2026-10-01T20:43:20.803Z"
+    },
+    {
+      "id": "ORD-2026-289",
+      "userId": 1,
+      "createdAt": "2026-10-01T14:43:06.260Z",
+      "customer": {
+        "name": "นายพีรพล แก้วพูลสุข (นศ. 65123456)",
+        "phone": "081-999-8877",
+        "email": "peerapol.k@psru.ac.th",
+        "address": "หอพักนักศึกษาหญิง อาคาร 2 ห้อง 314 มหาวิทยาลัยราชภัฏพิบูลสงคราม (ทะเลแก้ว)",
+        "note": "[วิทยาเขต: มรพส. ทะเลแก้ว] [จุดรับผ้า: 🏢 ใต้ตึกหอพักนักศึกษา (ป้อม รปภ. / โต๊ะนิติหอใน มรพส.)] "
+      },
+      "items": [
+        {
+          "serviceId": "srv_standard",
+          "serviceName": "บริการซักอบรีด แบบมาตรฐาน (วันถัดไป) (มรพส. ทะเลแก้ว)",
+          "quantity": 1,
+          "unit": "ชิ้น",
+          "pricePerUnit": 49,
+          "subtotal": 49
+        }
+      ],
+      "preferences": {
+        "detergent": "มาตรฐาน DekDry",
+        "softener": "กลิ่นอ่อนโยน",
+        "packaging": "พับผ้า",
+        "temperature": "น้ำเย็น — 30°C",
+        "drying": "เครื่องอบผ้า (อุณหภูมิต่ำ)",
+        "bedding": "ไม่มี"
+      },
+      "subtotal": 49,
+      "deliveryFee": 40,
+      "discount": 0,
+      "totalAmount": 89,
+      "paymentStatus": "PAID",
+      "paymentMethod": "PROMPTPAY",
+      "paymentTime": "2026-10-01T14:43:06.260Z",
+      "status": "RIDER_ASSIGNED",
+      "timeline": [
+        {
+          "status": "ORDER_PLACED",
+          "title": "สั่งออเดอร์สำเร็จ",
+          "description": "ระบบบันทึกรายการคำสั่งซื้อเรียบร้อยแล้ว",
+          "timestamp": "2026-10-01T14:43:06.260Z"
+        },
+        {
+          "status": "RIDER_ASSIGNED",
+          "title": "จัดสรรไรเดอร์รับส่งผ้า",
+          "description": "ไรเดอร์ นายวรเชษฐ์ ส่งตรงเวลา กำลังเตรียมตัวเข้ารับผ้า",
+          "timestamp": "2026-10-01T14:43:07.260Z"
+        }
+      ],
+      "assignedRider": {
+        "id": "RIDER-02",
+        "name": "นายวรเชษฐ์ ส่งตรงเวลา",
+        "phone": "084-555-6677",
+        "vehicle": "ยามาฮ่า แกรนด์ ฟีลาโน่ ทะเบียน 2ขค-4567"
+      },
+      "estimatedDelivery": "2026-10-02T14:43:06.260Z"
+    },
     {
       "id": "ORD-2026-485",
       "userId": null,
