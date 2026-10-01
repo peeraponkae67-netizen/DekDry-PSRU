@@ -113,17 +113,33 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupBookingForm();
   setupOrderFlowForm();
   setupAuthForms();
+  if (typeof syncScheduleWithPlan === 'function') syncScheduleWithPlan(false);
   updateOrderFlowTotals();
   startLiveTrackingPoll();
 });
 
-// ฟังก์ชันสลับหน้า (Landing, Order, Pricing, Tracking, Profile, Rider, Staff, Admin)
+// ฟังก์ชันสลับหน้า (Landing, Order, Pricing, Privacy, Terms, Tracking, Profile, Rider, Staff, Admin)
 window.switchAppView = function (viewName) {
   if ((viewName === 'order' || viewName === 'tracking' || viewName === 'profile') && !state.currentUser) {
     window.pendingAppView = viewName;
     const actionText = viewName === 'order' ? 'สั่งจองบริการ' : (viewName === 'tracking' ? 'ตรวจสอบสถานะผ้า' : 'ดูข้อมูลบัญชีผู้ใช้งาน');
     showToast(`กรุณาเข้าสู่ระบบก่อน${actionText} 🔐`, 'info');
     openAuthModal('login');
+    return;
+  }
+
+  // ป้องกันความปลอดภัย: เฉพาะเจ้าหน้าที่ที่มีสิทธิ์เท่านั้นที่สามารถเปิดหน้าระบบงานหลังบ้านได้
+  const userRole = (state.currentUser?.role || '').toLowerCase();
+  if (viewName === 'rider' && (!state.currentUser || (userRole !== 'rider' && userRole !== 'admin'))) {
+    showToast('หน้านี้สงวนสิทธิ์เฉพาะพนักงานจัดส่ง (Rider) เท่านั้น 🛵', 'error');
+    return;
+  }
+  if (viewName === 'staff' && (!state.currentUser || (userRole !== 'staff' && userRole !== 'admin'))) {
+    showToast('หน้านี้สงวนสิทธิ์เฉพาะเจ้าหน้าที่ซักรีด (Staff) เท่านั้น 🧼', 'error');
+    return;
+  }
+  if (viewName === 'admin' && (!state.currentUser || userRole !== 'admin')) {
+    showToast('หน้านี้สงวนสิทธิ์เฉพาะผู้ดูแลระบบ (Admin) เท่านั้น 🛡️', 'error');
     return;
   }
 
@@ -139,8 +155,16 @@ window.switchAppView = function (viewName) {
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
-  if (viewName === 'order') prefillCustomerForms();
-  else if (viewName === 'tracking') loadTrackingView();
+  if (viewName === 'order') {
+    prefillCustomerForms();
+    if (typeof syncScheduleWithPlan === 'function') syncScheduleWithPlan(false);
+  }
+  else if (viewName === 'tracking') {
+    window.customerOrderTab = 'active';
+    const searchInput = document.getElementById('tracking-search-input');
+    if (searchInput) searchInput.value = '';
+    loadTrackingView();
+  }
   else if (viewName === 'profile') loadProfileView();
   else if (viewName === 'rider') loadRiderView();
   else if (viewName === 'staff') loadStaffView();
@@ -184,31 +208,60 @@ window.goToOrderPage = function (planKey = 'standard') {
   }
 };
 
-// Booking Modal
-window.openBookingModal = function (tier = null) {
-  if (!state.currentUser) {
-    window.pendingBookingModalTier = tier;
-    showToast('กรุณาเข้าสู่ระบบก่อนสั่งจองบริการ 🔐', 'info');
-    openAuthModal('login');
-    return;
-  }
+// Booking Modal -> Route to dedicated Order Flow Page
+window.openBookingModal = function (tier = 'standard') {
+  goToOrderPage(tier);
+};
 
-  if (tier && state.services.length > 0) {
-    state.cart = {};
-    if (tier === 'economy') {
-      state.cart['srv_wash_fold'] = 5;
-    } else if (tier === 'standard') {
-      state.cart['srv_wash_iron'] = 4;
-    } else if (tier === 'express') {
-      state.cart['srv_wash_fold'] = 5;
-      state.cart['srv_express'] = 1;
+window.closeBookingModal = function () {
+  const el = document.getElementById('booking-modal');
+  if (el) el.classList.remove('active');
+};
+
+// Terms of Service Modal Handlers
+window.openTermsModal = function () {
+  const el = document.getElementById('terms-modal');
+  if (el) el.classList.add('active');
+};
+
+window.closeTermsModal = function () {
+  const el = document.getElementById('terms-modal');
+  if (el) el.classList.remove('active');
+};
+
+window.acceptTermsAndCloseModal = function () {
+  const chk = document.getElementById('order-terms-checkbox');
+  if (chk) chk.checked = true;
+  closeTermsModal();
+  showToast('ข้าพเจ้ายอมรับเงื่อนไขการบริการ DekDry @ PSRU เรียบร้อย ✅', 'success');
+};
+
+// Footer Navigation & Actions
+window.goToSupportSection = function () {
+  switchAppView('landing');
+  setTimeout(() => {
+    const el = document.getElementById('faq');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-  }
+  }, 100);
+};
 
-  document.getElementById('booking-modal').classList.add('active');
-  prefillCustomerForms();
-  renderServicesGrid();
-  updateCartSummary();
+window.showLanguageNotice = function () {
+  showToast('ระบบนี้ยังไม่ได้ทำ', 'info');
+};
+
+window.goToCoverageSection = function (zone) {
+  switchAppView('landing');
+  setTimeout(() => {
+    const el = document.getElementById('coverage');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    if (zone) {
+      showToast(`📍 พื้นที่ให้บริการ: ${zone}`, 'info');
+    }
+  }, 100);
 };
 
 // เติมข้อมูลลูกค้าอัตโนมัติเมื่อเข้าสู่ระบบ (เชื่อมกับข้อมูลตอนสมัครสมาชิก)
@@ -224,18 +277,7 @@ function prefillCustomerForms() {
   if (orderPhone) orderPhone.value = u.phone || '';
   if (orderEmail) orderEmail.value = u.email || '';
   if (orderAddr) orderAddr.value = u.address || '';
-
-  const custName = document.getElementById('cust-name');
-  const custPhone = document.getElementById('cust-phone');
-  const custAddr = document.getElementById('cust-address');
-  if (custName) custName.value = u.name || '';
-  if (custPhone) custPhone.value = u.phone || '';
-  if (custAddr) custAddr.value = u.address || '';
 }
-
-window.closeBookingModal = function () {
-  document.getElementById('booking-modal').classList.remove('active');
-};
 
 // Load Initial Data
 async function loadInitialData() {
@@ -441,16 +483,76 @@ window.closePaymentModal = function () {
 
 // ========================================================
 // 6-Step PSRU Campus Laundry Order Flow Logic
+// (ตารางแพ็กเกจข้อ 1 และตารางเวลารับส่งข้อ 2 เชื่อมโยงกันแบบไดนามิก)
 // ========================================================
+const SCHEDULE_PLAN_CONFIG = {
+  economy: {
+    key: 'economy',
+    name: 'แบบประหยัด',
+    fullName: 'แบบประหยัด — 3 วัน (ชุดอยู่หอ/ทั่วไป)',
+    durationDays: 3,
+    durationText: '3 วัน',
+    icon: '🍃',
+    badgeText: '🍃 ส่งคืนหลังรับผ้า 3 วัน',
+    badgeBg: '#dcfce7',
+    badgeColor: '#15803d',
+    cardBorder: '#86efac',
+    cardBg: '#f0fdf4',
+    returnTag: '(3 วันตามแพ็กเกจประหยัด)'
+  },
+  standard: {
+    key: 'standard',
+    name: 'แบบมาตรฐาน',
+    fullName: 'แบบมาตรฐาน — วันถัดไป (ซัก-อบ-พับหอม)',
+    durationDays: 1,
+    durationText: 'วันถัดไป (24 ชม.)',
+    icon: '⭐',
+    badgeText: '⭐ ส่งคืนวันถัดไป (24 ชม.)',
+    badgeBg: '#fef3c7',
+    badgeColor: '#b45309',
+    cardBorder: '#fde047',
+    cardBg: '#fffbeb',
+    returnTag: '(วันถัดไป 24 ชม.)'
+  },
+  express: {
+    key: 'express',
+    name: 'แบบเร่งด่วน',
+    fullName: 'แบบเร่งด่วน — วันเดียวกัน (ทันใส่สอบ/กิจกรรม)',
+    durationDays: 0,
+    durationText: 'วันเดียวกัน (ด่วน 4-6 ชม.)',
+    icon: '⚡',
+    badgeText: '⚡ ส่งคืนวันเดียวกัน (ด่วน 4-6 ชม.)',
+    badgeBg: '#ffedd5',
+    badgeColor: '#c2410c',
+    cardBorder: '#fdba74',
+    cardBg: '#fff7ed',
+    returnTag: '(วันเดียวกัน ด่วน 4-6 ชม.)'
+  }
+};
+
+const AVAILABLE_DAYS = [
+  { dayIndex: 0, dayName: 'ศ.', dayFull: 'วันศุกร์', num: 2, month: 'ต.ค.', year: 2026 },
+  { dayIndex: 1, dayName: 'ส.', dayFull: 'วันเสาร์', num: 3, month: 'ต.ค.', year: 2026 },
+  { dayIndex: 2, dayName: 'อา.', dayFull: 'วันอาทิตย์', num: 4, month: 'ต.ค.', year: 2026 },
+  { dayIndex: 3, dayName: 'จ.', dayFull: 'วันจันทร์', num: 5, month: 'ต.ค.', year: 2026 },
+  { dayIndex: 4, dayName: 'อ.', dayFull: 'วันอังคาร', num: 6, month: 'ต.ค.', year: 2026 },
+  { dayIndex: 5, dayName: 'พ.', dayFull: 'วันพุธ', num: 7, month: 'ต.ค.', year: 2026 },
+  { dayIndex: 6, dayName: 'พฤ.', dayFull: 'วันพฤหัสบดี', num: 8, month: 'ต.ค.', year: 2026 },
+  { dayIndex: 7, dayName: 'ศ.', dayFull: 'วันศุกร์', num: 9, month: 'ต.ค.', year: 2026 }
+];
+
 const orderFlow = {
   region: 'psru_tk',
   plan: 'standard', // 'economy' | 'standard' | 'express'
   rates: {
     psru_tk: { economy: 35, standard: 49, express: 69 }
   },
+  pickupDayIndex: 0,
   pickupDate: 'ศ. 2 ต.ค.',
+  pickupDateFull: 'ศ. 2 ต.ค. 2026',
   pickupSlot: '10:00 — 12:00',
   returnDate: 'ส. 3 ต.ค.',
+  returnDateFull: 'ส. 3 ต.ค. 2026',
   returnSlot: '10:00 — 12:00',
   weight: 1,
   ironing: { label: 'พับผ้า', price: 0 },
@@ -466,7 +568,6 @@ window.setOrderRegion = function (region = 'psru_tk') {
   const tkBtn = document.getElementById('order-city-bkk');
   if (tkBtn) tkBtn.classList.add('active');
 
-  // Update rates display in plan cards
   const rates = orderFlow.rates.psru_tk;
   const ecoEl = document.querySelector('#plan-opt-economy .price-num');
   const stdEl = document.querySelector('#plan-opt-standard .price-num');
@@ -478,54 +579,264 @@ window.setOrderRegion = function (region = 'psru_tk') {
   updateOrderFlowTotals();
 };
 
+// เลือกแพ็กเกจในข้อ 1 -> อัปเดตตารางเวลาข้อ 2 ทันที
 window.selectOrderPlan = function (planKey) {
   orderFlow.plan = planKey;
   ['economy', 'standard', 'express'].forEach(k => {
     const card = document.getElementById(`plan-opt-${k}`);
     if (card) card.classList.toggle('selected', k === planKey);
   });
+
+  // ซิงค์ตารางเวลาในข้อ 2 ให้สอดคล้องกับแพ็กเกจที่เลือก
+  syncScheduleWithPlan(true);
+};
+
+// เลือกวันที่นัดรับผ้าในข้อ 2 -> คำนวณวันส่งคืนใหม่อัตโนมัติตามแพ็กเกจ
+window.selectPickupDayIndex = function (idx) {
+  orderFlow.pickupDayIndex = Number(idx);
+  document.querySelectorAll('#pickup-date-tabs .date-tab-btn').forEach((btn, i) => {
+    btn.classList.toggle('selected', i === Number(idx));
+  });
+
+  // คำนวณวันส่งคืนและอัปเดตสรุป
+  syncScheduleWithPlan(true);
+};
+
+// ฟังก์ชันรองรับการคลิกแบบเดิม (fallback)
+window.selectPickupDate = function (el) {
+  const tabs = Array.from(document.querySelectorAll('#pickup-date-tabs .date-tab-btn'));
+  const idx = tabs.indexOf(el);
+  if (idx !== -1) {
+    selectPickupDayIndex(idx);
+  } else {
+    const dayName = el.querySelector('.day-name')?.innerText || '';
+    const dayNum = el.querySelector('.day-num')?.innerText || '';
+    orderFlow.pickupDate = `${dayName} ${dayNum} ต.ค.`;
+    syncScheduleWithPlan(true);
+  }
+};
+
+// ฟังก์ชันหลัก: เชื่อมโยงแพ็กเกจบริการ (ข้อ 1) กับกำหนดเวลารับ-ส่งผ้า (ข้อ 2)
+window.syncScheduleWithPlan = function (shouldAnimate = false) {
+  const plan = orderFlow.plan || 'standard';
+  const planCfg = SCHEDULE_PLAN_CONFIG[plan] || SCHEDULE_PLAN_CONFIG.standard;
+  const pickupIdx = orderFlow.pickupDayIndex || 0;
+  const pickupDay = AVAILABLE_DAYS[pickupIdx] || AVAILABLE_DAYS[0];
+
+  // 1. คำนวณวันส่งคืนตามระยะเวลาของแพ็กเกจ
+  const returnIdx = pickupIdx + planCfg.durationDays;
+  const returnDay = AVAILABLE_DAYS[returnIdx] || {
+    dayIndex: returnIdx,
+    dayName: 'วันถัดไป',
+    dayFull: 'วันถัดไป',
+    num: pickupDay.num + planCfg.durationDays,
+    month: pickupDay.month,
+    year: pickupDay.year
+  };
+
+  orderFlow.pickupDate = `${pickupDay.dayName} ${pickupDay.num} ${pickupDay.month}`;
+  orderFlow.pickupDateFull = `${pickupDay.dayName} ${pickupDay.num} ${pickupDay.month} ${pickupDay.year}`;
+  orderFlow.returnDate = `${returnDay.dayName} ${returnDay.num} ${returnDay.month}`;
+  orderFlow.returnDateFull = `${returnDay.dayName} ${returnDay.num} ${returnDay.month} ${returnDay.year}`;
+
+  // 2. อัปเดตแถบ Sync Banner ด้านบนตารางเวลาข้อ 2
+  const banner = document.getElementById('schedule-sync-banner');
+  const bannerIcon = document.getElementById('sync-banner-icon');
+  const bannerTitle = document.getElementById('sync-banner-title');
+  const bannerBadge = document.getElementById('sync-banner-badge');
+
+  if (banner) {
+    banner.style.background = planCfg.cardBg;
+    banner.style.borderColor = planCfg.cardBorder;
+  }
+  if (bannerIcon) bannerIcon.innerText = planCfg.icon;
+  if (bannerTitle) bannerTitle.innerText = planCfg.fullName;
+  if (bannerBadge) {
+    bannerBadge.innerText = planCfg.badgeText;
+    bannerBadge.style.background = planCfg.badgeBg;
+    bannerBadge.style.color = planCfg.badgeColor;
+  }
+
+  // 3. อัปเดตหัวข้อวันนัดรับผ้า (Pickup Header)
+  const pickupHeader = document.getElementById('pickup-date-header');
+  if (pickupHeader) {
+    let dayWord = 'today';
+    if (pickupIdx === 0) {
+      dayWord = 'today';
+    } else if (pickupIdx === 1) {
+      dayWord = 'tomorrow';
+    } else {
+      dayWord = 'on';
+    }
+    pickupHeader.innerHTML = `📅 Collection ${dayWord} (${orderFlow.pickupDateFull})`;
+  }
+
+  // 4. อัปเดตกล่องกำหนดส่งคืนผ้า (Return Schedule Block)
+  const returnBlock = document.getElementById('return-schedule-block');
+  const returnHeader = document.getElementById('return-date-header');
+  const durationBadge = document.getElementById('return-plan-duration-badge');
+
+  if (returnBlock) {
+    returnBlock.style.background = planCfg.cardBg;
+    returnBlock.style.borderColor = planCfg.cardBorder;
+    if (shouldAnimate) {
+      returnBlock.style.transform = 'scale(1.015)';
+      returnBlock.style.boxShadow = '0 6px 16px rgba(2, 132, 199, 0.18)';
+      setTimeout(() => {
+        returnBlock.style.transform = 'scale(1)';
+        returnBlock.style.boxShadow = 'none';
+      }, 350);
+    }
+  }
+
+  if (returnHeader) {
+    if (plan === 'express') {
+      returnHeader.innerHTML = `⚡ Return on ${orderFlow.returnDateFull} <span style="color:#c2410c; font-size:0.85rem; font-weight:700;">(วันเดียวกัน ด่วน 4-6 ชม.)</span>`;
+    } else if (plan === 'economy') {
+      returnHeader.innerHTML = `🚚 Return on ${orderFlow.returnDateFull} <span style="color:#15803d; font-size:0.85rem; font-weight:700;">(3 วันตามแพ็กเกจประหยัด)</span>`;
+    } else {
+      returnHeader.innerHTML = `🚚 Return on ${orderFlow.returnDateFull} <span style="color:#0284c7; font-size:0.85rem; font-weight:700;">(วันถัดไป 24 ชม.)</span>`;
+    }
+  }
+
+  if (durationBadge) {
+    durationBadge.innerText = `ระยะเวลา: ${planCfg.durationText}`;
+    durationBadge.style.background = planCfg.badgeBg;
+    durationBadge.style.color = planCfg.badgeColor;
+  }
+
+  // 5. ปรับรอบเวลาส่งคืนผ้าให้สอดคล้องกับแพ็กเกจ (โดยเฉพาะแบบเร่งด่วนที่ส่งวันเดียวกัน)
+  renderReturnTimeSlots(plan);
+
+  // 6. อัปเดตยอดรวมและกล่องสรุปคำสั่งซื้อ
   updateOrderFlowTotals();
 };
 
-window.selectPickupDate = function (el) {
-  document.querySelectorAll('.date-tab-btn').forEach(btn => btn.classList.remove('selected'));
-  el.classList.add('selected');
-  const dayName = el.querySelector('.day-name')?.innerText || '';
-  const dayNum = el.querySelector('.day-num')?.innerText || '';
-  orderFlow.pickupDate = `${dayName} ${dayNum} ต.ค.`;
-  updateOrderFlowTotals();
+// เรนเดอร์รอบเวลาส่งคืนผ้าตามเงื่อนไขของแพ็กเกจ
+window.renderReturnTimeSlots = function (plan) {
+  const container = document.getElementById('return-time-slots-container');
+  if (!container) return;
+
+  let slots = [];
+  const currentPickup = orderFlow.pickupSlot || '10:00 — 12:00';
+
+  if (plan === 'express') {
+    // แพ็กเกจด่วนวันเดียวกัน: รอบส่งคืนจะสัมพันธ์กับรอบรับผ้า (หลังรับ 4-6 ชม.)
+    if (currentPickup.includes('10:00')) {
+      slots = [
+        { time: '16:00 — 18:00', badge: '⚡ ด่วน 4-6 ชม. ทันใจ' },
+        { time: '18:00 — 20:00', badge: 'รอบค่ำ' }
+      ];
+    } else if (currentPickup.includes('12:00')) {
+      slots = [
+        { time: '17:00 — 19:00', badge: '⚡ ด่วน 4-6 ชม. ทันใจ' },
+        { time: '19:00 — 21:00', badge: 'รอบค่ำ' }
+      ];
+    } else if (currentPickup.includes('14:00')) {
+      slots = [
+        { time: '19:00 — 21:00', badge: '⚡ ด่วนรอบค่ำ' },
+        { time: '21:00 — 22:30', badge: 'รอบดึก' }
+      ];
+    } else {
+      slots = [
+        { time: '21:30 — 22:30', badge: '⚡ ด่วนรอบดึก คืนนี้' },
+        { time: '08:00 — 10:00', badge: 'เช้าตรู่วันรุ่งขึ้น' }
+      ];
+    }
+  } else {
+    // แพ็กเกจมาตรฐาน และ ประหยัด: รอบส่งคืนมีครบทุกช่วงเวลา
+    slots = [
+      { time: '10:00 — 12:00', badge: 'รอบเช้า' },
+      { time: '14:00 — 16:00', badge: 'รอบบ่าย' },
+      { time: '16:00 — 18:00', badge: 'รอบเย็น' }
+    ];
+  }
+
+  // เลือกรอบเวลาเริ่มต้นหากยังไม่มีการเลือก
+  if (!slots.some(s => s.time === orderFlow.returnSlot)) {
+    orderFlow.returnSlot = slots[0].time;
+  }
+
+  container.innerHTML = slots.map((s, idx) => {
+    const isSel = (s.time === orderFlow.returnSlot) || (!orderFlow.returnSlot && idx === 0);
+    return `
+      <div class="time-slot-option ${isSel ? 'selected' : ''}" data-slot-type="return" onclick="selectTimeSlot(this, 'return')">
+        <span>🕒 ${s.time}</span>
+        <div style="display:flex; align-items:center; gap:0.4rem;">
+          ${s.badge ? `<span style="font-size:0.75rem; color:#64748b;">${s.badge}</span>` : ''}
+          <span class="slot-check-icon">✓</span>
+        </div>
+      </div>
+    `;
+  }).join('');
 };
 
 window.selectTimeSlot = function (el, type) {
-  const container = el.parentElement;
-  if (!container) return;
-
-  // Deselect siblings of same group
-  const selector = type === 'pickup' ? '.time-slot-option:not([data-return])' : '.time-slot-option[data-return]';
-  el.closest('.step-section-card').querySelectorAll('.time-slot-option').forEach(slot => {
-    // Check if this slot belongs to pickup or return
-    if (type === 'pickup' && slot.onclick && slot.onclick.toString().includes("'pickup'")) {
-      slot.classList.remove('selected');
-      const check = slot.querySelector('span:last-child');
-      if (check && check.innerText === '✓') check.innerText = '';
-    } else if (type === 'return' && slot.onclick && slot.onclick.toString().includes("'return'")) {
-      slot.classList.remove('selected');
-      const check = slot.querySelector('span:last-child');
-      if (check && check.innerText === '✓') check.innerText = '';
+  if (type === 'pickup') {
+    const pickupSlots = document.querySelectorAll('#step-schedule-card .time-slot-option[data-slot-type="pickup"], #pickup-slots-morning .time-slot-option, #pickup-slots-afternoon .time-slot-option');
+    pickupSlots.forEach(slot => slot.classList.remove('selected'));
+  } else if (type === 'return') {
+    const returnSlots = document.querySelectorAll('#return-time-slots-container .time-slot-option, #step-schedule-card .time-slot-option[data-slot-type="return"]');
+    returnSlots.forEach(slot => slot.classList.remove('selected'));
+  } else {
+    const container = el.parentElement;
+    if (container) {
+      container.querySelectorAll('.time-slot-option').forEach(slot => slot.classList.remove('selected'));
     }
-  });
-
-  el.classList.add('selected');
-  const checkSpan = el.querySelector('span:last-child');
-  if (checkSpan && !checkSpan.innerText.includes('bonus')) {
-    checkSpan.innerText = '✓';
-    checkSpan.style.color = '#0284c7';
-    checkSpan.style.fontWeight = '800';
   }
 
-  const timeText = el.querySelector('span:first-child')?.innerText || '';
-  if (type === 'pickup') orderFlow.pickupSlot = timeText;
-  else orderFlow.returnSlot = timeText;
+  el.classList.add('selected');
+
+  const rawText = el.querySelector('span:first-child')?.innerText || '';
+  const timeText = rawText.replace('🕒', '').trim();
+
+  if (type === 'pickup') {
+    orderFlow.pickupSlot = timeText;
+    // หากเลือกแบบเร่งด่วน การเปลี่ยนเวลารับจะกระทบกับเวลาส่งคืนที่พร้อมส่ง
+    if (orderFlow.plan === 'express') {
+      renderReturnTimeSlots('express');
+    }
+  } else {
+    orderFlow.returnSlot = timeText;
+  }
+
+  updateOrderFlowTotals();
+};
+
+window.changeOrderWeight = function (delta) {
+  const input = document.getElementById('order-weight-input');
+  if (!input) return;
+  let val = Math.max(1, Math.min(100, (parseInt(input.value, 10) || 1) + delta));
+  input.value = val;
+  updateOrderFlowTotals();
+};
+
+window.setOrderWeight = function (val) {
+  const input = document.getElementById('order-weight-input');
+  if (!input) return;
+  input.value = val;
+  updateOrderFlowTotals();
+};
+
+window.toggleBeddingCheckbox = function (e) {
+  if (e.target && (e.target.tagName.toLowerCase() === 'input' || e.target.type === 'checkbox')) return;
+  const chk = document.getElementById('chk-bedding');
+  if (chk) {
+    chk.checked = !chk.checked;
+    updateOrderFlowTotals();
+  }
+};
+
+window.appendWashNote = function (text) {
+  const textarea = document.getElementById('order-washing-note');
+  if (!textarea) return;
+  const current = textarea.value.trim();
+  if (!current) {
+    textarea.value = text;
+  } else if (!current.includes(text)) {
+    textarea.value = `${current}, ${text}`;
+  }
+  textarea.focus();
 };
 
 window.selectPrefPill = function (el, category) {
@@ -535,27 +846,23 @@ window.selectPrefPill = function (el, category) {
   }
   el.classList.add('selected');
 
-  const text = el.querySelector('span:first-child')?.innerText || '';
-  const priceText = el.querySelector('span:last-child')?.innerText || '';
+  const titleEl = el.querySelector('.pref-pill-title') || el.querySelector('span:first-child');
+  const badgeEl = el.querySelector('.pref-pill-badge') || el.querySelector('span:last-child');
+
+  const text = titleEl ? titleEl.innerText.trim() : '';
+  const priceText = badgeEl ? badgeEl.innerText.trim() : '';
+
+  const priceMatch = priceText.match(/\+(\d+)/);
+  const extra = priceMatch ? parseInt(priceMatch[1], 10) : 0;
 
   if (category === 'iron') {
-    let extra = 0;
-    if (priceText.includes('39')) extra = 39;
-    if (priceText.includes('49')) extra = 49;
     orderFlow.ironing = { label: text, price: extra };
   } else if (category === 'softener') {
-    let extraPerKg = 0;
-    if (priceText.includes('15')) extraPerKg = 15;
-    orderFlow.softener = { label: text, pricePerKg: extraPerKg };
+    orderFlow.softener = { label: text, pricePerKg: extra };
   } else if (category === 'temp') {
-    let extraPerKg = 0;
-    if (priceText.includes('10')) extraPerKg = 10;
-    if (priceText.includes('20')) extraPerKg = 20;
-    orderFlow.temp = { label: text, pricePerKg: extraPerKg };
+    orderFlow.temp = { label: text, pricePerKg: extra };
   } else if (category === 'dry') {
-    let extraPerKg = 0;
-    if (priceText.includes('20')) extraPerKg = 20;
-    orderFlow.drying = { label: text, pricePerKg: extraPerKg };
+    orderFlow.drying = { label: text, pricePerKg: extra };
   }
 
   updateOrderFlowTotals();
@@ -566,25 +873,36 @@ window.updateOrderFlowTotals = function () {
   const weight = Math.max(1, Number(weightInput ? weightInput.value : 1) || 1);
   orderFlow.weight = weight;
 
-  const rates = orderFlow.rates[orderFlow.region] || orderFlow.rates.bkk;
+  const rates = orderFlow.rates.psru_tk;
   const baseRate = rates[orderFlow.plan] || rates.standard;
 
   const extraPerKg = (orderFlow.softener.pricePerKg || 0) +
     (orderFlow.temp.pricePerKg || 0) +
     (orderFlow.drying.pricePerKg || 0);
 
-  const rawServicePrice = (baseRate + extraPerKg) * weight + (orderFlow.ironing.price || 0);
+  const beddingChecked = document.getElementById('chk-bedding')?.checked || false;
+  const beddingExtra = beddingChecked ? 80 : 0;
+
+  const rawServicePrice = (baseRate + extraPerKg) * weight + (orderFlow.ironing.price || 0) + beddingExtra;
   const totalAmount = Math.max(orderFlow.minCharge, rawServicePrice);
 
+  const planNames = {
+    economy: 'แบบประหยัด (3 วัน)',
+    standard: 'แบบมาตรฐาน (วันถัดไป)',
+    express: 'แบบเร่งด่วน (วันเดียวกัน 4-6 ชม.)'
+  };
+
   // Update Summary DOM
+  const planEl = document.getElementById('summary-flow-plan');
   const pickupEl = document.getElementById('summary-flow-pickup');
   const returnEl = document.getElementById('summary-flow-return');
   const weightEl = document.getElementById('summary-flow-weight');
   const priceEl = document.getElementById('summary-flow-service-price');
   const totalEl = document.getElementById('summary-flow-total');
 
-  if (pickupEl) pickupEl.innerText = `พรุ่งนี้ · ${orderFlow.pickupDate}`;
-  if (returnEl) returnEl.innerText = `${orderFlow.returnDate}`;
+  if (planEl) planEl.innerText = planNames[orderFlow.plan] || 'แบบมาตรฐาน (วันถัดไป)';
+  if (pickupEl) pickupEl.innerText = `${orderFlow.pickupDate} (${orderFlow.pickupSlot})`;
+  if (returnEl) returnEl.innerText = `${orderFlow.returnDate} (${orderFlow.returnSlot})`;
   if (weightEl) weightEl.innerText = `${weight} กก.`;
   if (priceEl) priceEl.innerText = `${rawServicePrice.toLocaleString()} บาท`;
   if (totalEl) totalEl.innerText = `${totalAmount.toLocaleString()} บาท`;
@@ -601,24 +919,27 @@ function setupOrderFlowForm() {
     const phone = document.getElementById('order-cust-phone').value.trim();
     const email = document.getElementById('order-cust-email').value.trim();
     const address = document.getElementById('order-cust-address').value.trim();
-    const note = document.getElementById('order-cust-note').value.trim();
+    const riderNote = document.getElementById('order-cust-note')?.value.trim() || '';
+    const washNote = document.getElementById('order-washing-note')?.value.trim() || '';
 
     const paymentMethodEl = document.querySelector('input[name="order-payment-method"]:checked');
     const paymentMethod = paymentMethodEl ? paymentMethodEl.value : 'PROMPTPAY';
-
-    const handoverEl = document.querySelector('input[name="pickup-handover"]:checked');
-    const handoverText = handoverEl ? handoverEl.parentElement.innerText.trim() : 'รับโดยตรงกับลูกค้า';
 
     const beddingChecked = document.getElementById('chk-bedding')?.checked || false;
 
     const rates = orderFlow.rates[orderFlow.region] || orderFlow.rates.psru_tk;
     const baseRate = rates[orderFlow.plan] || rates.standard;
     const planNames = {
-      economy: 'แบบประหยัด (2 วัน)',
+      economy: 'แบบประหยัด (3 วัน)',
       standard: 'แบบมาตรฐาน (วันถัดไป)',
       express: 'แบบเร่งด่วน (ด่วน 4-6 ชม.)'
     };
     const campusLabel = 'มรพส. ทะเลแก้ว';
+
+    let noteParts = [];
+    if (riderNote) noteParts.push(`🛵 ส่งถึง: ${riderNote}`);
+    if (washNote) noteParts.push(`🧺 ถึงร้าน: ${washNote}`);
+    const finalCustomerNote = noteParts.join(' | ');
 
     const orderData = {
       userId: state.currentUser ? state.currentUser.id : null,
@@ -627,7 +948,7 @@ function setupOrderFlowForm() {
         phone,
         email,
         address,
-        note: `[วิทยาเขต: ${campusLabel}] [จุดรับผ้า: ${handoverText}] ${note ? ' | ' + note : ''}`
+        note: `[วิทยาเขต: ${campusLabel}] ${finalCustomerNote ? '| ' + finalCustomerNote : ''}`.trim()
       },
       items: [
         {
@@ -643,7 +964,8 @@ function setupOrderFlowForm() {
         packaging: orderFlow.ironing.label,
         temperature: orderFlow.temp.label,
         drying: orderFlow.drying.label,
-        bedding: beddingChecked ? 'มีผ้านวม/เครื่องนอน' : 'ไม่มี'
+        bedding: beddingChecked ? 'มีผ้านวม/เครื่องนอน (+฿80)' : 'ไม่มี',
+        specialNote: washNote
       },
       pickupSchedule: `${orderFlow.pickupDate} (${orderFlow.pickupSlot})`,
       returnSchedule: `${orderFlow.returnDate} (${orderFlow.returnSlot})`,
@@ -695,15 +1017,16 @@ function renderAuthNavbar() {
   if (!container) return;
 
   if (state.currentUser) {
+    const role = (state.currentUser.role || '').toLowerCase();
     let roleLabel = 'ลูกค้า';
     let portalItem = '';
-    if (state.currentUser.role === 'rider') {
+    if (role === 'rider') {
       roleLabel = 'พนักงานจัดส่ง (Rider)';
       portalItem = `<button class="account-menu-item" onclick="switchAppView('rider')">🛵 งานไรเดอร์</button>`;
-    } else if (state.currentUser.role === 'staff') {
+    } else if (role === 'staff') {
       roleLabel = 'โรงงานซักรีด (Staff)';
       portalItem = `<button class="account-menu-item" onclick="switchAppView('staff')">🧼 งานซักรีด</button>`;
-    } else if (state.currentUser.role === 'admin') {
+    } else if (role === 'admin') {
       roleLabel = 'ผู้ดูแลระบบ (Admin)';
       portalItem = `<button class="account-menu-item" onclick="switchAppView('admin')">📊 แดชบอร์ดร้าน</button>`;
     }
@@ -878,20 +1201,17 @@ async function loadTrackingView(targetOrderId = null) {
 
     state.orders = res.data || [];
 
-    // Filter orders belonging to the logged-in user
-    const isSpecialRole = ['admin', 'rider', 'staff'].includes(state.currentUser.role);
+    // Filter orders belonging strictly to the logged-in user
     const cleanUserPhone = (state.currentUser.phone || '').replace(/\D/g, '');
-    const userOrders = isSpecialRole
-      ? state.orders
-      : state.orders.filter(o => {
-          if (o.userId && String(o.userId) === String(state.currentUser.id)) return true;
-          if (o.customer) {
-            const cleanCustPhone = (o.customer.phone || '').replace(/\D/g, '');
-            if (cleanUserPhone && cleanCustPhone && cleanCustPhone === cleanUserPhone) return true;
-            if (o.customer.name && state.currentUser.name && o.customer.name.trim() === state.currentUser.name.trim()) return true;
-          }
-          return false;
-        });
+    const userOrders = state.orders.filter(o => {
+      if (o.userId && String(o.userId) === String(state.currentUser.id)) return true;
+      if (o.customer) {
+        const cleanCustPhone = (o.customer.phone || '').replace(/\D/g, '');
+        if (cleanUserPhone && cleanCustPhone && cleanCustPhone === cleanUserPhone) return true;
+        if (o.customer.name && state.currentUser.name && o.customer.name.trim() === state.currentUser.name.trim()) return true;
+      }
+      return false;
+    });
 
     // Split orders into Active and History (Completed / Cancelled)
     const activeOrders = userOrders.filter(o => o.status !== 'COMPLETED' && o.status !== 'CANCELLED');
@@ -906,11 +1226,9 @@ async function loadTrackingView(targetOrderId = null) {
     // If targetOrderId is explicitly passed, determine which tab it belongs to
     if (targetOrderId) {
       const isTargetInHistory = historyOrders.some(o => o.id === targetOrderId);
-      if (isTargetInHistory) {
-        window.customerOrderTab = 'history';
-      } else {
-        window.customerOrderTab = 'active';
-      }
+      window.customerOrderTab = isTargetInHistory ? 'history' : 'active';
+    } else if (!window.customerOrderTab) {
+      window.customerOrderTab = 'active';
     }
 
     // Update Tab Button Styles
@@ -932,11 +1250,22 @@ async function loadTrackingView(targetOrderId = null) {
     if (!activeOrderId && searchInput && searchInput.value.trim()) {
       activeOrderId = searchInput.value.trim().toUpperCase();
     }
-    if (!activeOrderId && currentTabOrders.length > 0) {
-      activeOrderId = currentTabOrders[0].id;
-    } else if (!activeOrderId && userOrders.length > 0) {
-      // If selected tab is empty but user has orders in other tab
-      activeOrderId = userOrders[0].id;
+
+    // Only pick an active order if there is one currently in progress; NEVER fallback to old history orders
+    if (!activeOrderId) {
+      if (window.customerOrderTab === 'active') {
+        if (activeOrders.length > 0) {
+          activeOrderId = activeOrders[0].id;
+        } else {
+          activeOrderId = null;
+        }
+      } else if (window.customerOrderTab === 'history') {
+        if (historyOrders.length > 0) {
+          activeOrderId = historyOrders[0].id;
+        } else {
+          activeOrderId = null;
+        }
+      }
     }
 
     // Render Quick Chips for user orders according to selected tab
@@ -957,7 +1286,7 @@ async function loadTrackingView(targetOrderId = null) {
         if (window.customerOrderTab === 'active') {
           quickChips.innerHTML = `
             <div style="font-size:0.88rem; color:#64748b; padding:0.4rem 0;">
-              ✨ ไม่มีรายการที่กำลังดำเนินการอยู่ ${historyOrders.length > 0 ? `(มีประวัติงานที่สำเร็จแล้ว ${historyOrders.length} รายการ)` : ''}
+              ✨ ไม่มีรายการที่กำลังดำเนินการอยู่ ${historyOrders.length > 0 ? `(มีประวัติงานเดิมที่เสร็จสิ้น ${historyOrders.length} รายการ)` : ''}
             </div>
           `;
         } else {
@@ -975,14 +1304,31 @@ async function loadTrackingView(targetOrderId = null) {
       renderTrackingDetails(activeOrderId);
     } else {
       if (searchInput) searchInput.value = '';
-      contentEl.innerHTML = `
-        <div class="card" style="text-align:center; padding:3.5rem 1.5rem; background:white; border-radius:16px;">
-          <div style="font-size:3.5rem; margin-bottom:1rem;">🧺</div>
-          <h3 style="font-weight:800; font-size:1.3rem; color:#0f172a; margin-bottom:0.5rem;">ยังไม่มีรายการคำสั่งซื้อของคุณ (${state.currentUser.name})</h3>
-          <p style="color:#64748b; font-size:0.95rem; margin-bottom:1.5rem;">สั่งบริการซักอบรีด DekDry ตอนนี้ เพื่อเริ่มติดตามสถานะผ้าแบบเรียลไทม์ได้ทันที</p>
-          <button class="btn btn-primary" onclick="switchAppView('order')">🚀 สั่งจองบริการซักผ้าตอนนี้ &rsaquo;</button>
-        </div>
-      `;
+      if (window.customerOrderTab === 'active') {
+        contentEl.innerHTML = `
+          <div class="card" style="text-align:center; padding:3.5rem 1.5rem; background:white; border-radius:16px; border:1px solid #e2e8f0; box-shadow:0 4px 15px rgba(0,0,0,0.03);">
+            <div style="font-size:3.5rem; margin-bottom:1rem;">🧺</div>
+            <h3 style="font-weight:800; font-size:1.3rem; color:#0f172a; margin-bottom:0.5rem;">ไม่มีคำสั่งซื้อที่อยู่ระหว่างดำเนินการ</h3>
+            <p style="color:#64748b; font-size:0.95rem; margin-bottom:1.5rem;">คุณ (${state.currentUser.name || state.currentUser.username}) ยังไม่มีรายการผ้าที่กำลังซักหรือจัดส่งในขณะนี้ สามารถส่งผ้าซักกับ DekDry ได้ทันที</p>
+            <button class="btn btn-primary" onclick="goToOrderPage('standard')">🚀 สั่งจองบริการซักผ้าตอนนี้ &rsaquo;</button>
+            ${historyOrders.length > 0 ? `
+              <div style="margin-top:2rem; padding-top:1.25rem; border-top:1px dashed #cbd5e1;">
+                <div style="font-size:0.85rem; color:#64748b; margin-bottom:0.6rem;">📜 คุณมีประวัติคำสั่งซื้อเดิมที่เสร็จสิ้นแล้ว ${historyOrders.length} รายการ</div>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="switchCustomerOrderTab('history')">คลิกเพื่อดูประวัติคำสั่งซื้อเดิม</button>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      } else {
+        contentEl.innerHTML = `
+          <div class="card" style="text-align:center; padding:3.5rem 1.5rem; background:white; border-radius:16px; border:1px solid #e2e8f0; box-shadow:0 4px 15px rgba(0,0,0,0.03);">
+            <div style="font-size:3.5rem; margin-bottom:1rem;">📜</div>
+            <h3 style="font-weight:800; font-size:1.3rem; color:#0f172a; margin-bottom:0.5rem;">ยังไม่มีประวัติคำสั่งซื้อที่เสร็จสิ้น</h3>
+            <p style="color:#64748b; font-size:0.95rem; margin-bottom:1.5rem;">เมื่อคำสั่งซื้อของคุณเสร็จสิ้นเรียบร้อยแล้ว รายการจะถูกจัดเก็บไว้ที่นี่</p>
+            <button class="btn btn-secondary btn-sm" onclick="switchCustomerOrderTab('active')">← กลับไปที่คำสั่งซื้อปัจจุบัน</button>
+          </div>
+        `;
+      }
     }
   } catch (err) {
     console.error('loadTrackingView error:', err);
@@ -1309,6 +1655,18 @@ function renderTrackingDetails(orderId) {
             <span class="value" style="color:#0284c7; font-weight:600;">${order.preferences.bedding}</span>
           </div>
           ` : ''}
+          ${order.preferences?.specialNote ? `
+          <div class="tracking-info-row" style="background:#fefce8; padding:0.5rem 0.75rem; border-radius:8px; margin-top:0.4rem; border:1px solid #fde047;">
+            <span class="label" style="color:#854d0e; font-weight:700;">📝 ข้อความถึงร้าน:</span>
+            <span class="value" style="color:#713f12; font-weight:700; word-break:break-word;">${order.preferences.specialNote}</span>
+          </div>
+          ` : ''}
+          ${(order.priceAdjustmentNote || order.priceAdjustNote) ? `
+          <div class="tracking-info-row" style="background:#f0fdf4; padding:0.5rem 0.75rem; border-radius:8px; margin-top:0.4rem; border:1px solid #86efac;">
+            <span class="label" style="color:#15803d; font-weight:700;">📢 หมายเหตุจากร้าน:</span>
+            <span class="value" style="color:#166534; font-weight:700; word-break:break-word;">${order.priceAdjustmentNote || order.priceAdjustNote}</span>
+          </div>
+          ` : ''}
         </div>
       </div>
     </div>
@@ -1411,6 +1769,7 @@ async function loadStaffView() {
         <div class="kanban-card">
           <strong>${o.id}</strong> - ${o.customer.name}
           <div style="font-size:0.78rem; color:#64748b; margin:0.3rem 0;">${o.preferences.detergent}</div>
+          ${o.preferences?.specialNote ? `<div style="font-size:0.75rem; color:#b45309; background:#fef3c7; padding:0.25rem 0.45rem; border-radius:6px; margin-bottom:0.4rem; font-weight:600;">📝 พิเศษ: ${o.preferences.specialNote}</div>` : ''}
           <button class="btn btn-primary btn-sm btn-block" style="background:#f59e0b;" onclick="staffAdvance('${o.id}', 'WASHED_READY')">✨ QC & พร้อมส่ง</button>
         </div>
       `).join('')}
@@ -1550,7 +1909,7 @@ function renderAdminTable(orders) {
       </td>
       <td>
         ${(o.items || []).map(i => `<span style="display:inline-block; background:#f1f5f9; padding:2px 6px; border-radius:4px; font-size:0.75rem; margin:1px 0;">${i.serviceName} (${i.quantity} ${i.unit || 'กก.'})</span>`).join('<br>')}
-        ${o.priceAdjustNote ? `<div style="font-size:0.72rem; color:#c2410c; margin-top:3px; background:#fff7ed; padding:2px 4px; border-radius:3px;">📝 ${o.priceAdjustNote}</div>` : ''}
+        ${(o.priceAdjustmentNote || o.priceAdjustNote) ? `<div style="font-size:0.72rem; color:#c2410c; margin-top:3px; background:#fff7ed; padding:2px 4px; border-radius:3px; word-break:break-word;">📝 ${o.priceAdjustmentNote || o.priceAdjustNote}</div>` : ''}
       </td>
       <td>
         <strong style="color:#0284c7; font-size:1rem;">฿${(o.totalAmount || 0).toLocaleString()}</strong>
@@ -1824,7 +2183,17 @@ window.openAdminEditOrderModal = function (orderId) {
   }];
 
   renderAdminEditOrderItems();
-  recalcAdminEditOrderTotals();
+  recalcAdminEditOrderTotals(false);
+
+  // Set custom total amount and adjustment note
+  const customTotalInput = document.getElementById('edit-order-custom-total');
+  if (customTotalInput) {
+    customTotalInput.value = (order.totalAmount !== undefined) ? order.totalAmount : 0;
+  }
+  const priceNoteInput = document.getElementById('edit-order-price-note');
+  if (priceNoteInput) {
+    priceNoteInput.value = order.priceAdjustmentNote || order.priceAdjustNote || '';
+  }
 
   const modal = document.getElementById('admin-edit-order-modal');
   if (modal) modal.classList.add('active');
@@ -1850,11 +2219,14 @@ window.renderAdminEditOrderItems = function () {
   container.innerHTML = adminEditOrderItems.map((item, idx) => `
     <div style="display:flex; align-items:center; gap:0.5rem; background:white; border:1px solid #cbd5e1; border-radius:8px; padding:0.5rem 0.75rem; flex-wrap:wrap;">
       <select class="form-select" style="flex:2; min-width:180px; font-size:0.85rem;" onchange="onAdminEditServiceChange(${idx}, this.value)">
-        ${services.map(s => `
-          <option value="${s.id}" ${String(s.id) === String(item.serviceId) ? 'selected' : ''}>
-            ${s.name} (฿${s.basePrice}/${s.unit || 'กก.'})
-          </option>
-        `).join('')}
+        ${services.map(s => {
+          const prc = Number(s.pricePerUnit || s.basePrice || s.price || 0);
+          return `
+            <option value="${s.id}" ${String(s.id) === String(item.serviceId) ? 'selected' : ''}>
+              ${s.name} (฿${prc}/${s.unit || 'กก.'})
+            </option>
+          `;
+        }).join('')}
       </select>
       <div style="display:flex; align-items:center; gap:0.35rem;">
         <input type="number" step="0.1" min="0.1" max="100" class="form-control" style="width:75px; text-align:center; font-size:0.85rem; padding:0.3rem;" value="${item.quantity}" oninput="onAdminEditQtyChange(${idx}, this.value)">
@@ -1872,16 +2244,16 @@ window.renderAdminEditOrderItems = function () {
 
 window.onAdminEditServiceChange = function (idx, serviceId) {
   const services = (state.services && state.services.length > 0) ? state.services : [
-    { id: 1, name: 'ซัก อบ พับ (Wash & Fold)', basePrice: 60, unit: 'กก.' },
-    { id: 2, name: 'ซัก อบ รีด (Wash & Iron)', basePrice: 80, unit: 'กก.' },
-    { id: 3, name: 'ซักแห้ง (Dry Clean)', basePrice: 120, unit: 'ชิ้น' },
-    { id: 4, name: 'ซักผ้านวม / เครื่องนอน (Bedding)', basePrice: 150, unit: 'ผืน' }
+    { id: 1, name: 'ซัก อบ พับ (Wash & Fold)', pricePerUnit: 60, unit: 'กก.' },
+    { id: 2, name: 'ซัก อบ รีด (Wash & Iron)', pricePerUnit: 80, unit: 'กก.' },
+    { id: 3, name: 'ซักแห้ง (Dry Clean)', pricePerUnit: 120, unit: 'ชิ้น' },
+    { id: 4, name: 'ซักผ้านวม / เครื่องนอน (Bedding)', pricePerUnit: 150, unit: 'ผืน' }
   ];
   const s = services.find(x => String(x.id) === String(serviceId));
   if (s) {
     adminEditOrderItems[idx].serviceId = s.id;
     adminEditOrderItems[idx].serviceName = s.name;
-    adminEditOrderItems[idx].pricePerUnit = s.basePrice;
+    adminEditOrderItems[idx].pricePerUnit = Number(s.pricePerUnit || s.basePrice || s.price || 0);
     adminEditOrderItems[idx].unit = s.unit || 'กก.';
     renderAdminEditOrderItems();
     recalcAdminEditOrderTotals();
@@ -1896,11 +2268,11 @@ window.onAdminEditQtyChange = function (idx, val) {
 };
 
 window.addAdminEditOrderItemRow = function () {
-  const defaultService = (state.services && state.services[0]) || { id: 1, name: 'ซัก อบ พับ (Wash & Fold)', basePrice: 60, unit: 'กก.' };
+  const defaultService = (state.services && state.services[0]) || { id: 1, name: 'ซัก อบ พับ (Wash & Fold)', pricePerUnit: 60, unit: 'กก.' };
   adminEditOrderItems.push({
     serviceId: defaultService.id,
     serviceName: defaultService.name,
-    pricePerUnit: defaultService.basePrice,
+    pricePerUnit: Number(defaultService.pricePerUnit || defaultService.basePrice || defaultService.price || 60),
     quantity: 1,
     unit: defaultService.unit || 'กก.'
   });
@@ -1918,28 +2290,55 @@ window.removeAdminEditOrderItemRow = function (idx) {
   recalcAdminEditOrderTotals();
 };
 
-window.recalcAdminEditOrderTotals = function () {
+window.recalcAdminEditOrderTotals = function (autoSyncInput = false) {
   let subtotal = 0;
   adminEditOrderItems.forEach(it => {
     subtotal += (it.quantity * it.pricePerUnit);
   });
   subtotal = Math.round(subtotal);
-  const deliveryFee = 40;
-  const total = subtotal + deliveryFee;
+  const deliveryFee = 0;
+  const calculatedTotal = subtotal;
 
   const subtotalEl = document.getElementById('edit-order-subtotal');
   const totalEl = document.getElementById('edit-order-total');
   if (subtotalEl) subtotalEl.innerText = `฿${subtotal.toLocaleString()}`;
-  if (totalEl) totalEl.innerText = `฿${total.toLocaleString()}`;
+  if (totalEl) totalEl.innerText = `฿${calculatedTotal.toLocaleString()}`;
 
-  return { subtotal, deliveryFee, total };
+  const customTotalInput = document.getElementById('edit-order-custom-total');
+  if (customTotalInput && autoSyncInput) {
+    customTotalInput.value = calculatedTotal;
+  }
+
+  return { subtotal, deliveryFee, calculatedTotal };
+};
+
+window.resetAdminEditPriceToCalculated = function () {
+  const { calculatedTotal } = recalcAdminEditOrderTotals(true);
+  showToast(`รีเซ็ตราคาเป็น ฿${calculatedTotal.toLocaleString()} ตามรายการเรียบร้อย`, 'info');
+};
+
+window.setAdminPriceNote = function (text) {
+  const input = document.getElementById('edit-order-price-note');
+  if (input) {
+    if (input.value.trim()) {
+      input.value += ` | ${text}`;
+    } else {
+      input.value = text;
+    }
+    input.focus();
+  }
 };
 
 window.submitAdminEditOrder = async function (e) {
   e.preventDefault();
   if (!currentAdminEditOrderId) return;
 
-  const { subtotal, deliveryFee, total } = recalcAdminEditOrderTotals();
+  const { calculatedTotal } = recalcAdminEditOrderTotals();
+  const customTotalInput = document.getElementById('edit-order-custom-total');
+  const priceNoteInput = document.getElementById('edit-order-price-note');
+
+  const customTotal = customTotalInput ? Math.max(0, parseFloat(customTotalInput.value) || 0) : calculatedTotal;
+  const priceAdjustmentNote = priceNoteInput ? priceNoteInput.value.trim() : '';
 
   const payload = {
     customerName: document.getElementById('edit-order-cust-name').value.trim(),
@@ -1963,7 +2362,8 @@ window.submitAdminEditOrder = async function (e) {
       ...it,
       subtotal: Math.round(it.quantity * it.pricePerUnit)
     })),
-    totalAmount: total
+    totalAmount: customTotal,
+    priceAdjustmentNote: priceAdjustmentNote
   };
 
   const btn = document.getElementById('edit-order-submit-btn');

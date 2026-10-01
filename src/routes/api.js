@@ -371,9 +371,14 @@ router.put('/orders/:id', async (req, res) => {
       subtotal = processedItems.reduce((sum, it) => sum + (Number(it.subtotal) || 0), 0);
     }
 
-    const deliveryFee = 40;
+    const deliveryFee = 0;
     const discount = subtotal >= 500 ? 50 : 0;
-    const totalAmount = subtotal + deliveryFee - discount;
+    let totalAmount = Math.max(0, subtotal + deliveryFee - discount);
+    if (req.body.totalAmount !== undefined && !isNaN(Number(req.body.totalAmount))) {
+      totalAmount = Math.max(0, Number(req.body.totalAmount));
+    }
+
+    const priceAdjustmentNote = (req.body.priceAdjustmentNote || req.body.priceNote || '').trim();
 
     const riderName = (assignedRider && assignedRider.name) ? assignedRider.name : (existingOrder.assignedRider?.name || 'นายพงษ์อนันต์ ชนะสแบง');
     const riderPhone = (assignedRider && assignedRider.phone) ? assignedRider.phone : (existingOrder.assignedRider?.phone || '671-223-1091');
@@ -386,7 +391,8 @@ router.put('/orders/:id', async (req, res) => {
       note: updatedCust.note,
       preferences: updatedPref,
       pickupSchedule: updatedPickup,
-      returnSchedule: updatedReturn
+      returnSchedule: updatedReturn,
+      priceAdjustmentNote: priceAdjustmentNote || existingOrder.priceAdjustmentNote || ''
     };
     const notePayload = JSON.stringify(orderMeta);
 
@@ -433,6 +439,9 @@ router.put('/orders/:id', async (req, res) => {
       jsonOrder.status = newStatus;
       jsonOrder.subtotal = subtotal;
       jsonOrder.totalAmount = totalAmount;
+      if (priceAdjustmentNote) {
+        jsonOrder.priceAdjustmentNote = priceAdjustmentNote;
+      }
       jsonOrder.assignedRider = {
         name: riderName,
         phone: riderPhone,

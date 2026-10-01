@@ -306,7 +306,8 @@ async function getOrdersList() {
           } : null,
           paymentStatus: ord.paymentStatus || 'UNPAID',
           paymentMethod: ord.paymentMethod || 'PROMPTPAY',
-          specialNotes: note
+          specialNotes: note,
+          priceAdjustmentNote: meta?.priceAdjustmentNote || ''
         };
       });
     } catch (err) {
