@@ -36,6 +36,7 @@
           <ul class="nav-links">
             <li><a href="#" class="nav-link" onclick="switchAppView('pricing'); return false;">อัตราค่าบริการ</a></li>
             <li><a href="#" class="nav-link" onclick="switchAppView('tracking'); return false;">เช็คสถานะผ้า</a></li>
+            <li><a href="#" class="nav-link" id="nav-link-profile" style="display:none;" onclick="switchAppView('profile'); return false;">ข้อมูลบัญชี</a></li>
             <li><a href="#faq" class="nav-link" onclick="switchAppView('landing')">ช่วยเหลือ</a></li>
           </ul>
         </nav>
@@ -73,9 +74,8 @@
           </h1>
 
           <p class="hero-subtitle">
-            บริการซักอบรีดออนไลน์สำหรับชาว <strong>มรพส. (พิบูลสงคราม)</strong> — ไรเดอร์เข้ารับผ้าถึงหอพัก ทั้ง
-            <strong>วิทยาเขตทะเลแก้ว</strong> และ <strong>วิทยาเขตวังจันทน์</strong> เสื้อผ้าสะอาด หอมสดชื่น
-            รวดเร็วทันใจ
+            บริการซักอบรีดออนไลน์สำหรับชาว <strong>มรพส. (พิบูลสงคราม)</strong> — ไรเดอร์เข้ารับผ้าถึงหอพัก
+            <strong>วิทยาเขตทะเลแก้ว (มอนอก)</strong> เสื้อผ้าสะอาด หอมสดชื่น รวดเร็วทันใจ
           </p>
 
           <div class="hero-cta-group">
@@ -143,7 +143,7 @@
             <div class="step-num-badge">1</div>
           </div>
           <h3 class="step-title">สั่งจองผ่านเว็บ</h3>
-          <p class="step-desc">เลือกวิทยาเขต (ทะเลแก้ว/วังจันทน์) และแพ็กเกจที่ต้องการ</p>
+          <p class="step-desc">เลือกแพ็กเกจบริการซักอบรีดและเวลานัดรับผ้าที่ต้องการ</p>
         </div>
 
         <!-- Step 2 -->
@@ -203,8 +203,8 @@
           </div>
 
           <div class="stat-box-modern">
-            <div class="stat-number">2 วิทยาเขต</div>
-            <div class="stat-text">ครอบคลุมทั้ง มรพส. ทะเลแก้ว และ มรพส. วังจันทน์</div>
+            <div class="stat-number">มรพส. ทะเลแก้ว</div>
+            <div class="stat-text">ครอบคลุมหอพักใน-นอก มอนอก และทุกคณะในมหาวิทยาลัย</div>
           </div>
 
           <div class="stat-box-modern">
@@ -242,16 +242,15 @@
           </div>
         </div>
 
-        <!-- PSRU Wangchan -->
+        <!-- PSRU Campus & Outside Zones -->
         <div class="city-card">
           <div class="city-img-box" style="background: linear-gradient(135deg, #0d9488, #0f766e);">
-            <span>🏫</span>
+            <span>🏢</span>
           </div>
           <div class="city-info">
-            <div class="city-tag">วิทยาเขตในเมือง (มอใน)</div>
-            <h3 class="city-name">มรพส. วังจันทน์</h3>
-            <p style="font-size:0.85rem; color:#64748b; margin-top:0.3rem;">หอพักนักศึกษา, อาคารเรียน,
-              สำนักงานอธิการบดี, ชุมชนรอบมอใน</p>
+            <div class="city-tag">อาคารเรียน & หอนอกรอบรั้วมอ</div>
+            <h3 class="city-name">โซนรอบรั้วทะเลแก้ว</h3>
+            <p style="font-size:0.85rem; color:#64748b; margin-top:0.3rem;">ทุกคณะ, ศูนย์อาหาร, อาคารกิจกรรม, โซนเคหะทะเลแก้ว & ประตู 1-3</p>
           </div>
         </div>
       </div>
@@ -426,15 +425,12 @@
 
           <!-- STEP 1: เลือกบริการ -->
           <div class="step-section-card">
-            <h2 class="step-section-heading">1. เลือกวิทยาเขต & บริการ (PSRU Campus)</h2>
+            <h2 class="step-section-heading">1. แพ็กเกจบริการซักรีด (PSRU ทะเลแก้ว)</h2>
 
-            <div class="city-capsule-toggle" style="margin-bottom:1.5rem; justify-content:flex-start;">
-              <div class="capsule-box" style="background:#f1f5f9;">
-                <button type="button" class="capsule-btn active" id="order-city-bkk"
-                  onclick="setOrderRegion('psru_tk')">🏛️ PSRU ทะเลแก้ว</button>
-                <button type="button" class="capsule-btn" id="order-city-cnx" onclick="setOrderRegion('psru_wc')">🏫
-                  PSRU วังจันทน์</button>
-              </div>
+            <div style="margin-bottom:1.25rem;">
+              <span class="badge" style="background:#e0f2fe; color:#0369a1; font-size:0.85rem; font-weight:700; padding:0.35rem 0.9rem; border-radius:99px; display:inline-flex; align-items:center; gap:0.4rem;">
+                🏛️ ให้บริการ ณ มรพส. ทะเลแก้ว (มอนอก)
+              </span>
             </div>
 
             <!-- Option 1: แบบประหยัด -->
@@ -668,21 +664,25 @@
 
           <!-- STEP 4: ข้อมูลติดต่อของท่าน -->
           <div class="step-section-card">
-            <h2 class="step-section-heading">4. ข้อมูลติดต่อของท่าน (PSRU Student / Staff)</h2>
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; margin-bottom:0.75rem;">
+              <h2 class="step-section-heading" style="margin-bottom:0;">4. ข้อมูลติดต่อของท่าน (PSRU Student / Staff)</h2>
+              <span style="font-size:0.78rem; font-weight:700; color:#0284c7; background:#e0f2fe; padding:0.25rem 0.65rem; border-radius:99px;">
+                ✓ อิงจากบัญชีของคุณอัตโนมัติ
+              </span>
+            </div>
             <div class="form-row">
               <div class="form-group">
                 <label class="form-label" for="order-cust-name">ชื่อ-นามสกุล / รหัสนักศึกษา *</label>
-                <input type="text" id="order-cust-name" class="form-control" value="นายพีรพล แก้วพูลสุข (นศ. 65123456)"
-                  required>
+                <input type="text" id="order-cust-name" class="form-control" placeholder="ชื่อ-นามสกุล / รหัสนักศึกษา" required>
               </div>
               <div class="form-group">
                 <label class="form-label" for="order-cust-phone">เบอร์โทรศัพท์มือถือ *</label>
-                <input type="tel" id="order-cust-phone" class="form-control" value="081-999-8877" required>
+                <input type="tel" id="order-cust-phone" class="form-control" placeholder="08X-XXX-XXXX" required>
               </div>
             </div>
             <div class="form-group" style="margin-bottom:0;">
               <label class="form-label" for="order-cust-email">อีเมล (สำหรับรับใบแจ้งราคาและใบเสร็จ) *</label>
-              <input type="email" id="order-cust-email" class="form-control" value="peerapol.k@psru.ac.th" required>
+              <input type="email" id="order-cust-email" class="form-control" placeholder="student@psru.ac.th" required>
             </div>
           </div>
 
@@ -690,10 +690,9 @@
           <div class="step-section-card">
             <h2 class="step-section-heading">5. สถานที่นัดรับ-ส่งผ้าภายใน มรพส. / หอพัก</h2>
             <div class="form-group">
-              <label class="form-label" for="order-cust-address">ระบุหอพัก / อาคารเรียน / คณะ / บ้านพักอาจารย์
-                อย่างละเอียด *</label>
+              <label class="form-label" for="order-cust-address">ระบุหอพัก / อาคารเรียน / คณะ / บ้านพักอาจารย์ อย่างละเอียด *</label>
               <textarea id="order-cust-address" rows="3" class="form-control" required
-                placeholder="ระบุตึกหอพัก / ห้องพัก / จุดนัดรับ...">หอพักนักศึกษาหญิง อาคาร 2 ห้อง 314 มหาวิทยาลัยราชภัฏพิบูลสงคราม (ทะเลแก้ว)</textarea>
+                placeholder="ระบุตึกหอพัก / หมายเลขห้องพัก / จุดนัดรับผ้า เช่น หอพักนักศึกษาหญิง อาคาร 2 ห้อง 314 มรพส. (ทะเลแก้ว)"></textarea>
             </div>
             <div class="form-group" style="margin-bottom:0;">
               <label class="form-label" for="order-cust-note">คำสั่งพิเศษเพิ่มเติมให้ไรเดอร์เมื่อมาส่ง:</label>
@@ -799,13 +798,11 @@
     <div class="pricing-view-container">
       <h1 class="pricing-title-main">อัตราค่าบริการ (PSRU Campus)</h1>
 
-      <!-- City Toggle Switcher -->
-      <div class="city-capsule-toggle">
-        <div class="capsule-box">
-          <button type="button" class="capsule-btn active" id="btn-city-bkk" onclick="setPricingCity('psru_tk')">🏛️
-            PSRU ทะเลแก้ว (มอนอก)</button>
-          <button type="button" class="capsule-btn" id="btn-city-cnx" onclick="setPricingCity('psru_wc')">🏫 PSRU
-            วังจันทน์ (มอใน)</button>
+      <!-- Service Area Badge -->
+      <div style="display:flex; justify-content:center; margin-bottom:2rem;">
+        <div style="background:#e0f2fe; color:#0369a1; padding:0.5rem 1.5rem; border-radius:99px; font-weight:700; font-size:0.95rem; display:inline-flex; align-items:center; gap:0.5rem; border:1px solid #bae6fd; box-shadow:0 2px 4px rgba(2,132,199,0.06);">
+          <span>🏛️</span>
+          <span>ให้บริการเฉพาะ <strong>มรพส. ทะเลแก้ว (มอนอก)</strong></span>
         </div>
       </div>
 
@@ -922,7 +919,7 @@
       <div class="delivery-service-block">
         <h2 class="delivery-service-title">บริการรับส่งผ้าภายใน มรพส. (PSRU)</h2>
         <p class="delivery-service-text">
-          เราให้บริการรับ-ส่งฟรีสำหรับ นักศึกษา บุคลากร และอาจารย์ทุกคนที่อยู่ในหอพัก มรพส. ทะเลแก้ว และ มรพส. วังจันทน์
+          เราให้บริการรับ-ส่งฟรีสำหรับ นักศึกษา บุคลากร และอาจารย์ทุกคนที่อยู่ในหอพัก มรพส. ทะเลแก้ว
           (สำหรับหอพักนอกรอบรั้วมอ ส่งฟรีเมื่อสั่งครบ 120 บาท)
         </p>
       </div>
@@ -965,10 +962,20 @@
           </div>
         </form>
 
-        <!-- User's Orders Quick Chips -->
+        <!-- User's Orders Quick Chips & Tabs -->
         <div id="user-orders-quick-container" style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px dashed #e2e8f0; display: none;">
-          <div style="font-size: 0.85rem; font-weight: 700; color: #475569; margin-bottom: 0.5rem;">
-            📋 รายการคำสั่งซื้อในบัญชีของคุณ (คลิกเพื่อดูสถานะ):
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom: 0.75rem;">
+            <div style="font-size: 0.88rem; font-weight: 700; color: #334155;">
+              📋 คำสั่งซื้อในบัญชีของคุณ:
+            </div>
+            <div style="display:flex; gap:0.4rem;">
+              <button type="button" id="tab-cust-active" class="btn btn-primary btn-sm" onclick="switchCustomerOrderTab('active')" style="font-size:0.8rem; padding:0.3rem 0.85rem; border-radius:99px; font-weight:700;">
+                🧺 กำลังดำเนินการ (<span id="cust-active-count">0</span>)
+              </button>
+              <button type="button" id="tab-cust-history" class="btn btn-secondary btn-sm" onclick="switchCustomerOrderTab('history')" style="font-size:0.8rem; padding:0.3rem 0.85rem; border-radius:99px; font-weight:700;">
+                📜 ประวัติที่สำเร็จแล้ว (<span id="cust-history-count">0</span>)
+              </button>
+            </div>
           </div>
           <div id="user-orders-chips" style="display: flex; gap: 0.5rem; flex-wrap: wrap;"></div>
         </div>
@@ -976,6 +983,156 @@
 
       <!-- Live Tracking Content Area -->
       <div id="tracking-content"></div>
+    </div>
+  </section>
+
+  <!-- ========================================================
+       VIEW: CUSTOMER PROFILE & ACCOUNT MANAGEMENT (จัดการข้อมูลผู้ใช้ & ลบบัญชี)
+  ======================================================== -->
+  <section id="app-view-profile" class="app-view-panel" style="padding: 2.5rem 1rem 5rem;">
+    <div style="max-width: 860px; margin: 0 auto;">
+
+      <!-- Header Title -->
+      <div style="text-align: center; margin-bottom: 2rem;">
+        <span class="badge" style="background:#e0f2fe; color:#0284c7; font-size:0.85rem; font-weight:700; padding:0.35rem 0.85rem; border-radius:99px; margin-bottom:0.75rem; display:inline-block;">
+          👤 บัญชีผู้ใช้งาน (Member Account)
+        </span>
+        <h1 style="font-size: 2rem; font-weight: 800; color: #0f172a; margin-bottom: 0.5rem;">
+          ข้อมูลส่วนตัว & การจัดการบัญชี
+        </h1>
+        <p style="font-size: 0.95rem; color: #64748b;">
+          ตรวจสอบ ID บัญชี แก้ไขข้อมูลติดต่อ ที่อยู่หอพัก และความปลอดภัยของบัญชี DekDry @ PSRU
+        </p>
+      </div>
+
+      <!-- User ID Badge & Card Summary -->
+      <div class="card" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: white; border-radius: 18px; padding: 1.75rem; margin-bottom: 1.75rem; box-shadow: 0 10px 25px -5px rgba(2, 132, 199, 0.3);">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1.25rem;">
+          <div style="display:flex; align-items:center; gap:1.25rem;">
+            <div style="width:72px; height:72px; background:rgba(255,255,255,0.2); backdrop-filter:blur(5px); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:2.4rem; border:2px solid rgba(255,255,255,0.4);">
+              🎓
+            </div>
+            <div>
+              <div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap;">
+                <h2 id="profile-display-name" style="margin:0; font-size:1.45rem; font-weight:800; color:white;">กำลังโหลด...</h2>
+                <span id="profile-display-role" style="background:#fef08a; color:#854d0e; font-size:0.75rem; font-weight:800; padding:0.2rem 0.65rem; border-radius:99px;">ลูกค้า</span>
+              </div>
+              <div style="font-size:0.9rem; opacity:0.9; margin-top:0.3rem;">
+                ชื่อผู้ใช้: <strong id="profile-display-username">@username</strong> &bull; สมาชิก DekDry @ PSRU
+              </div>
+            </div>
+          </div>
+          <div style="text-align:right; background:rgba(255,255,255,0.12); padding:0.75rem 1.25rem; border-radius:12px; border:1px solid rgba(255,255,255,0.2);">
+            <div style="font-size:0.75rem; opacity:0.85; text-transform:uppercase; letter-spacing:0.5px;">รหัสประจำตัวบัญชี (User ID)</div>
+            <div id="profile-display-id" style="font-size:1.6rem; font-weight:900; letter-spacing:1px; color:#fef08a;">CUST-00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Edit Profile Form Card -->
+      <div class="card" style="background:white; border-radius:16px; border:1px solid #e2e8f0; padding:2rem; margin-bottom:1.75rem; box-shadow:0 4px 6px -1px rgba(0,0,0,0.04);">
+        <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:1.5rem; border-bottom:1.5px solid #f1f5f9; padding-bottom:0.75rem;">
+          <span style="font-size:1.4rem;">📝</span>
+          <h3 style="margin:0; font-size:1.2rem; font-weight:800; color:#0f172a;">แก้ไขข้อมูลส่วนตัว & ข้อมูลติดต่อ</h3>
+        </div>
+
+        <form id="profile-edit-form" onsubmit="submitProfileUpdate(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="profile-username-input">ชื่อผู้ใช้งาน (Username) <span style="font-size:0.75rem; color:#64748b;">(ไม่สามารถเปลี่ยนได้)</span></label>
+              <input type="text" id="profile-username-input" class="form-control" style="background:#f8fafc; color:#64748b; font-weight:600;" disabled readonly>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="profile-name-input">ชื่อ-นามสกุล / รหัสนักศึกษา *</label>
+              <input type="text" id="profile-name-input" class="form-control" placeholder="เช่น นายสมชาย ใจดี (นศ. 65123456)" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="profile-phone-input">เบอร์โทรศัพท์มือถือ *</label>
+              <input type="tel" id="profile-phone-input" class="form-control" placeholder="เช่น 081-234-5678" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="profile-email-input">อีเมลติดต่อ *</label>
+              <input type="email" id="profile-email-input" class="form-control" placeholder="เช่น student@psru.ac.th" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="profile-address-input">หอพัก / ที่อยู่นัดรับ-ส่งผ้าประจำ (มรพส.) *</label>
+            <textarea id="profile-address-input" rows="3" class="form-control" placeholder="ระบุตึกหอพัก / เลขที่ห้อง / จุดนัดรับผ้า เช่น หอพักนักศึกษาหญิง อาคาร 2 ห้อง 314 มรพส. (ทะเลแก้ว)" required></textarea>
+            <small style="color:#64748b; font-size:0.8rem; display:block; margin-top:0.35rem;">
+              * ข้อมูลนี้จะถูกนำไปเติมในหน้าสั่งจองบริการอัตโนมัติ เพื่อความสะดวกรวดเร็วในการสั่งซักผ้า
+            </small>
+          </div>
+
+          <!-- Change Password Section -->
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:1.25rem; margin-top:1.5rem; margin-bottom:1.5rem;">
+            <div style="font-weight:700; font-size:0.95rem; color:#334155; margin-bottom:0.75rem;">
+              🔒 เปลี่ยนรหัสผ่านใหม่ (เว้นว่างไว้หากไม่ต้องการเปลี่ยน)
+            </div>
+            <div class="form-row" style="margin-bottom:0;">
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label" for="profile-password-input" style="font-size:0.82rem;">รหัสผ่านใหม่ (อย่างน้อย 6 ตัวอักษร)</label>
+                <input type="password" id="profile-password-input" class="form-control" placeholder="••••••••">
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label" for="profile-confirm-password-input" style="font-size:0.82rem;">ยืนยันรหัสผ่านใหม่อีกครั้ง</label>
+                <input type="password" id="profile-confirm-password-input" class="form-control" placeholder="••••••••">
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex; justify-content:flex-end; gap:0.75rem;">
+            <button type="submit" id="btn-save-profile" class="btn btn-primary" style="padding:0.75rem 2rem; font-weight:800; font-size:0.95rem;">
+              💾 บันทึกการเปลี่ยนแปลงข้อมูล
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Quick Actions -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:1rem; margin-bottom:1.75rem;">
+        <div class="card" style="padding:1.25rem; background:white; border-radius:14px; border:1px solid #e2e8f0; display:flex; align-items:center; gap:1rem;">
+          <div style="font-size:2rem;">🧺</div>
+          <div style="flex:1;">
+            <div style="font-weight:700; font-size:0.95rem; color:#0f172a;">คำสั่งซื้อของฉัน</div>
+            <div style="font-size:0.8rem; color:#64748b;">ติดตามสถานะผ้า & เช็คประวัติย้อนหลัง</div>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="switchAppView('tracking')">เปิดดู &rsaquo;</button>
+        </div>
+
+        <div class="card" style="padding:1.25rem; background:white; border-radius:14px; border:1px solid #e2e8f0; display:flex; align-items:center; gap:1rem;">
+          <div style="font-size:2rem;">🚀</div>
+          <div style="flex:1;">
+            <div style="font-weight:700; font-size:0.95rem; color:#0f172a;">สั่งบริการซักผ้า</div>
+            <div style="font-size:0.8rem; color:#64748b;">ส่งผ้าซัก อบ รีด วันนี้</div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="switchAppView('order')">สั่งตอนนี้ &rsaquo;</button>
+        </div>
+      </div>
+
+      <!-- Danger Zone: Delete Account -->
+      <div class="card" style="background:#fff1f2; border:1.5px dashed #f43f5e; border-radius:16px; padding:1.75rem;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:1.25rem;">
+          <div style="flex:1; min-width:280px;">
+            <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.4rem;">
+              <span style="font-size:1.4rem;">⚠️</span>
+              <h3 style="margin:0; font-size:1.15rem; font-weight:800; color:#e11d48;">โซนอันตราย: ขอลบบัญชีผู้ใช้งาน (Delete Account)</h3>
+            </div>
+            <p style="margin:0; font-size:0.88rem; color:#9f1239; line-height:1.5;">
+              หากคุณลบบัญชีนี้ ข้อมูลส่วนตัว ข้อมูลติดต่อ และประวัติคำสั่งซื้อทั้งหมดของคุณจะถูกลบออกจากระบบ DekDry อย่างถาวร และไม่สามารถกู้คืนได้
+            </p>
+          </div>
+          <div>
+            <button type="button" class="btn" style="background:#e11d48; color:white; font-weight:800; padding:0.7rem 1.4rem; border-radius:10px; font-size:0.9rem; border:none; cursor:pointer; box-shadow:0 4px 10px rgba(225, 29, 72, 0.25);" onclick="deleteCustomerAccount()">
+              🗑️ ลบบัญชีผู้ใช้งานนี้อย่างถาวร
+            </button>
+          </div>
+        </div>
+      </div>
+
     </div>
   </section>
 
@@ -1012,40 +1169,120 @@
       </div>
       <button class="btn btn-secondary btn-sm" onclick="loadAdminView()">🔄 อัปเดตข้อมูล</button>
     </div>
-    <div class="stats-grid-2x2" id="admin-stats-grid" style="margin-bottom:1.5rem;"></div>
 
-    <div class="card">
-      <div
-        style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1rem;">
-        <h3 class="card-title" style="margin-bottom:0;">📦 รายการคำสั่งซื้อทั้งหมด (All Orders)</h3>
-        <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
-          <input type="text" id="admin-search-input" class="form-control" style="width:200px;" placeholder="ค้นหา..."
-            onkeyup="filterAdminTable()">
-          <select id="admin-filter-status" class="form-select" style="width:160px;" onchange="filterAdminTable()">
-            <option value="ALL">ทุกสถานะ</option>
-            <option value="ORDER_PLACED">สั่งออเดอร์แล้ว</option>
-            <option value="IN_WASHING">กำลังซัก/รีด</option>
-            <option value="WASHED_READY">ซักเสร็จพร้อมส่ง</option>
-            <option value="OUT_FOR_DELIVERY">กำลังนำส่งลูกค้า</option>
-            <option value="DELIVERED">จัดส่งสำเร็จ</option>
-          </select>
+    <!-- Admin Section Navigation Tabs: Orders vs Users -->
+    <div style="display:flex; gap:0.6rem; margin-bottom:1.5rem; background:#f1f5f9; padding:0.4rem; border-radius:12px; width:fit-content;">
+      <button type="button" id="admin-nav-orders" class="btn btn-primary btn-sm" onclick="switchAdminSection('orders')" style="font-weight:800; border-radius:8px; padding:0.5rem 1.25rem;">
+        📦 จัดการคำสั่งซื้อ (Orders)
+      </button>
+      <button type="button" id="admin-nav-users" class="btn btn-secondary btn-sm" onclick="switchAdminSection('users')" style="font-weight:800; border-radius:8px; padding:0.5rem 1.25rem;">
+        👥 จัดการบัญชีผู้ใช้ในระบบ (Users)
+      </button>
+    </div>
+
+    <!-- SUB-SECTION 1: ORDERS MANAGEMENT -->
+    <div id="admin-section-orders">
+      <div class="stats-grid-2x2" id="admin-stats-grid" style="margin-bottom:1.5rem;"></div>
+
+      <div class="card">
+        <!-- Tabs for Admin Orders: Active vs Completed -->
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem; border-bottom:2px solid #f1f5f9; padding-bottom:0.85rem; margin-bottom:1rem;">
+          <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+            <button type="button" id="tab-admin-active" class="btn btn-primary btn-sm" onclick="switchAdminOrderTab('active')" style="font-weight:700; border-radius:8px; padding:0.4rem 0.9rem;">
+              ⏳ งานที่กำลังดำเนินการ (<span id="admin-active-count">0</span>)
+            </button>
+            <button type="button" id="tab-admin-completed" class="btn btn-secondary btn-sm" onclick="switchAdminOrderTab('completed')" style="font-weight:700; border-radius:8px; padding:0.4rem 0.9rem;">
+              ✅ ลูกค้ายืนยันรับผ้าแล้ว (เสร็จสิ้น) (<span id="admin-completed-count">0</span>)
+            </button>
+            <button type="button" id="tab-admin-all" class="btn btn-secondary btn-sm" onclick="switchAdminOrderTab('all')" style="font-weight:700; border-radius:8px; padding:0.4rem 0.9rem;">
+              📑 ดูทั้งหมด (<span id="admin-all-count">0</span>)
+            </button>
+          </div>
+
+          <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+            <input type="text" id="admin-search-input" class="form-control" style="width:190px;" placeholder="ค้นหาออเดอร์/ชื่อ..."
+              onkeyup="filterAdminTable()">
+            <select id="admin-filter-status" class="form-select" style="width:180px;" onchange="filterAdminTable()">
+              <option value="ALL">ทุกสถานะ</option>
+              <option value="ORDER_PLACED">สั่งออเดอร์แล้ว</option>
+              <option value="RIDER_ASSIGNED">จัดสรรไรเดอร์แล้ว</option>
+              <option value="PICKED_UP">รับผ้าเข้าร้านแล้ว</option>
+              <option value="WAIT_PRICE_CONFIRM">⚖️ รอลูกค้ายืนยันราคา</option>
+              <option value="IN_WASHING">กำลังซัก/รีด</option>
+              <option value="WASHED_READY">ซักเสร็จพร้อมส่ง</option>
+              <option value="OUT_FOR_DELIVERY">กำลังนำส่งลูกค้า</option>
+              <option value="DELIVERED">จัดส่งแล้ว (รอตรวจรับ)</option>
+              <option value="COMPLETED">✅ เสร็จสิ้น (ลูกค้ายืนยันแล้ว)</option>
+              <option value="CANCELLED">ยกเลิก</option>
+            </select>
+          </div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>ลูกค้า</th>
+                <th>บริการ</th>
+                <th>ยอดชำระ</th>
+                <th>สถานะ</th>
+                <th>ไรเดอร์</th>
+                <th style="min-width:180px;">จัดการออเดอร์ & สถานะ</th>
+              </tr>
+            </thead>
+            <tbody id="admin-orders-tbody"></tbody>
+          </table>
         </div>
       </div>
-      <div style="overflow-x:auto;">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Order ID</th>
-              <th>ลูกค้า</th>
-              <th>บริการ</th>
-              <th>ยอดชำระ</th>
-              <th>สถานะ</th>
-              <th>ไรเดอร์</th>
-              <th>จัดการสถานะ</th>
-            </tr>
-          </thead>
-          <tbody id="admin-orders-tbody"></tbody>
-        </table>
+    </div>
+
+    <!-- SUB-SECTION 2: USER ACCOUNT MANAGEMENT (จัดการบัญชีผู้ใช้งาน) -->
+    <div id="admin-section-users" style="display:none;">
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1.25rem;">
+          <div>
+            <h3 style="margin:0 0 0.25rem 0; font-size:1.15rem; font-weight:800; color:#0f172a;">👥 บัญชีผู้ใช้งานทั้งหมดในระบบ DekDry</h3>
+            <p style="margin:0; font-size:0.85rem; color:#64748b;">ดูรายชื่อ แก้ไขข้อมูลสมาชิก เปลี่ยนแปลงบทบาท และรีเซ็ตรหัสผ่าน</p>
+          </div>
+          <button type="button" class="btn btn-primary btn-sm" onclick="openAdminUserModal()" style="font-weight:700; padding:0.5rem 1.15rem; border-radius:8px;">
+            ➕ เพิ่มผู้ใช้งานใหม่
+          </button>
+        </div>
+
+        <!-- Filter bar for users -->
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem; margin-bottom:1rem; border-top:1px dashed #e2e8f0; padding-top:1rem;">
+          <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+            <input type="text" id="admin-user-search-input" class="form-control" style="width:230px;" placeholder="ค้นหาชื่อ, เบอร์, username..." onkeyup="filterAdminUserTable()">
+            <select id="admin-user-filter-role" class="form-select" style="width:160px;" onchange="filterAdminUserTable()">
+              <option value="ALL">ทุกบทบาท (All Roles)</option>
+              <option value="customer">👤 ลูกค้า (Customer)</option>
+              <option value="rider">🛵 ไรเดอร์ (Rider)</option>
+              <option value="staff">🧼 โรงซักรีด (Staff)</option>
+              <option value="admin">🛡️ ผู้ดูแลระบบ (Admin)</option>
+            </select>
+          </div>
+          <div style="font-size:0.85rem; color:#64748b;">
+            จำนวนสมาชิกทั้งหมด: <strong id="admin-user-total-count" style="color:#0284c7; font-size:1rem;">0</strong> คน
+          </div>
+        </div>
+
+        <div style="overflow-x:auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width:60px;">ID</th>
+                <th>Username</th>
+                <th>บทบาท / Role</th>
+                <th>ชื่อ - นามสกุล</th>
+                <th>เบอร์โทรศัพท์</th>
+                <th>อีเมล</th>
+                <th>ที่อยู่ / หอพัก</th>
+                <th style="width:140px; text-align:center;">จัดการ</th>
+              </tr>
+            </thead>
+            <tbody id="admin-users-tbody"></tbody>
+          </table>
+        </div>
       </div>
     </div>
   </section>
@@ -1330,6 +1567,284 @@
       </div>
     </div>
   </footer>
+
+  <!-- ========================================================
+       MODAL: ADMIN ADJUST ORDER & WEIGH MODAL (ชั่งน้ำหนักและปรับปรุงราคา)
+  ======================================================== -->
+  <div class="modal-overlay" id="admin-adjust-modal">
+    <div class="modal-box" style="max-width: 650px;">
+      <div class="modal-header">
+        <h3 class="modal-title">⚖️ ชั่งน้ำหนักจริง & ปรับราคาออเดอร์</h3>
+        <button class="modal-close" onclick="closeAdminAdjustModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; padding:0.85rem 1.15rem; margin-bottom:1.15rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+            <div>
+              <div style="display:flex; align-items:center; gap:0.5rem;">
+                <strong id="adjust-order-id" style="font-size:1.15rem; color:#1e40af;">ORD-XXX</strong>
+                <span class="status-badge status-PICKED_UP" id="adjust-current-status">รับผ้าแล้ว (เข้าร้าน)</span>
+              </div>
+              <div id="adjust-customer-name" style="font-size:0.85rem; color:#475569; margin-top:0.25rem;">ลูกค้า: -</div>
+            </div>
+            <div style="text-align:right;">
+              <small style="color:#64748b;">ราคาเดิมก่อนชั่ง:</small>
+              <div id="adjust-old-total-badge" style="font-weight:800; color:#475569; font-size:1.05rem;">฿0</div>
+            </div>
+          </div>
+        </div>
+
+        <form id="admin-adjust-form" onsubmit="submitAdminAdjustOrder(event)">
+          <div style="margin-bottom:1rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem;">
+              <div style="font-weight:700; font-size:0.95rem;">🧺 รายการบริการ & น้ำหนัก/จำนวนจริงที่ชั่งได้:</div>
+              <small style="color:#0284c7;">* กรอกน้ำหนักหรือจำนวนจริงเพื่อคำนวณราคาใหม่</small>
+            </div>
+            <div id="adjust-items-container" style="display:flex; flex-direction:column; gap:0.65rem;"></div>
+          </div>
+
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:1rem 1.25rem; margin-bottom:1.15rem;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.9rem;">
+              <span style="color:#64748b;">ยอดรวมค่าบริการ (Subtotal):</span>
+              <strong id="adjust-subtotal-text">฿0</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.9rem;">
+              <span style="color:#64748b;">ค่าจัดส่ง (Delivery Fee):</span>
+              <span id="adjust-delivery-text">฿40</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem; font-size:0.9rem; color:#16a34a;">
+              <span>ส่วนลดโปรโมชั่น (Discount):</span>
+              <span id="adjust-discount-text">-฿0</span>
+            </div>
+            <div style="border-top:1px dashed #cbd5e1; padding-top:0.65rem; display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <span style="font-weight:800; font-size:0.95rem;">ยอดสุทธิใหม่ที่ลูกค้าต้องชำระ:</span>
+                <div style="font-size:0.75rem; color:#f97316;">* ลูกค้าต้องกดยืนยันยอดนี้ก่อนเริ่มซัก</div>
+              </div>
+              <strong style="font-size:1.45rem; color:#0284c7;" id="adjust-total-text">฿0</strong>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom:1.25rem;">
+            <label class="form-label" style="font-weight:700;">📝 หมายเหตุการปรับราคา / ผลการชั่งน้ำหนัก (จะส่งให้ลูกค้าเห็น):</label>
+            <textarea id="adjust-note-input" class="form-control" rows="3" placeholder="ตัวอย่าง: ร้านได้รับผ้าเรียบร้อยแล้ว ชั่งน้ำหนักจริงได้ 4.2 กก. (จากที่ระบุไว้ 2 กก.) จึงขอปรับยอดเงินเป็น ฿292 ครับ" required></textarea>
+            <small style="color:#64748b;">* หมายเหตุนี้จะเด้งไปแสดงในหน้าติดตามสถานะของลูกค้าทันที</small>
+          </div>
+
+          <div style="display:flex; justify-content:flex-end; gap:0.75rem;">
+            <button type="button" class="btn btn-secondary" onclick="closeAdminAdjustModal()">ยกเลิก</button>
+            <button type="submit" class="btn btn-primary" style="background:#ea580c; border-color:#ea580c; font-weight:700;">
+              🚀 บันทึกและส่งให้ลูกค้ายืนยันราคา
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       MODAL: ADMIN EDIT ORDER DETAILS (แอดมินแก้ไขข้อมูลออเดอร์ลูกค้า)
+  ======================================================== -->
+  <div class="modal-overlay" id="admin-edit-order-modal">
+    <div class="modal-box" style="max-width: 780px;">
+      <div class="modal-header">
+        <h3 class="modal-title">✏️ แก้ไขข้อมูลคำสั่งซื้อ (Order Edit)</h3>
+        <button class="modal-close" onclick="closeAdminEditOrderModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="admin-edit-order-form" onsubmit="submitAdminEditOrder(event)">
+          <input type="hidden" id="edit-order-id">
+
+          <!-- Header Order Summary Badge -->
+          <div style="background:#f0f9ff; border:1px solid #bae6fd; border-radius:10px; padding:0.85rem 1.15rem; margin-bottom:1.15rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+            <div>
+              <span style="font-size:0.8rem; color:#0369a1; font-weight:700;">เลขออเดอร์:</span>
+              <strong id="edit-order-display-id" style="font-size:1.2rem; color:#0369a1; margin-left:0.35rem;">ORD-XXX</strong>
+            </div>
+            <div style="display:flex; align-items:center; gap:0.6rem;">
+              <label for="edit-order-status" style="font-size:0.85rem; font-weight:700; color:#334155; margin:0;">สถานะงาน:</label>
+              <select id="edit-order-status" class="form-select" style="width:auto; padding:0.3rem 0.6rem; font-size:0.85rem; font-weight:700;">
+                <option value="ORDER_PLACED">📝 สั่งออเดอร์แล้ว</option>
+                <option value="RIDER_ASSIGNED">🛵 จัดสรรไรเดอร์แล้ว</option>
+                <option value="PICKED_UP">🧺 รับผ้าเข้าร้านแล้ว</option>
+                <option value="WAIT_PRICE_CONFIRM">⚖️ รอลูกค้ายืนยันราคา</option>
+                <option value="IN_WASHING">🧼 กำลังซัก/รีด</option>
+                <option value="WASHED_READY">✨ ซักเสร็จพร้อมส่ง</option>
+                <option value="OUT_FOR_DELIVERY">🚚 กำลังนำส่งลูกค้า</option>
+                <option value="DELIVERED">🚚 จัดส่งแล้ว (รอตรวจรับ)</option>
+                <option value="COMPLETED">✅ เสร็จสิ้น (ลูกค้ายืนยันแล้ว)</option>
+                <option value="CANCELLED">❌ ยกเลิก</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Section 1: Customer Contact & Delivery Info -->
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:1rem; margin-bottom:1rem;">
+            <div style="font-weight:800; font-size:0.95rem; margin-bottom:0.75rem; color:#0f172a;">👤 1. ข้อมูลผู้สั่ง & สถานที่จัดส่ง</div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="edit-order-cust-name">ชื่อลูกค้า *</label>
+                <input type="text" id="edit-order-cust-name" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="edit-order-cust-phone">เบอร์โทรศัพท์ติดต่อ *</label>
+                <input type="tel" id="edit-order-cust-phone" class="form-control" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group" style="flex:2;">
+                <label class="form-label" for="edit-order-cust-address">สถานที่รับ-ส่งผ้า (หอพัก/ห้อง) *</label>
+                <input type="text" id="edit-order-cust-address" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="edit-order-cust-email">อีเมล</label>
+                <input type="email" id="edit-order-cust-email" class="form-control">
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label" for="edit-order-cust-note">หมายเหตุจากลูกค้า</label>
+              <input type="text" id="edit-order-cust-note" class="form-control" placeholder="เช่น ฝากไว้ที่ป้อม รปภ., โทรมาก่อนถึง 10 นาที">
+            </div>
+          </div>
+
+          <!-- Section 2: Schedules & Preferences -->
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:1rem; margin-bottom:1rem;">
+            <div style="font-weight:800; font-size:0.95rem; margin-bottom:0.75rem; color:#0f172a;">🕒 2. นัดหมาย & การดูแลผ้า (Preferences)</div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="edit-order-pickup">เวลานัดรับผ้า</label>
+                <input type="text" id="edit-order-pickup" class="form-control" placeholder="เช่น วันนี้ 14:00 - 16:00">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="edit-order-return">เวลานัดส่งคืน</label>
+                <input type="text" id="edit-order-return" class="form-control" placeholder="เช่น พรุ่งนี้ 17:00 - 19:00">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="edit-order-pref-detergent">สูตรน้ำยาซัก</label>
+                <input type="text" id="edit-order-pref-detergent" class="form-control">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="edit-order-pref-softener">น้ำยาปรับผ้านุ่ม</label>
+                <input type="text" id="edit-order-pref-softener" class="form-control">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="edit-order-pref-packaging">การรีด / พับ</label>
+                <input type="text" id="edit-order-pref-packaging" class="form-control">
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 3: Laundry Services & Items -->
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:1rem; margin-bottom:1rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+              <div style="font-weight:800; font-size:0.95rem; color:#0f172a;">🧺 3. รายการบริการซักรีด (Items)</div>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="addAdminEditOrderItemRow()" style="font-size:0.78rem;">
+                ➕ เพิ่มรายการบริการ
+              </button>
+            </div>
+            <div id="edit-order-items-list" style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:0.75rem;"></div>
+            
+            <div style="display:flex; justify-content:flex-end; gap:1.5rem; font-size:0.9rem; border-top:1px dashed #cbd5e1; padding-top:0.6rem;">
+              <div>ยอดรวมบริการ: <strong id="edit-order-subtotal">฿0</strong></div>
+              <div>ค่าส่ง: <span>฿40</span></div>
+              <div>ยอดสุทธิ: <strong id="edit-order-total" style="color:#0284c7; font-size:1.1rem;">฿0</strong></div>
+            </div>
+          </div>
+
+          <!-- Section 4: Assigned Rider -->
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:1rem; margin-bottom:1.25rem;">
+            <div style="font-weight:800; font-size:0.95rem; margin-bottom:0.75rem; color:#0f172a;">🛵 4. ไรเดอร์ผู้รับผิดชอบงาน</div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="edit-order-rider-name">ชื่อไรเดอร์</label>
+                <input type="text" id="edit-order-rider-name" class="form-control">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="edit-order-rider-phone">เบอร์โทรศัพท์ไรเดอร์</label>
+                <input type="tel" id="edit-order-rider-phone" class="form-control">
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex; justify-content:flex-end; gap:0.75rem;">
+            <button type="button" class="btn btn-secondary" onclick="closeAdminEditOrderModal()">ยกเลิก</button>
+            <button type="submit" class="btn btn-primary" id="edit-order-submit-btn" style="font-weight:700; padding:0.65rem 1.5rem;">
+              💾 บันทึกการแก้ไขออเดอร์ทั้งหมด
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       MODAL: ADMIN USER ACCOUNT MODAL (จัดการเพิ่ม/แก้ไขบัญชีผู้ใช้)
+  ======================================================== -->
+  <div class="modal-overlay" id="admin-user-modal">
+    <div class="modal-box" style="max-width: 580px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="admin-user-modal-title">👤 จัดการบัญชีผู้ใช้งาน</h3>
+        <button class="modal-close" onclick="closeAdminUserModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="admin-user-form" onsubmit="submitAdminUserForm(event)">
+          <input type="hidden" id="admin-user-form-id">
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="admin-user-form-username">ชื่อผู้ใช้ (Username) *</label>
+              <input type="text" id="admin-user-form-username" class="form-control" placeholder="เช่น somchai01" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="admin-user-form-role">บทบาทในระบบ (Role) *</label>
+              <select id="admin-user-form-role" class="form-select" required>
+                <option value="customer">👤 ลูกค้าทั่วไป / นักศึกษา (Customer)</option>
+                <option value="rider">🛵 พนักงานรับส่งผ้า (Rider)</option>
+                <option value="staff">🧼 พนักงานโรงซักรีด (Staff)</option>
+                <option value="admin">🛡️ ผู้ดูแลระบบ (Admin)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="admin-user-form-password" id="admin-user-password-label">รหัสผ่าน (Password) *</label>
+            <input type="password" id="admin-user-form-password" class="form-control" placeholder="อย่างน้อย 6 ตัวอักษร">
+            <small id="admin-user-password-help" style="color:#64748b; font-size:0.75rem; display:none;">* ปล่อยว่างไว้หากไม่ต้องการเปลี่ยนรหัสผ่าน</small>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="admin-user-form-name">ชื่อ - นามสกุล *</label>
+              <input type="text" id="admin-user-form-name" class="form-control" placeholder="เช่น นายสมชาย สายสะอาด" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="admin-user-form-phone">เบอร์โทรศัพท์ *</label>
+              <input type="tel" id="admin-user-form-phone" class="form-control" placeholder="เช่น 081-234-5678" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="admin-user-form-email">อีเมล *</label>
+            <input type="email" id="admin-user-form-email" class="form-control" placeholder="เช่น user@psru.ac.th" required>
+          </div>
+
+          <div class="form-group" style="margin-bottom:1.5rem;">
+            <label class="form-label" for="admin-user-form-address">ที่อยู่ / หอพัก</label>
+            <textarea id="admin-user-form-address" class="form-control" rows="2" placeholder="เช่น หอพักนักศึกษา อาคาร A ห้อง 402"></textarea>
+          </div>
+
+          <div style="display:flex; justify-content:flex-end; gap:0.75rem;">
+            <button type="button" class="btn btn-secondary" onclick="closeAdminUserModal()">ยกเลิก</button>
+            <button type="submit" class="btn btn-primary" id="admin-user-submit-btn" style="font-weight:700; padding:0.65rem 1.5rem;">
+              💾 บันทึกข้อมูลบัญชี
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 
   <!-- Toast Notification Container -->
   <div class="toast-container" id="toast-container"></div>

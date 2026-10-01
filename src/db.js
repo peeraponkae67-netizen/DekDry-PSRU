@@ -34,13 +34,21 @@ async function initMySQL() {
     await conn.ping();
     conn.release();
     useMySQL = true;
-    console.log('MySQL Database connected');
+    console.log('✅ MySQL Database connected successfully to', process.env.DB_NAME || 'laundry_db');
     return true;
   } catch (err) {
-    console.log('MySQL not connected, fallback to JSON database');
+    console.log('⚠️ MySQL not connected, fallback to JSON database:', err.message);
     useMySQL = false;
     return false;
   }
+}
+
+function isMySQLActive() {
+  return useMySQL && pool !== null;
+}
+
+function getPool() {
+  return pool;
 }
 
 // ฟังก์ชันอ่านและบันทึกไฟล์ JSON (กรณีไม่ได้เปิด MySQL)
@@ -63,16 +71,18 @@ function saveJSONDB(data) {
   }
 }
 
-// ค้นหาผู้ใช้จาก username หรือ email
+// ค้นหาผู้ใช้จาก username หรือ email (ตาราง Customer ใน MySQL)
 async function findUserByUsernameOrEmail(identifier) {
   const cleanId = String(identifier).trim().toLowerCase();
-  if (useMySQL && pool) {
+  if (isMySQLActive()) {
     try {
       const [rows] = await pool.execute(
-        'SELECT * FROM users WHERE LOWER(username) = ? OR LOWER(email) = ? LIMIT 1',
+        'SELECT customerID AS id, customerID, username, password, name, phone, address, email, role, createdAt FROM Customer WHERE LOWER(username) = ? OR LOWER(email) = ? LIMIT 1',
         [cleanId, cleanId]
       );
-      return rows[0] || null;
+      if (rows && rows.length > 0) {
+        return rows[0];
+      }
     } catch (err) {
       console.error('MySQL findUser error:', err.message);
     }
@@ -88,9 +98,12 @@ async function findUserByUsernameOrEmail(identifier) {
 
 // ค้นหาผู้ใช้จาก ID
 async function findUserById(id) {
-  if (useMySQL && pool) {
+  if (isMySQLActive()) {
     try {
-      const [rows] = await pool.execute('SELECT id, username, email, name, phone, address, role, created_at FROM users WHERE id = ?', [id]);
+      const [rows] = await pool.execute(
+        'SELECT customerID AS id, customerID, username, name, phone, address, email, role, createdAt FROM Customer WHERE customerID = ?',
+        [id]
+      );
       return rows[0] || null;
     } catch (err) {
       console.error('MySQL findUserById error:', err.message);
@@ -109,14 +122,15 @@ async function createUser({ username, email, password, name, phone, address, rol
   const hashedPassword = await bcrypt.hash(password, 10);
   const now = new Date();
 
-  if (useMySQL && pool) {
+  if (isMySQLActive()) {
     try {
       const [result] = await pool.execute(
-        'INSERT INTO users (username, email, password, name, phone, address, role) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        'INSERT INTO Customer (username, email, password, name, phone, address, role) VALUES (?, ?, ?, ?, ?, ?, ?)',
         [username.trim(), email.trim(), hashedPassword, name.trim(), phone.trim(), address ? address.trim() : '', role]
       );
       return {
         id: result.insertId,
+        customerID: result.insertId,
         username,
         email,
         name,
@@ -160,13 +174,253 @@ async function verifyPassword(plainPassword, hashedPassword) {
   return await bcrypt.compare(plainPassword, hashedPassword);
 }
 
+// ดึงรายการบริการทั้งหมด (จากตาราง Service ใน MySQL หรือ JSON)
+async function getServicesList() {
+  if (isMySQLActive()) {
+    try {
+      const [rows] = await pool.query('SELECT * FROM Service ORDER BY serviceID ASC');
+      if (rows && rows.length > 0) {
+        return rows.map(s => ({
+          id: s.serviceID,
+          serviceId: s.serviceID,
+          name: s.serviceName,
+          pricePerUnit: Number(s.price),
+          unit: s.unit || 'กก.',
+          description: s.description || '',
+          icon: s.icon || '👕',
+          category: s.category || 'regular',
+          popular: s.serviceID === 1
+        }));
+      }
+    } catch (err) {
+      console.error('MySQL getServices error:', err.message);
+    }
+  }
+
+  const db = getJSONDB();
+  return db.services || [];
+}
+
+// ดึงรายการคำสั่งซื้อทั้งหมด (จากตาราง Order หรือ JSON)
+async function getOrdersList() {
+  if (isMySQLActive()) {
+    try {
+      const [orders] = await pool.query(`
+        SELECT 
+          o.orderID,
+          o.orderID AS id,
+          o.customerID AS userId,
+          o.orderDate AS createdAt,
+          o.status,
+          o.totalPrice AS totalAmount,
+          o.note AS specialNotes,
+          c.name AS customerName,
+          c.phone AS customerPhone,
+          c.address AS customerAddress,
+          d.status AS deliveryStatus,
+          d.address AS deliveryAddress,
+          d.riderName,
+          d.riderPhone,
+          d.deliveryDate,
+          p.status AS paymentStatus,
+          p.paymentMethod
+        FROM \`Order\` o
+        LEFT JOIN Customer c ON o.customerID = c.customerID
+        LEFT JOIN Delivery d ON o.orderID = d.orderID
+        LEFT JOIN Payment p ON o.orderID = p.orderID
+        ORDER BY o.orderID DESC
+      `);
+
+      const [items] = await pool.query(`
+        SELECT 
+          oi.orderID,
+          oi.serviceID,
+          oi.quantity,
+          oi.price AS pricePerUnit,
+          oi.subtotal,
+          s.serviceName,
+          s.unit
+        FROM OrderItem oi
+        LEFT JOIN Service s ON oi.serviceID = s.serviceID
+      `);
+
+      return orders.map(ord => {
+        const orderItems = items.filter(it => it.orderID === ord.orderID).map(it => ({
+          serviceId: it.serviceID,
+          serviceName: it.serviceName,
+          quantity: it.quantity,
+          pricePerUnit: Number(it.pricePerUnit),
+          unit: it.unit,
+          subtotal: Number(it.subtotal)
+        }));
+
+        let meta = null;
+        if (ord.specialNotes && typeof ord.specialNotes === 'string' && ord.specialNotes.trim().startsWith('{')) {
+          try {
+            meta = JSON.parse(ord.specialNotes);
+          } catch (e) {
+            meta = null;
+          }
+        }
+
+        const name = (meta && meta.name) || ord.customerName || 'ลูกค้า DekDry';
+        const phone = (meta && meta.phone) || ord.customerPhone || '';
+        const email = (meta && meta.email) || '';
+        // Prioritize: 1) address from order metadata, 2) deliveryAddress from Delivery table, 3) profile address
+        const address = (meta && meta.address) || ord.deliveryAddress || ord.customerAddress || '';
+        const note = (meta && meta.note !== undefined) ? meta.note : (ord.specialNotes || '');
+        const preferences = (meta && meta.preferences) || {
+          detergent: 'มาตรฐาน DekDry',
+          softener: 'กลิ่นอ่อนโยน',
+          packaging: 'พับมาตรฐาน',
+          temperature: '30°C',
+          drying: 'เครื่องอบ'
+        };
+
+        return {
+          id: `ORD-${ord.orderID}`,
+          rawId: ord.orderID,
+          userId: ord.userId,
+          createdAt: ord.createdAt,
+          status: ord.status || 'ORDER_PLACED',
+          totalAmount: Number(ord.totalAmount) || 0,
+          customer: {
+            name,
+            phone,
+            email,
+            address,
+            note
+          },
+          deliveryAddress: address,
+          notes: note,
+          customerName: name,
+          customerPhone: phone,
+          customerAddress: address,
+          items: orderItems,
+          preferences,
+          pickupSchedule: meta?.pickupSchedule || '',
+          returnSchedule: meta?.returnSchedule || '',
+          assignedRider: ord.riderName ? {
+            name: ord.riderName,
+            phone: ord.riderPhone || '671-223-1091'
+          } : null,
+          paymentStatus: ord.paymentStatus || 'UNPAID',
+          paymentMethod: ord.paymentMethod || 'PROMPTPAY',
+          specialNotes: note
+        };
+      });
+    } catch (err) {
+      console.error('MySQL getOrders error:', err.message);
+    }
+  }
+
+  const db = getJSONDB();
+  return db.orders || [];
+}
+
+// อัปเดตข้อมูลผู้ใช้
+async function updateUser(id, { name, phone, address, email, password, role }) {
+  const cleanId = Number(id);
+
+  if (isMySQLActive()) {
+    try {
+      // ตรวจสอบว่า email ซ้ำกับคนอื่นหรือไม่
+      if (email) {
+        const [existing] = await pool.query(
+          'SELECT customerID FROM Customer WHERE email = ? AND customerID != ?',
+          [email.trim(), cleanId]
+        );
+        if (existing.length > 0) {
+          throw new Error('อีเมลนี้ถูกใช้งานโดยบัญชีอื่นแล้ว');
+        }
+      }
+
+      if (password && password.trim().length >= 6) {
+        const hashedPassword = await bcrypt.hash(password.trim(), 10);
+        await pool.query(
+          'UPDATE Customer SET name = ?, phone = ?, address = ?, email = ?, password = ?, role = COALESCE(?, role) WHERE customerID = ?',
+          [name.trim(), phone.trim(), address ? address.trim() : '', email.trim(), hashedPassword, role || null, cleanId]
+        );
+      } else {
+        await pool.query(
+          'UPDATE Customer SET name = ?, phone = ?, address = ?, email = ?, role = COALESCE(?, role) WHERE customerID = ?',
+          [name.trim(), phone.trim(), address ? address.trim() : '', email.trim(), role || null, cleanId]
+        );
+      }
+
+      const [updated] = await pool.query(
+        'SELECT customerID AS id, customerID, username, email, name, phone, address, role, createdAt FROM Customer WHERE customerID = ?',
+        [cleanId]
+      );
+      if (updated.length > 0) return updated[0];
+    } catch (err) {
+      console.error('MySQL updateUser error:', err.message);
+      throw err;
+    }
+  }
+
+  // fallback JSON
+  const db = getJSONDB();
+  if (!db.users) db.users = [];
+  const idx = db.users.findIndex(u => u.id === cleanId);
+  if (idx === -1) throw new Error('ไม่พบข้อมูลผู้ใช้');
+
+  if (email && email.trim()) {
+    const isDup = db.users.some(u => u.id !== cleanId && u.email.toLowerCase() === email.trim().toLowerCase());
+    if (isDup) throw new Error('อีเมลนี้ถูกใช้งานโดยบัญชีอื่นแล้ว');
+  }
+
+  db.users[idx].name = name.trim();
+  db.users[idx].phone = phone.trim();
+  db.users[idx].address = address ? address.trim() : '';
+  if (role) db.users[idx].role = role;
+  if (email) db.users[idx].email = email.trim();
+  if (password && password.trim().length >= 6) {
+    db.users[idx].password = await bcrypt.hash(password.trim(), 10);
+  }
+  saveJSONDB(db);
+
+  const { password: _, ...safeUser } = db.users[idx];
+  return safeUser;
+}
+
+// ลบบัญชีผู้ใช้
+async function deleteUser(id) {
+  const cleanId = Number(id);
+
+  if (isMySQLActive()) {
+    try {
+      await pool.query('DELETE FROM Customer WHERE customerID = ?', [cleanId]);
+      return { success: true, message: 'ลบบัญชีผู้ใช้งานเรียบร้อยแล้ว' };
+    } catch (err) {
+      console.error('MySQL deleteUser error:', err.message);
+      throw err;
+    }
+  }
+
+  // fallback JSON
+  const db = getJSONDB();
+  if (db.users) {
+    db.users = db.users.filter(u => u.id !== cleanId);
+  }
+  saveJSONDB(db);
+  return { success: true, message: 'ลบบัญชีผู้ใช้งานเรียบร้อยแล้ว' };
+}
+
 module.exports = {
   initMySQL,
+  isMySQLActive,
+  getPool,
   getDB: getJSONDB,
   saveDB: saveJSONDB,
   findUserByUsernameOrEmail,
   findUserById,
   createUser,
+  updateUser,
+  deleteUser,
   verifyPassword,
+  getServicesList,
+  getOrdersList,
   DB_PATH
 };
+

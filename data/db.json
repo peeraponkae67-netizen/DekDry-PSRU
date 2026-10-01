@@ -16,8 +16,8 @@
       "username": "rider1",
       "email": "rider@example.com",
       "password": "$2b$10$5ZP7T2K.a.Vim2oNoOkqNOO3mHTuCJBrN5xQ2EwCWyvkCRtc1FVYq",
-      "name": "นายนที วิ่งไว",
-      "phone": "089-999-1122",
+      "name": "นายพงษ์อนันต์ ชนะสแบง",
+      "phone": "671-223-1091",
       "address": "ศูนย์กระจายสินค้าสุขุมวิท",
       "role": "rider",
       "createdAt": "2026-10-01T10:00:00.000Z"
@@ -27,8 +27,8 @@
       "username": "staff1",
       "email": "staff@example.com",
       "password": "$2b$10$5ZP7T2K.a.Vim2oNoOkqNOO3mHTuCJBrN5xQ2EwCWyvkCRtc1FVYq",
-      "name": "สมศรี รีดเรียบ",
-      "phone": "082-333-4455",
+      "name": "นายธิเบศ พรมมา",
+      "phone": "671-223-1017",
       "address": "โรงซักรีดสาขา 1",
       "role": "staff",
       "createdAt": "2026-10-01T10:00:00.000Z"
@@ -208,6 +208,83 @@
       "address": "หอพักใน มรพส. ตึก 1",
       "role": "customer",
       "createdAt": "2026-10-01T14:52:21.296Z"
+    },
+    {
+      "id": 20,
+      "username": "user_1790875447399",
+      "email": "user_1790875447399@psru.ac.th",
+      "password": "$2b$10$rsMz4yhFAJvlDdEMC6bGzeTtsHiVhZgQuu3Bu2BxJ9LalW7.GFaXK",
+      "name": "นักศึกษา มรพส.",
+      "phone": "0812345678",
+      "address": "หอพักใน มรพส. ตึก 1",
+      "role": "customer",
+      "createdAt": "2026-10-01T17:24:07.474Z"
+    },
+    {
+      "id": 21,
+      "username": "user_1790875856620",
+      "email": "user_1790875856620@psru.ac.th",
+      "password": "$2b$10$9S3..OwQVZmsGQxzJegb7O2JB0WHqbLBXhd7WMf5bcqy6cgm7lDAu",
+      "name": "นักศึกษา มรพส.",
+      "phone": "0812345678",
+      "address": "หอพักใน มรพส. ตึก 1",
+      "role": "customer",
+      "createdAt": "2026-10-01T17:30:56.686Z"
+    },
+    {
+      "id": 22,
+      "username": "user_1790876792892",
+      "email": "user_1790876792892@psru.ac.th",
+      "password": "$2b$10$OLoWCnnbsniibexcXLKpfuuNwh3Z7aUSRfW6x0zQU495iTXV/cbjC",
+      "name": "นักศึกษา มรพส.",
+      "phone": "0812345678",
+      "address": "หอพักใน มรพส. ตึก 1",
+      "role": "customer",
+      "createdAt": "2026-10-01T17:46:32.960Z"
+    },
+    {
+      "id": 23,
+      "username": "user_1790877587394",
+      "email": "user_1790877587394@psru.ac.th",
+      "password": "$2b$10$pu6aRqFpiSmA/A9QEzkCNuNJLsa2T4GnTpmrYGzw/Sl.qwj0fRiiW",
+      "name": "นักศึกษา มรพส.",
+      "phone": "0812345678",
+      "address": "หอพักใน มรพส. ตึก 1",
+      "role": "customer",
+      "createdAt": "2026-10-01T17:59:47.462Z"
+    },
+    {
+      "id": 24,
+      "username": "user_1790877695775",
+      "email": "user_1790877695775@psru.ac.th",
+      "password": "$2b$10$4.QE0iYCge92hGFMdMJwnOfAlMhX7HiZxD/sbpDxR1XZXwulN0w.S",
+      "name": "นักศึกษา มรพส.",
+      "phone": "0812345678",
+      "address": "หอพักใน มรพส. ตึก 1",
+      "role": "customer",
+      "createdAt": "2026-10-01T18:01:35.844Z"
+    },
+    {
+      "id": 25,
+      "username": "user_1790878327329",
+      "email": "user_1790878327329@psru.ac.th",
+      "password": "$2b$10$j91FYRrl0Xw0wBN495uvxuGcWkuIBye5w9hdE6IX3pVniQRvVjduG",
+      "name": "นักศึกษา มรพส.",
+      "phone": "0812345678",
+      "address": "หอพักใน มรพส. ตึก 1",
+      "role": "customer",
+      "createdAt": "2026-10-01T18:12:07.398Z"
+    },
+    {
+      "id": 26,
+      "username": "user_1790879801461",
+      "email": "user_1790879801461@psru.ac.th",
+      "password": "$2b$10$dwtHVjx8ehrxxg6jK6th4eHUwCW6dC4O4sb4vxjOODo320AGI//yW",
+      "name": "นักศึกษา มรพส.",
+      "phone": "0812345678",
+      "address": "หอพักใน มรพส. ตึก 1",
+      "role": "customer",
+      "createdAt": "2026-10-01T18:36:41.528Z"
     }
   ],
   "services": [
@@ -280,6 +357,825 @@
   ],
   "orders": [
     {
+      "id": "ORD-8",
+      "rawId": 8,
+      "userId": null,
+      "createdAt": "2026-10-01T17:24:07.010Z",
+      "customer": {
+        "name": "สมปอง ทดสอบแก้ชื่อ",
+        "phone": "089-777-1111",
+        "email": "sompong@psru.ac.th",
+        "address": "หอพักขวัญเรือน ห้อง 310",
+        "note": "ฝากไว้ที่เคาน์เตอร์ด้านล่าง โทรแจ้งด้วย"
+      },
+      "items": [
+        {
+          "serviceId": 1,
+          "serviceName": "ซัก อบ พับ (Wash & Fold)",
+          "quantity": 3.5,
+          "unit": "กก.",
+          "pricePerUnit": 60,
+          "subtotal": 210
+        },
+        {
+          "serviceId": 2,
+          "serviceName": "ซัก อบ รีด (Wash & Iron)",
+          "quantity": 2,
+          "unit": "กก.",
+          "pricePerUnit": 80,
+          "subtotal": 160
+        }
+      ],
+      "preferences": {
+        "detergent": "สูตรซักผ้าขาว",
+        "softener": "กลิ่นซากุระ",
+        "packaging": "แขวนไม้แขวน"
+      },
+      "subtotal": 370,
+      "deliveryFee": 40,
+      "discount": 0,
+      "totalAmount": 410,
+      "paymentStatus": "PAID",
+      "paymentMethod": "PROMPTPAY",
+      "paymentTime": "2026-10-01T17:24:07.010Z",
+      "status": "CANCELLED",
+      "timeline": [
+        {
+          "status": "ORDER_PLACED",
+          "title": "สั่งออเดอร์สำเร็จ",
+          "description": "ระบบบันทึกรายการคำสั่งซื้อเรียบร้อยแล้ว",
+          "timestamp": "2026-10-01T17:24:07.010Z"
+        },
+        {
+          "status": "RIDER_ASSIGNED",
+          "title": "จัดสรรไรเดอร์รับส่งผ้า",
+          "description": "ไรเดอร์ นายพงษ์อนันต์ ชนะสแบง กำลังเตรียมตัวเข้ารับผ้า",
+          "timestamp": "2026-10-01T17:24:08.010Z"
+        },
+        {
+          "status": "CANCELLED",
+          "title": "ยกเลิกออเดอร์",
+          "description": "รายการถูกยกเลิก",
+          "timestamp": "2026-10-01T17:35:28.436Z"
+        }
+      ],
+      "assignedRider": {
+        "name": "นายพงษ์อนันต์ ชนะสแบง",
+        "phone": "671-223-1091",
+        "vehicle": "ฮอนด้า เวฟ 125 ทะเบียน 1กข-8899"
+      },
+      "estimatedDelivery": "2026-10-02T17:24:07.010Z",
+      "pickupSchedule": "14:00 - 16:00",
+      "returnSchedule": "พรุ่งนี้ 18:00"
+    },
+    {
+      "id": "ORD-7",
+      "rawId": 7,
+      "userId": null,
+      "createdAt": "2026-10-01T17:23:24.894Z",
+      "customer": {
+        "name": "ทดสอบระบบ",
+        "phone": "0812345678",
+        "email": "",
+        "address": "หอพักนักศึกษา PSRU",
+        "note": ""
+      },
+      "items": [
+        {
+          "serviceId": 1,
+          "serviceName": "ซัก อบ พับ (Wash & Fold)",
+          "quantity": 2,
+          "unit": "กก.",
+          "pricePerUnit": 60,
+          "subtotal": 120
+        }
+      ],
+      "preferences": {
+        "detergent": "สูตรมาตรฐานพรีเมียม",
+        "softener": "กลิ่นบลอสซั่ม (Blossom Fresh)",
+        "packaging": "พับใส่ถุงซีลสุญญากาศ"
+      },
+      "subtotal": 120,
+      "deliveryFee": 40,
+      "discount": 0,
+      "totalAmount": 160,
+      "paymentStatus": "PAID",
+      "paymentMethod": "PROMPTPAY",
+      "paymentTime": "2026-10-01T17:23:24.894Z",
+      "status": "ORDER_PLACED",
+      "timeline": [
+        {
+          "status": "ORDER_PLACED",
+          "title": "สั่งออเดอร์สำเร็จ",
+          "description": "ระบบบันทึกรายการคำสั่งซื้อเรียบร้อยแล้ว",
+          "timestamp": "2026-10-01T17:23:24.894Z"
+        },
+        {
+          "status": "RIDER_ASSIGNED",
+          "title": "จัดสรรไรเดอร์รับส่งผ้า",
+          "description": "ไรเดอร์ นายพงษ์อนันต์ ชนะสแบง กำลังเตรียมตัวเข้ารับผ้า",
+          "timestamp": "2026-10-01T17:23:25.894Z"
+        },
+        {
+          "status": "RIDER_ASSIGNED",
+          "title": "จัดสรรไรเดอร์แล้ว",
+          "description": "",
+          "timestamp": "2026-10-01T17:35:43.040Z"
+        },
+        {
+          "status": "ORDER_PLACED",
+          "title": "สั่งออเดอร์แล้ว",
+          "description": "",
+          "timestamp": "2026-10-01T17:35:47.452Z"
+        },
+        {
+          "status": "RIDER_ASSIGNED",
+          "title": "จัดสรรไรเดอร์แล้ว",
+          "description": "",
+          "timestamp": "2026-10-01T17:36:07.967Z"
+        },
+        {
+          "status": "PICKED_UP",
+          "title": "รับผ้าแล้ว (เข้าร้าน)",
+          "description": "ไรเดอร์เข้ารับผ้าจากลูกค้าและนำเข้าสู่ศูนย์ซักรีดเรียบร้อย",
+          "timestamp": "2026-10-01T17:36:14.465Z"
+        },
+        {
+          "status": "RIDER_ASSIGNED",
+          "title": "จัดสรรไรเดอร์แล้ว",
+          "description": "",
+          "timestamp": "2026-10-01T17:49:02.066Z"
+        },
+        {
+          "status": "ORDER_PLACED",
+          "title": "สั่งออเดอร์แล้ว",
+          "description": "",
+          "timestamp": "2026-10-01T17:49:06.272Z"
+        }
+      ],
+      "assignedRider": {
+        "id": "RIDER-01",
+        "name": "นายพงษ์อนันต์ ชนะสแบง",
+        "phone": "671-223-1091",
+        "vehicle": "ฮอนด้า เวฟ 125 ทะเบียน 1กข-8899"
+      },
+      "estimatedDelivery": "2026-10-02T17:23:24.894Z"
+    },
+    {
+      "id": "ORD-6",
+      "rawId": 6,
+      "userId": 4,
+      "createdAt": "2026-10-01T17:12:08.889Z",
+      "customer": {
+        "name": "ผู้ดูแลระบบสูงสุดtest",
+        "phone": "099-888-7766",
+        "email": "admin@example.com",
+        "address": "สำนักงานใหญ่",
+        "note": "[วิทยาเขต: มรพส. ทะเลแก้ว] [จุดรับผ้า: 🏢 ใต้ตึกหอพักนักศึกษา (ป้อม รปภ. / โต๊ะนิติหอใน มรพส.)] "
+      },
+      "items": [
+        {
+          "serviceId": 1,
+          "serviceName": "ซัก อบ พับ (Wash & Fold)",
+          "pricePerUnit": 35,
+          "quantity": 1.5,
+          "unit": "กก.",
+          "subtotal": 53
+        }
+      ],
+      "preferences": {
+        "detergent": "มาตรฐาน DekDry",
+        "softener": "กลิ่นอ่อนโยน",
+        "packaging": "พับผ้า",
+        "temperature": "น้ำเย็น — 30°C",
+        "drying": "เครื่องอบผ้า (อุณหภูมิต่ำ)",
+        "bedding": "ไม่มี"
+      },
+      "subtotal": 35,
+      "deliveryFee": 40,
+      "discount": 0,
+      "totalAmount": 93,
+      "paymentStatus": "PAID",
+      "paymentMethod": "PROMPTPAY",
+      "paymentTime": "2026-10-01T17:12:08.889Z",
+      "status": "COMPLETED",
+      "timeline": [
+        {
+          "status": "ORDER_PLACED",
+          "title": "สั่งออเดอร์สำเร็จ",
+          "description": "ระบบบันทึกรายการคำสั่งซื้อเรียบร้อยแล้ว",
+          "timestamp": "2026-10-01T17:12:08.889Z"
+        },
+        {
+          "status": "RIDER_ASSIGNED",
+          "title": "จัดสรรไรเดอร์รับส่งผ้า",
+          "description": "ไรเดอร์ นายพงษ์อนันต์ ชนะสแบง กำลังเตรียมตัวเข้ารับผ้า",
+          "timestamp": "2026-10-01T17:12:09.889Z"
+        },
+        {
+          "status": "PICKED_UP",
+          "title": "รับผ้าแล้ว (เข้าร้าน)",
+          "description": "ไรเดอร์เข้ารับผ้าจากลูกค้าและนำเข้าสู่ศูนย์ซักรีดเรียบร้อย",
+          "timestamp": "2026-10-01T17:12:46.959Z"
+        },
+        {
+          "status": "WAIT_PRICE_CONFIRM",
+          "title": "ชั่งน้ำหนักผ้าและปรับปรุงราคา",
+          "description": "ทางร้านชั่งน้ำหนักจริง ปรับราคาจาก ฿75 เป็น ฿93 (หมายเหตุ: [วิทยาเขต: มรพส. ทะเลแก้ว] [จุดรับผ้า: 🏢 ใต้ตึกหอพักนักศึกษา (ป้อม รปภ. / โต๊ะนิติหอใน มรพส.)])",
+          "timestamp": "2026-10-01T17:12:53.652Z"
+        },
+        {
+          "status": "IN_WASHING",
+          "title": "ลูกค้ายืนยันราคาเรียบร้อย",
+          "description": "ลูกค้ายืนยันราคา ฿93 เรียบร้อยแล้ว ร้านเริ่มดำเนินการซัก อบ รีด ทันที",
+          "timestamp": "2026-10-01T17:13:01.638Z"
+        },
+        {
+          "status": "DELIVERED",
+          "title": "จัดส่งสำเร็จ (รอตรวจรับ)",
+          "description": "ส่งมอบผ้าสะอาดให้ลูกค้าเรียบร้อยแล้ว",
+          "timestamp": "2026-10-01T17:13:40.956Z"
+        },
+        {
+          "status": "COMPLETED",
+          "title": "ลูกค้ายืนยันรับผ้าเรียบร้อยแล้ว",
+          "description": "ลูกค้ากดยืนยันได้รับผ้าสะอาดเรียบร้อย คำสั่งซื้อเสร็จสิ้นสมบูรณ์",
+          "timestamp": "2026-10-01T17:13:50.551Z"
+        }
+      ],
+      "assignedRider": {
+        "id": "RIDER-01",
+        "name": "นายพงษ์อนันต์ ชนะสแบง",
+        "phone": "671-223-1091",
+        "vehicle": "ฮอนด้า เวฟ 125 ทะเบียน 1กข-8899"
+      },
+      "estimatedDelivery": "2026-10-02T17:12:08.889Z",
+      "oldAmount": 75,
+      "priceAdjustNote": "[วิทยาเขต: มรพส. ทะเลแก้ว] [จุดรับผ้า: 🏢 ใต้ตึกหอพักนักศึกษา (ป้อม รปภ. / โต๊ะนิติหอใน มรพส.)]",
+      "customerApprovedAt": "2026-10-01T17:13:01.638Z",
+      "completedAt": "2026-10-01T17:13:40.956Z",
+      "customerConfirmedAt": "2026-10-01T17:13:50.551Z"
+    },
+    {
+      "id": "ORD-5",
+      "rawId": 5,
+      "userId": 5,
+      "createdAt": "2026-10-01T17:10:49.395Z",
+      "customer": {
+        "name": "ธิเบศ พรมมา (นศ. 651463024)",
+        "phone": "089-999-5555",
+        "email": "thibet.pro67@psru.ac.th",
+        "address": "หอพักนักศึกษา อาคาร 4 ห้อง 402 มรพส. ทะเลแก้ว",
+        "note": "[วิทยาเขต: มรพส. ทะเลแก้ว] [จุดรับผ้า: ป้อม รปภ.] ฝากไว้ที่โต๊ะ รปภ. ใต้ตึก"
+      },
+      "items": [
+        {
+          "serviceId": 1,
+          "serviceName": "ซัก อบ พับ (Wash & Fold)",
+          "pricePerUnit": 60,
+          "quantity": 2.5,
+          "unit": "กก.",
+          "subtotal": 150
+        }
+      ],
+      "preferences": {
+        "detergent": "มาตรฐาน DekDry",
+        "softener": "กลิ่นหอมละมุน",
+        "packaging": "รีดเรียบแขวนไม้",
+        "temperature": "40°C",
+        "drying": "เครื่องอบผ้า"
+      },
+      "subtotal": 180,
+      "deliveryFee": 40,
+      "discount": 0,
+      "totalAmount": 190,
+      "paymentStatus": "PAID",
+      "paymentMethod": "PROMPTPAY",
+      "paymentTime": "2026-10-01T17:10:49.395Z",
+      "status": "COMPLETED",
+      "timeline": [
+        {
+          "status": "ORDER_PLACED",
+          "title": "สั่งออเดอร์สำเร็จ",
+          "description": "ระบบบันทึกรายการคำสั่งซื้อเรียบร้อยแล้ว",
+          "timestamp": "2026-10-01T17:10:49.395Z"
+        },
+        {
+          "status": "RIDER_ASSIGNED",
+          "title": "จัดสรรไรเดอร์รับส่งผ้า",
+          "description": "ไรเดอร์ นายพงษ์อนันต์ ชนะสแบง กำลังเตรียมตัวเข้ารับผ้า",
+          "timestamp": "2026-10-01T17:10:50.395Z"
+        },
+        {
+          "status": "PICKED_UP",
+          "title": "รับผ้าแล้ว (เข้าร้าน)",
+          "description": "ไรเดอร์เข้ารับผ้าจากลูกค้าและนำเข้าสู่ศูนย์ซักรีดเรียบร้อย",
+          "timestamp": "2026-10-01T17:46:26.839Z"
+        },
+        {
+          "status": "IN_WASHING",
+          "title": "กำลังซัก / อบ / รีด",
+          "description": "ผ้าอยู่ระหว่างการคัดแยก ซัก อบ และรีดตามมาตรฐาน",
+          "timestamp": "2026-10-01T17:46:26.930Z"
+        },
+        {
+          "status": "ORDER_PLACED",
+          "title": "สั่งออเดอร์แล้ว",
+          "description": "",
+          "timestamp": "2026-10-01T17:48:16.967Z"
+        },
+        {
+          "status": "RIDER_ASSIGNED",
+          "title": "จัดสรรไรเดอร์แล้ว",
+          "description": "",
+          "timestamp": "2026-10-01T17:49:14.377Z"
+        },
+        {
+          "status": "PICKED_UP",
+          "title": "รับผ้าแล้ว (เข้าร้าน)",
+          "description": "ไรเดอร์เข้ารับผ้าจากลูกค้าและนำเข้าสู่ศูนย์ซักรีดเรียบร้อย",
+          "timestamp": "2026-10-01T17:49:20.378Z"
+        },
+        {
+          "status": "WAIT_PRICE_CONFIRM",
+          "title": "ชั่งน้ำหนักผ้าและปรับปรุงราคา",
+          "description": "ทางร้านชั่งน้ำหนักจริง ปรับราคาจาก ฿220 เป็น ฿190 (หมายเหตุ: [วิทยาเขต: มรพส. ทะเลแก้ว] [จุดรับผ้า: ป้อม รปภ.] ฝากไว้ที่โต๊ะ รปภ. ใต้ตึก)",
+          "timestamp": "2026-10-01T17:49:53.187Z"
+        },
+        {
+          "status": "IN_WASHING",
+          "title": "ลูกค้ายืนยันราคาเรียบร้อย",
+          "description": "ลูกค้ายืนยันราคา ฿190 เรียบร้อยแล้ว ร้านเริ่มดำเนินการซัก อบ รีด ทันที",
+          "timestamp": "2026-10-01T17:49:57.737Z"
+        },
+        {
+          "status": "IN_WASHING",
+          "title": "กำลังซัก / อบ / รีด",
+          "description": "ผ้าอยู่ระหว่างการคัดแยก ซัก อบ และรีดตามมาตรฐาน",
+          "timestamp": "2026-10-01T17:50:03.509Z"
+        },
+        {
+          "status": "WASHED_READY",
+          "title": "ซักเสร็จ พร้อมจัดส่ง",
+          "description": "ซัก อบ รีด และตรวจสอบคุณภาพเรียบร้อย พร้อมส่งมอบ",
+          "timestamp": "2026-10-01T17:50:11.991Z"
+        },
+        {
+          "status": "OUT_FOR_DELIVERY",
+          "title": "กำลังนำส่งลูกค้า",
+          "description": "ไรเดอร์กำลังนำผ้าไปจัดส่งคืนลูกค้าตามที่อยู่",
+          "timestamp": "2026-10-01T17:50:45.117Z"
+        },
+        {
+          "status": "DELIVERED",
+          "title": "จัดส่งสำเร็จ (รอตรวจรับ)",
+          "description": "ส่งมอบผ้าสะอาดให้ลูกค้าเรียบร้อยแล้ว",
+          "timestamp": "2026-10-01T17:50:59.568Z"
+        },
+        {
+          "status": "COMPLETED",
+          "title": "ลูกค้ายืนยันรับผ้าเรียบร้อยแล้ว",
+          "description": "ลูกค้ากดยืนยันได้รับผ้าสะอาดเรียบร้อย คำสั่งซื้อเสร็จสิ้นสมบูรณ์",
+          "timestamp": "2026-10-01T17:51:07.700Z"
+        }
+      ],
+      "assignedRider": {
+        "id": "RIDER-01",
+        "name": "นายพงษ์อนันต์ ชนะสแบง",
+        "phone": "671-223-1091",
+        "vehicle": "ฮอนด้า เวฟ 125 ทะเบียน 1กข-8899"
+      },
+      "estimatedDelivery": "2026-10-02T17:10:49.395Z",
+      "oldAmount": 220,
+      "priceAdjustNote": "[วิทยาเขต: มรพส. ทะเลแก้ว] [จุดรับผ้า: ป้อม รปภ.] ฝากไว้ที่โต๊ะ รปภ. ใต้ตึก",
+      "customerApprovedAt": "2026-10-01T17:49:57.737Z",
+      "completedAt": "2026-10-01T17:50:59.568Z",
+      "customerConfirmedAt": "2026-10-01T17:51:07.700Z"
+    },
+    {
+      "id": "ORD-4",
+      "rawId": 4,
+      "userId": 5,
+      "createdAt": "2026-10-01T17:06:35.607Z",
+      "customer": {
+        "name": "ธิเบศ พรมมา",
+        "phone": "08912345678",
+        "email": "thibet.pro67@psru.ac.th",
+        "address": "ห้องใต้ดินของเซเว่น",
+        "note": "[วิทยาเขต: มรพส. ทะเลแก้ว] [จุดรับผ้า: 🏢 ใต้ตึกหอพักนักศึกษา (ป้อม รปภ. / โต๊ะนิติหอใน มรพส.)] "
+      },
+      "items": [
+        {
+          "serviceId": "srv_standard",
+          "serviceName": "บริการซักอบรีด แบบมาตรฐาน (วันถัดไป) (มรพส. ทะเลแก้ว)",
+          "quantity": 1,
+          "unit": "ชิ้น",
+          "pricePerUnit": 49,
+          "subtotal": 49
+        }
+      ],
+      "preferences": {
+        "detergent": "มาตรฐาน DekDry",
+        "softener": "กลิ่นอ่อนโยน",
+        "packaging": "พับผ้า",
+        "temperature": "น้ำเย็น — 30°C",
+        "drying": "เครื่องอบผ้า (อุณหภูมิต่ำ)",
+        "bedding": "ไม่มี"
+      },
+      "subtotal": 49,
+      "deliveryFee": 40,
+      "discount": 0,
+      "totalAmount": 89,
+      "paymentStatus": "PAID",
+      "paymentMethod": "PROMPTPAY",
+      "paymentTime": "2026-10-01T17:06:35.607Z",
+      "status": "CANCELLED",
+      "timeline": [
+        {
+          "status": "ORDER_PLACED",
+          "title": "สั่งออเดอร์สำเร็จ",
+          "description": "ระบบบันทึกรายการคำสั่งซื้อเรียบร้อยแล้ว",
+          "timestamp": "2026-10-01T17:06:35.607Z"
+        },
+        {
+          "status": "RIDER_ASSIGNED",
+          "title": "จัดสรรไรเดอร์รับส่งผ้า",
+          "description": "ไรเดอร์ นายพงษ์อนันต์ ชนะสแบง กำลังเตรียมตัวเข้ารับผ้า",
+          "timestamp": "2026-10-01T17:06:36.607Z"
+        },
+        {
+          "status": "RIDER_ASSIGNED",
+          "title": "จัดสรรไรเดอร์แล้ว",
+          "description": "",
+          "timestamp": "2026-10-01T17:33:06.529Z"
+        },
+        {
+          "status": "ORDER_PLACED",
+          "title": "สั่งออเดอร์แล้ว",
+          "description": "",
+          "timestamp": "2026-10-01T17:33:13.247Z"
+        },
+        {
+          "status": "CANCELLED",
+          "title": "ยกเลิกออเดอร์",
+          "description": "รายการถูกยกเลิก",
+          "timestamp": "2026-10-01T17:35:06.532Z"
+        }
+      ],
+      "assignedRider": {
+        "id": "RIDER-01",
+        "name": "นายพงษ์อนันต์ ชนะสแบง",
+        "phone": "671-223-1091",
+        "vehicle": "ฮอนด้า เวฟ 125 ทะเบียน 1กข-8899"
+      },
+      "estimatedDelivery": "2026-10-02T17:06:35.607Z"
+    },
+    {
+      "id": "ORD-3",
+      "rawId": 3,
+      "userId": 5,
+      "createdAt": "2026-10-01T16:37:12.539Z",
+      "customer": {
+        "name": "นายพีรพล แก้วพูลสุข (นศ. 65123456)",
+        "phone": "081-999-8877",
+        "email": "peerapol.k@psru.ac.th",
+        "address": "หอพักนักศึกษาหญิง อาคาร 2 ห้อง 314 มหาวิทยาลัยราชภัฏพิบูลสงคราม (ทะเลแก้ว)",
+        "note": "[วิทยาเขต: มรพส. ทะเลแก้ว] [จุดรับผ้า: 🏢 ใต้ตึกหอพักนักศึกษา (ป้อม รปภ. / โต๊ะนิติหอใน มรพส.)] "
+      },
+      "items": [
+        {
+          "serviceId": 1,
+          "serviceName": "ซัก อบ พับ (Wash & Fold)",
+          "pricePerUnit": 35,
+          "quantity": 2,
+          "unit": "กก.",
+          "subtotal": 70
+        }
+      ],
+      "preferences": {
+        "detergent": "มาตรฐาน DekDry",
+        "softener": "กลิ่นอ่อนโยน",
+        "packaging": "พับผ้า",
+        "temperature": "น้ำเย็น — 30°C",
+        "drying": "เครื่องอบผ้า (อุณหภูมิต่ำ)",
+        "bedding": "ไม่มี"
+      },
+      "subtotal": 35,
+      "deliveryFee": 40,
+      "discount": 0,
+      "totalAmount": 110,
+      "paymentStatus": "PAID",
+      "paymentMethod": "PROMPTPAY",
+      "paymentTime": "2026-10-01T16:37:12.539Z",
+      "status": "COMPLETED",
+      "timeline": [
+        {
+          "status": "ORDER_PLACED",
+          "title": "สั่งออเดอร์สำเร็จ",
+          "description": "ระบบบันทึกรายการคำสั่งซื้อเรียบร้อยแล้ว",
+          "timestamp": "2026-10-01T16:37:12.539Z"
+        },
+        {
+          "status": "RIDER_ASSIGNED",
+          "title": "จัดสรรไรเดอร์รับส่งผ้า",
+          "description": "ไรเดอร์ นายพงษ์อนันต์ ชนะสแบง กำลังเตรียมตัวเข้ารับผ้า",
+          "timestamp": "2026-10-01T16:37:13.539Z"
+        },
+        {
+          "status": "WAIT_PRICE_CONFIRM",
+          "title": "ชั่งน้ำหนักผ้าและปรับปรุงราคา",
+          "description": "ทางร้านชั่งน้ำหนักจริง ปรับราคาจาก ฿75 เป็น ฿110 (หมายเหตุ: [วิทยาเขต: มรพส. ทะเลแก้ว] [จุดรับผ้า: 🏢 ใต้ตึกหอพักนักศึกษา (ป้อม รปภ. / โต๊ะนิติหอใน มรพส.)])",
+          "timestamp": "2026-10-01T16:40:50.350Z"
+        },
+        {
+          "status": "IN_WASHING",
+          "title": "ลูกค้ายืนยันราคาเรียบร้อย",
+          "description": "ลูกค้ายืนยันราคา ฿110 เรียบร้อยแล้ว ร้านเริ่มดำเนินการซัก อบ รีด ทันที",
+          "timestamp": "2026-10-01T16:41:37.934Z"
+        },
+        {
+          "status": "WASHED_READY",
+          "title": "ซักเสร็จ พร้อมจัดส่ง",
+          "description": "ซัก อบ รีด และตรวจสอบคุณภาพเรียบร้อย พร้อมส่งมอบ",
+          "timestamp": "2026-10-01T16:42:16.379Z"
+        },
+        {
+          "status": "OUT_FOR_DELIVERY",
+          "title": "กำลังนำส่งลูกค้า",
+          "description": "ไรเดอร์กำลังนำผ้าไปจัดส่งคืนลูกค้าตามที่อยู่",
+          "timestamp": "2026-10-01T16:42:26.391Z"
+        },
+        {
+          "status": "DELIVERED",
+          "title": "จัดส่งสำเร็จ",
+          "description": "ส่งมอบผ้าสะอาดให้ลูกค้าเรียบร้อยแล้ว",
+          "timestamp": "2026-10-01T16:42:33.390Z"
+        },
+        {
+          "status": "CANCELLED",
+          "title": "ยกเลิกออเดอร์",
+          "description": "รายการถูกยกเลิก",
+          "timestamp": "2026-10-01T16:42:39.940Z"
+        },
+        {
+          "status": "DELIVERED",
+          "title": "จัดส่งสำเร็จ",
+          "description": "ส่งมอบผ้าสะอาดให้ลูกค้าเรียบร้อยแล้ว",
+          "timestamp": "2026-10-01T16:42:42.916Z"
+        },
+        {
+          "status": "DELIVERED",
+          "title": "จัดส่งสำเร็จ (รอตรวจรับ)",
+          "description": "ส่งมอบผ้าสะอาดให้ลูกค้าเรียบร้อยแล้ว",
+          "timestamp": "2026-10-01T16:55:54.707Z"
+        },
+        {
+          "status": "COMPLETED",
+          "title": "ลูกค้ายืนยันรับผ้าเรียบร้อยแล้ว",
+          "description": "ลูกค้ากดยืนยันได้รับผ้าสะอาดเรียบร้อย คำสั่งซื้อเสร็จสิ้นสมบูรณ์",
+          "timestamp": "2026-10-01T16:55:54.717Z"
+        }
+      ],
+      "assignedRider": {
+        "id": "RIDER-01",
+        "name": "นายพงษ์อนันต์ ชนะสแบง",
+        "phone": "671-223-1091",
+        "vehicle": "ฮอนด้า เวฟ 125 ทะเบียน 1กข-8899"
+      },
+      "estimatedDelivery": "2026-10-02T16:37:12.539Z",
+      "oldAmount": 75,
+      "priceAdjustNote": "[วิทยาเขต: มรพส. ทะเลแก้ว] [จุดรับผ้า: 🏢 ใต้ตึกหอพักนักศึกษา (ป้อม รปภ. / โต๊ะนิติหอใน มรพส.)]",
+      "customerApprovedAt": "2026-10-01T16:41:37.934Z",
+      "completedAt": "2026-10-01T16:55:54.707Z",
+      "customerConfirmedAt": "2026-10-01T16:55:54.717Z"
+    },
+    {
+      "id": "ORD-2",
+      "rawId": 2,
+      "userId": 5,
+      "createdAt": "2026-10-01T16:25:14.451Z",
+      "customer": {
+        "name": "ธิเบศ พรมมา (นศ. 65123456)",
+        "phone": "0871234567",
+        "email": "thibet.pro_67@psru.ac.th",
+        "address": "หน้าเซเว่นใน ม.",
+        "note": "[วิทยาเขต: มรพส. ทะเลแก้ว] [จุดรับผ้า: 📍 จุด Drop-Point ในมอ (หน้า 7-Eleven / อาคารกิจกรรม / ใต้ตึกคณะ)]  | ถึงแล้วร้องเพลง 1 2 3 4 5 i love you"
+      },
+      "items": [
+        {
+          "serviceId": 1,
+          "serviceName": "ซัก อบ พับ (Wash & Fold)",
+          "pricePerUnit": 69,
+          "quantity": 3,
+          "unit": "กก.",
+          "subtotal": 207
+        }
+      ],
+      "preferences": {
+        "detergent": "มาตรฐาน DekDry",
+        "softener": "กลิ่นพรีเมียม Downy®",
+        "packaging": "พับผ้า",
+        "temperature": "น้ำอุ่น — 60°C",
+        "drying": "เครื่องอบผ้า (อุณหภูมิต่ำ)",
+        "bedding": "ไม่มี"
+      },
+      "subtotal": 207,
+      "deliveryFee": 40,
+      "discount": 0,
+      "totalAmount": 247,
+      "paymentStatus": "PAID",
+      "paymentMethod": "COD",
+      "paymentTime": null,
+      "status": "COMPLETED",
+      "timeline": [
+        {
+          "status": "ORDER_PLACED",
+          "title": "สั่งออเดอร์สำเร็จ",
+          "description": "ระบบบันทึกรายการคำสั่งซื้อเรียบร้อยแล้ว",
+          "timestamp": "2026-10-01T16:25:14.451Z"
+        },
+        {
+          "status": "RIDER_ASSIGNED",
+          "title": "จัดสรรไรเดอร์รับส่งผ้า",
+          "description": "ไรเดอร์ นายพงษ์อนันต์ ชนะสแบง กำลังเตรียมตัวเข้ารับผ้า",
+          "timestamp": "2026-10-01T16:25:15.451Z"
+        },
+        {
+          "status": "RIDER_ASSIGNED",
+          "title": "จัดสรรไรเดอร์แล้ว",
+          "description": "",
+          "timestamp": "2026-10-01T16:32:12.600Z"
+        },
+        {
+          "status": "PICKED_UP",
+          "title": "รับผ้าแล้ว (เข้าร้าน)",
+          "description": "ไรเดอร์เข้ารับผ้าจากลูกค้าและนำเข้าสู่ศูนย์ซักรีดเรียบร้อย",
+          "timestamp": "2026-10-01T16:32:26.750Z"
+        },
+        {
+          "status": "WAIT_PRICE_CONFIRM",
+          "title": "ชั่งน้ำหนักผ้าและปรับปรุงราคา",
+          "description": "ทางร้านชั่งน้ำหนักจริง ปรับราคาจาก ฿247 เป็น ฿213 (หมายเหตุ: [วิทยาเขต: มรพส. ทะเลแก้ว] [จุดรับผ้า: 📍 จุด Drop-Point ในมอ (หน้า 7-Eleven / อาคารกิจกรรม / ใต้ตึกคณะ)]  | ถึงแล้วร้องเพลง 1 2 3 4 5 i love you)",
+          "timestamp": "2026-10-01T16:56:58.691Z"
+        },
+        {
+          "status": "IN_WASHING",
+          "title": "ลูกค้ายืนยันราคาเรียบร้อย",
+          "description": "ลูกค้ายืนยันราคา ฿213 เรียบร้อยแล้ว ร้านเริ่มดำเนินการซัก อบ รีด ทันที",
+          "timestamp": "2026-10-01T16:57:09.336Z"
+        },
+        {
+          "status": "WASHED_READY",
+          "title": "ซักเสร็จ พร้อมจัดส่ง",
+          "description": "ซัก อบ รีด และตรวจสอบคุณภาพเรียบร้อย พร้อมส่งมอบ",
+          "timestamp": "2026-10-01T16:57:17.109Z"
+        },
+        {
+          "status": "WAIT_PRICE_CONFIRM",
+          "title": "ชั่งน้ำหนักผ้าและปรับปรุงราคา",
+          "description": "ทางร้านชั่งน้ำหนักจริง ปรับราคาจาก ฿213 เป็น ฿247 (หมายเหตุ: [วิทยาเขต: มรพส. ทะเลแก้ว] [จุดรับผ้า: 📍 จุด Drop-Point ในมอ (หน้า 7-Eleven / อาคารกิจกรรม / ใต้ตึกคณะ)]  | ถึงแล้วร้องเพลง 1 2 3 4 5 i love you)",
+          "timestamp": "2026-10-01T16:57:23.321Z"
+        },
+        {
+          "status": "IN_WASHING",
+          "title": "ลูกค้ายืนยันราคาเรียบร้อย",
+          "description": "ลูกค้ายืนยันราคา ฿247 เรียบร้อยแล้ว ร้านเริ่มดำเนินการซัก อบ รีด ทันที",
+          "timestamp": "2026-10-01T16:57:28.902Z"
+        },
+        {
+          "status": "WASHED_READY",
+          "title": "ซักเสร็จ พร้อมจัดส่ง",
+          "description": "ซัก อบ รีด และตรวจสอบคุณภาพเรียบร้อย พร้อมส่งมอบ",
+          "timestamp": "2026-10-01T16:57:35.710Z"
+        },
+        {
+          "status": "OUT_FOR_DELIVERY",
+          "title": "กำลังนำส่งลูกค้า",
+          "description": "ไรเดอร์กำลังนำผ้าไปจัดส่งคืนลูกค้าตามที่อยู่",
+          "timestamp": "2026-10-01T16:57:45.472Z"
+        },
+        {
+          "status": "DELIVERED",
+          "title": "จัดส่งสำเร็จ (รอตรวจรับ)",
+          "description": "ส่งมอบผ้าสะอาดให้ลูกค้าเรียบร้อยแล้ว",
+          "timestamp": "2026-10-01T16:57:50.798Z"
+        },
+        {
+          "status": "COMPLETED",
+          "title": "เสร็จสิ้น (ลูกค้ายืนยันรับผ้าแล้ว)",
+          "description": "",
+          "timestamp": "2026-10-01T16:58:00.400Z"
+        }
+      ],
+      "assignedRider": {
+        "id": "RIDER-01",
+        "name": "นายพงษ์อนันต์ ชนะสแบง",
+        "phone": "671-223-1091",
+        "vehicle": "ฮอนด้า เวฟ 125 ทะเบียน 1กข-8899"
+      },
+      "estimatedDelivery": "2026-10-01T22:25:14.451Z",
+      "oldAmount": 213,
+      "priceAdjustNote": "[วิทยาเขต: มรพส. ทะเลแก้ว] [จุดรับผ้า: 📍 จุด Drop-Point ในมอ (หน้า 7-Eleven / อาคารกิจกรรม / ใต้ตึกคณะ)]  | ถึงแล้วร้องเพลง 1 2 3 4 5 i love you",
+      "customerApprovedAt": "2026-10-01T16:57:28.902Z",
+      "completedAt": "2026-10-01T16:57:50.798Z"
+    },
+    {
+      "id": "ORD-1",
+      "rawId": 1,
+      "userId": null,
+      "createdAt": "2026-10-01T16:17:58.001Z",
+      "customer": {
+        "name": "AmMeow Test",
+        "phone": "081-234-5678",
+        "email": "",
+        "address": "PSRU Dorm 1",
+        "note": ""
+      },
+      "items": [
+        {
+          "serviceId": 1,
+          "serviceName": "ซัก อบ พับ (Wash & Fold)",
+          "quantity": 3.5,
+          "pricePerUnit": 60,
+          "unit": "กก."
+        }
+      ],
+      "preferences": {
+        "detergent": "สูตรมาตรฐานพรีเมียม",
+        "softener": "กลิ่นบลอสซั่ม (Blossom Fresh)",
+        "packaging": "พับใส่ถุงซีลสุญญากาศ"
+      },
+      "subtotal": 120,
+      "deliveryFee": 40,
+      "discount": 0,
+      "totalAmount": 250,
+      "paymentStatus": "PAID",
+      "paymentMethod": "PROMPTPAY",
+      "paymentTime": "2026-10-01T16:17:58.001Z",
+      "status": "CANCELLED",
+      "timeline": [
+        {
+          "status": "ORDER_PLACED",
+          "title": "สั่งออเดอร์สำเร็จ",
+          "description": "ระบบบันทึกรายการคำสั่งซื้อเรียบร้อยแล้ว",
+          "timestamp": "2026-10-01T16:17:58.001Z"
+        },
+        {
+          "status": "RIDER_ASSIGNED",
+          "title": "จัดสรรไรเดอร์รับส่งผ้า",
+          "description": "ไรเดอร์ นายพงษ์อนันต์ ชนะสแบง กำลังเตรียมตัวเข้ารับผ้า",
+          "timestamp": "2026-10-01T16:17:59.001Z"
+        },
+        {
+          "status": "WAIT_PRICE_CONFIRM",
+          "title": "ชั่งน้ำหนักผ้าและปรับปรุงราคา",
+          "description": "ทางร้านชั่งน้ำหนักจริง ปรับราคาจาก ฿160 เป็น ฿250 (หมายเหตุ: ชั่งน้ำหนักจริงได้ 3.5 กก. ขอปรับราคาเป็น 250 บาท)",
+          "timestamp": "2026-10-01T16:39:32.084Z"
+        },
+        {
+          "status": "IN_WASHING",
+          "title": "ลูกค้ายืนยันราคาเรียบร้อย",
+          "description": "ลูกค้ายืนยันราคา ฿250 เรียบร้อยแล้ว ร้านเริ่มดำเนินการซัก อบ รีด ทันที",
+          "timestamp": "2026-10-01T16:39:40.392Z"
+        },
+        {
+          "status": "WASHED_READY",
+          "title": "ซักเสร็จ พร้อมจัดส่ง",
+          "description": "ซัก อบ รีด และตรวจสอบคุณภาพเรียบร้อย พร้อมส่งมอบ",
+          "timestamp": "2026-10-01T17:32:01.153Z"
+        },
+        {
+          "status": "OUT_FOR_DELIVERY",
+          "title": "กำลังนำส่งลูกค้า",
+          "description": "ไรเดอร์กำลังนำผ้าไปจัดส่งคืนลูกค้าตามที่อยู่",
+          "timestamp": "2026-10-01T17:33:37.734Z"
+        },
+        {
+          "status": "DELIVERED",
+          "title": "จัดส่งสำเร็จ (รอตรวจรับ)",
+          "description": "ส่งมอบผ้าสะอาดให้ลูกค้าเรียบร้อยแล้ว",
+          "timestamp": "2026-10-01T17:33:40.868Z"
+        },
+        {
+          "status": "CANCELLED",
+          "title": "ยกเลิกออเดอร์",
+          "description": "รายการถูกยกเลิก",
+          "timestamp": "2026-10-01T17:35:16.506Z"
+        }
+      ],
+      "assignedRider": {
+        "id": "RIDER-01",
+        "name": "นายพงษ์อนันต์ ชนะสแบง",
+        "phone": "671-223-1091",
+        "vehicle": "ฮอนด้า เวฟ 125 ทะเบียน 1กข-8899"
+      },
+      "estimatedDelivery": "2026-10-02T16:17:58.001Z",
+      "oldAmount": 160,
+      "priceAdjustNote": "ชั่งน้ำหนักจริงได้ 3.5 กก. ขอปรับราคาเป็น 250 บาท",
+      "customerApprovedAt": "2026-10-01T16:39:40.392Z",
+      "completedAt": "2026-10-01T17:33:40.868Z"
+    },
+    {
       "id": "ORD-2026-684",
       "userId": 1,
       "createdAt": "2026-10-01T14:43:20.803Z",
@@ -326,15 +1222,15 @@
         {
           "status": "RIDER_ASSIGNED",
           "title": "จัดสรรไรเดอร์รับส่งผ้า",
-          "description": "ไรเดอร์ นายวรเชษฐ์ ส่งตรงเวลา กำลังเตรียมตัวเข้ารับผ้า",
+          "description": "ไรเดอร์ นายพงษ์อนันต์ ชนะสแบง กำลังเตรียมตัวเข้ารับผ้า",
           "timestamp": "2026-10-01T14:43:21.803Z"
         }
       ],
       "assignedRider": {
-        "id": "RIDER-02",
-        "name": "นายวรเชษฐ์ ส่งตรงเวลา",
-        "phone": "084-555-6677",
-        "vehicle": "ยามาฮ่า แกรนด์ ฟีลาโน่ ทะเบียน 2ขค-4567"
+        "id": "RIDER-01",
+        "name": "นายพงษ์อนันต์ ชนะสแบง",
+        "phone": "671-223-1091",
+        "vehicle": "ฮอนด้า เวฟ 125 ทะเบียน 1กข-8899"
       },
       "estimatedDelivery": "2026-10-01T20:43:20.803Z"
     },
@@ -385,15 +1281,15 @@
         {
           "status": "RIDER_ASSIGNED",
           "title": "จัดสรรไรเดอร์รับส่งผ้า",
-          "description": "ไรเดอร์ นายวรเชษฐ์ ส่งตรงเวลา กำลังเตรียมตัวเข้ารับผ้า",
+          "description": "ไรเดอร์ นายพงษ์อนันต์ ชนะสแบง กำลังเตรียมตัวเข้ารับผ้า",
           "timestamp": "2026-10-01T14:43:07.260Z"
         }
       ],
       "assignedRider": {
-        "id": "RIDER-02",
-        "name": "นายวรเชษฐ์ ส่งตรงเวลา",
-        "phone": "084-555-6677",
-        "vehicle": "ยามาฮ่า แกรนด์ ฟีลาโน่ ทะเบียน 2ขค-4567"
+        "id": "RIDER-01",
+        "name": "นายพงษ์อนันต์ ชนะสแบง",
+        "phone": "671-223-1091",
+        "vehicle": "ฮอนด้า เวฟ 125 ทะเบียน 1กข-8899"
       },
       "estimatedDelivery": "2026-10-02T14:43:06.260Z"
     },
@@ -444,14 +1340,14 @@
         {
           "status": "RIDER_ASSIGNED",
           "title": "จัดสรรไรเดอร์รับส่งผ้า",
-          "description": "ไรเดอร์ นายนที วิ่งไว กำลังเตรียมตัวเข้ารับผ้า",
+          "description": "ไรเดอร์ นายพงษ์อนันต์ ชนะสแบง กำลังเตรียมตัวเข้ารับผ้า",
           "timestamp": "2026-10-01T12:55:26.394Z"
         }
       ],
       "assignedRider": {
         "id": "RIDER-01",
-        "name": "นายนที วิ่งไว",
-        "phone": "089-999-1122",
+        "name": "นายพงษ์อนันต์ ชนะสแบง",
+        "phone": "671-223-1091",
         "vehicle": "ฮอนด้า เวฟ 125 ทะเบียน 1กข-8899"
       },
       "estimatedDelivery": "2026-10-02T12:55:25.394Z"
@@ -500,15 +1396,15 @@
         {
           "status": "RIDER_ASSIGNED",
           "title": "จัดสรรไรเดอร์รับส่งผ้า",
-          "description": "ไรเดอร์ นายวรเชษฐ์ ส่งตรงเวลา กำลังเตรียมตัวเข้ารับผ้า",
+          "description": "ไรเดอร์ นายพงษ์อนันต์ ชนะสแบง กำลังเตรียมตัวเข้ารับผ้า",
           "timestamp": "2026-10-01T12:13:52.245Z"
         }
       ],
       "assignedRider": {
-        "id": "RIDER-02",
-        "name": "นายวรเชษฐ์ ส่งตรงเวลา",
-        "phone": "084-555-6677",
-        "vehicle": "ยามาฮ่า แกรนด์ ฟีลาโน่ ทะเบียน 2ขค-4567"
+        "id": "RIDER-01",
+        "name": "นายพงษ์อนันต์ ชนะสแบง",
+        "phone": "671-223-1091",
+        "vehicle": "ฮอนด้า เวฟ 125 ทะเบียน 1กข-8899"
       },
       "estimatedDelivery": "2026-10-02T12:13:51.245Z"
     },
@@ -555,7 +1451,7 @@
         {
           "status": "RIDER_ASSIGNED",
           "title": "จัดสรรไรเดอร์รับส่งผ้า",
-          "description": "ไรเดอร์ นายนที วิ่งไว กำลังเตรียมตัวเข้ารับผ้า",
+          "description": "ไรเดอร์ นายพงษ์อนันต์ ชนะสแบง กำลังเตรียมตัวเข้ารับผ้า",
           "timestamp": "2026-10-01T11:47:38.641Z"
         },
         {
@@ -567,8 +1463,8 @@
       ],
       "assignedRider": {
         "id": "RIDER-01",
-        "name": "นายนที วิ่งไว",
-        "phone": "089-999-1122",
+        "name": "นายพงษ์อนันต์ ชนะสแบง",
+        "phone": "671-223-1091",
         "vehicle": "ฮอนด้า เวฟ 125 ทะเบียน 1กข-8899"
       },
       "estimatedDelivery": "2026-10-02T11:47:37.641Z"
@@ -623,7 +1519,7 @@
         {
           "status": "RIDER_ASSIGNED",
           "title": "จัดสรรไรเดอร์แล้ว",
-          "description": "ไรเดอร์ นายนที กำลังเดินทางไปรับผ้าที่จุดนัดพบ",
+          "description": "ไรเดอร์ นายพงษ์อนันต์ ชนะสแบง กำลังเดินทางไปรับผ้าที่จุดนัดพบ",
           "timestamp": "2026-10-01T10:45:00.000Z"
         },
         {
@@ -641,8 +1537,8 @@
       ],
       "assignedRider": {
         "id": "RIDER-01",
-        "name": "นายนที วิ่งไว",
-        "phone": "089-999-1122",
+        "name": "นายพงษ์อนันต์ ชนะสแบง",
+        "phone": "671-223-1091",
         "vehicle": "ฮอนด้า เวฟ 125 ทะเบียน 1กข-8899"
       },
       "estimatedDelivery": "2026-10-02T16:00:00.000Z"
@@ -720,10 +1616,10 @@
         }
       ],
       "assignedRider": {
-        "id": "RIDER-02",
-        "name": "นายวรเชษฐ์ ส่งตรงเวลา",
-        "phone": "084-555-6677",
-        "vehicle": "ยามาฮ่า แกรนด์ ฟีลาโน่ ทะเบียน 2ขค-4567"
+        "id": "RIDER-01",
+        "name": "นายพงษ์อนันต์ ชนะสแบง",
+        "phone": "671-223-1091",
+        "vehicle": "ฮอนด้า เวฟ 125 ทะเบียน 1กข-8899"
       },
       "estimatedDelivery": "2026-10-01T19:30:00.000Z",
       "completedAt": "2026-10-01T11:48:20.085Z"
@@ -776,8 +1672,8 @@
       ],
       "assignedRider": {
         "id": "RIDER-01",
-        "name": "นายนที วิ่งไว",
-        "phone": "089-999-1122",
+        "name": "นายพงษ์อนันต์ ชนะสแบง",
+        "phone": "671-223-1091",
         "vehicle": "ฮอนด้า เวฟ 125 ทะเบียน 1กข-8899"
       },
       "estimatedDelivery": "2026-10-02T14:00:00.000Z"
@@ -786,21 +1682,12 @@
   "riders": [
     {
       "id": "RIDER-01",
-      "name": "นายนที วิ่งไว",
-      "phone": "089-999-1122",
+      "name": "นายพงษ์อนันต์ ชนะสแบง",
+      "phone": "671-223-1091",
       "vehicle": "ฮอนด้า เวฟ 125 ทะเบียน 1กข-8899",
       "status": "ACTIVE",
       "completedJobs": 142,
       "rating": 4.9
-    },
-    {
-      "id": "RIDER-02",
-      "name": "นายวรเชษฐ์ ส่งตรงเวลา",
-      "phone": "084-555-6677",
-      "vehicle": "ยามาฮ่า แกรนด์ ฟีลาโน่ ทะเบียน 2ขค-4567",
-      "status": "ACTIVE",
-      "completedJobs": 98,
-      "rating": 4.8
     }
   ]
 }

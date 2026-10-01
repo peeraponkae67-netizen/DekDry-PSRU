@@ -80,8 +80,8 @@ CREATE TABLE IF NOT EXISTS `Delivery` (
   `address` TEXT NOT NULL,
   `status` VARCHAR(50) DEFAULT 'RIDER_ASSIGNED', -- RIDER_ASSIGNED, PICKED_UP, DELIVERING, DELIVERED
   `deliveryDate` DATETIME NULL,
-  `riderName` VARCHAR(100) DEFAULT 'นายนที วิ่งไว',
-  `riderPhone` VARCHAR(20) DEFAULT '089-999-1122',
+  `riderName` VARCHAR(100) DEFAULT 'นายพงษ์อนันต์ ชนะสแบง',
+  `riderPhone` VARCHAR(20) DEFAULT '671-223-1091',
   FOREIGN KEY (`orderID`) REFERENCES `Order`(`orderID`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -93,8 +93,8 @@ CREATE TABLE IF NOT EXISTS `Delivery` (
 -- Customer / User Seed
 INSERT INTO `Customer` (`customerID`, `username`, `password`, `name`, `phone`, `address`, `email`, `role`) VALUES
 (1, 'customer1', '$2b$10$5ZP7T2K.a.Vim2oNoOkqNOO3mHTuCJBrN5xQ2EwCWyvkCRtc1FVYq', 'คุณสมศักดิ์ สุขใจ', '081-234-5678', '99/12 คอนโด ลุมพินี พาร์ค ชั้น 15 ถ.สุขุมวิท กทม.', 'customer@example.com', 'customer'),
-(2, 'rider1', '$2b$10$5ZP7T2K.a.Vim2oNoOkqNOO3mHTuCJBrN5xQ2EwCWyvkCRtc1FVYq', 'นายนที วิ่งไว', '089-999-1122', 'ศูนย์กระจายสินค้าสุขุมวิท', 'rider@example.com', 'rider'),
-(3, 'staff1', '$2b$10$5ZP7T2K.a.Vim2oNoOkqNOO3mHTuCJBrN5xQ2EwCWyvkCRtc1FVYq', 'สมศรี รีดเรียบ', '082-333-4455', 'โรงซักรีดสาขา 1', 'staff@example.com', 'staff'),
+(2, 'rider1', '$2b$10$5ZP7T2K.a.Vim2oNoOkqNOO3mHTuCJBrN5xQ2EwCWyvkCRtc1FVYq', 'นายพงษ์อนันต์ ชนะสแบง', '671-223-1091', 'ศูนย์กระจายสินค้า มรพส.', 'rider@example.com', 'rider'),
+(3, 'staff1', '$2b$10$5ZP7T2K.a.Vim2oNoOkqNOO3mHTuCJBrN5xQ2EwCWyvkCRtc1FVYq', 'นายธิเบศ พรมมา', '671-223-1017', 'โรงซักรีด มรพส.', 'staff@example.com', 'staff'),
 (4, 'admin', '$2b$10$5ZP7T2K.a.Vim2oNoOkqNOO3mHTuCJBrN5xQ2EwCWyvkCRtc1FVYq', 'ผู้ดูแลระบบสูงสุด', '099-888-7766', 'สำนักงานใหญ่', 'admin@example.com', 'admin')
 ON DUPLICATE KEY UPDATE `username`=`username`;
 

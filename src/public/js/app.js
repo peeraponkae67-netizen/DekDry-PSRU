@@ -40,8 +40,41 @@ const API = {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ method })
   }).then(r => r.json()),
+  adjustOrderPrice: (id, data) => fetch(`/api/orders/${id}/adjust-price`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  }).then(r => r.json()),
+  approveOrderPrice: (id, action = 'approve', reason = '') => fetch(`/api/orders/${id}/approve-price`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action, reason })
+  }).then(r => r.json()),
+  confirmDelivery: (id) => fetch(`/api/orders/${id}/confirm-delivery`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' }
+  }).then(r => r.json()),
+  updateProfile: (id, data) => fetch(`/api/auth/profile/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  }).then(r => r.json()),
+  deleteAccount: (id) => fetch(`/api/auth/profile/${id}`, {
+    method: 'DELETE'
+  }).then(r => r.json()),
   getStats: () => fetch('/api/stats').then(r => r.json()),
-  getRiders: () => fetch('/api/riders').then(r => r.json())
+  getRiders: () => fetch('/api/riders').then(r => r.json()),
+  updateOrder: (id, data) => fetch(`/api/orders/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  }).then(r => r.json()),
+  getUsers: () => fetch('/api/auth/users').then(r => r.json()),
+  createUser: (data) => fetch('/api/auth/users', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  }).then(r => r.json())
 };
 
 // รายละเอียดและสีของแต่ละสถานะ
@@ -49,10 +82,12 @@ const STATUS_CONFIG = {
   ORDER_PLACED: { label: 'สั่งออเดอร์แล้ว', icon: '📝', cls: 'status-ORDER_PLACED' },
   RIDER_ASSIGNED: { label: 'จัดสรรไรเดอร์แล้ว', icon: '🛵', cls: 'status-RIDER_ASSIGNED' },
   PICKED_UP: { label: 'รับผ้าแล้ว (เข้าร้าน)', icon: '🧺', cls: 'status-PICKED_UP' },
+  WAIT_PRICE_CONFIRM: { label: 'รอลูกค้ายืนยันราคา', icon: '⚖️', cls: 'status-WAIT_PRICE_CONFIRM' },
   IN_WASHING: { label: 'กำลังซัก / อบ / รีด', icon: '🧼', cls: 'status-IN_WASHING' },
   WASHED_READY: { label: 'ซักเสร็จ พร้อมจัดส่ง', icon: '✨', cls: 'status-WASHED_READY' },
   OUT_FOR_DELIVERY: { label: 'กำลังนำส่งลูกค้า', icon: '🚚', cls: 'status-OUT_FOR_DELIVERY' },
-  DELIVERED: { label: 'จัดส่งสำเร็จ', icon: '🎉', cls: 'status-DELIVERED' },
+  DELIVERED: { label: 'จัดส่งแล้ว (รอตรวจรับ)', icon: '🚚', cls: 'status-DELIVERED' },
+  COMPLETED: { label: 'เสร็จสิ้น (ยืนยันรับผ้าแล้ว)', icon: '✅', cls: 'status-COMPLETED' },
   CANCELLED: { label: 'ยกเลิก', icon: '❌', cls: 'status-CANCELLED' }
 };
 
@@ -79,13 +114,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupOrderFlowForm();
   setupAuthForms();
   updateOrderFlowTotals();
+  startLiveTrackingPoll();
 });
 
-// ฟังก์ชันสลับหน้า (Landing, Order, Pricing, Tracking, Rider, Staff, Admin)
+// ฟังก์ชันสลับหน้า (Landing, Order, Pricing, Tracking, Profile, Rider, Staff, Admin)
 window.switchAppView = function (viewName) {
-  if ((viewName === 'order' || viewName === 'tracking') && !state.currentUser) {
+  if ((viewName === 'order' || viewName === 'tracking' || viewName === 'profile') && !state.currentUser) {
     window.pendingAppView = viewName;
-    showToast(`กรุณาเข้าสู่ระบบก่อน${viewName === 'order' ? 'สั่งจองบริการ' : 'ตรวจสอบสถานะผ้า'} 🔐`, 'info');
+    const actionText = viewName === 'order' ? 'สั่งจองบริการ' : (viewName === 'tracking' ? 'ตรวจสอบสถานะผ้า' : 'ดูข้อมูลบัญชีผู้ใช้งาน');
+    showToast(`กรุณาเข้าสู่ระบบก่อน${actionText} 🔐`, 'info');
     openAuthModal('login');
     return;
   }
@@ -104,6 +141,7 @@ window.switchAppView = function (viewName) {
 
   if (viewName === 'order') prefillCustomerForms();
   else if (viewName === 'tracking') loadTrackingView();
+  else if (viewName === 'profile') loadProfileView();
   else if (viewName === 'rider') loadRiderView();
   else if (viewName === 'staff') loadStaffView();
   else if (viewName === 'admin') loadAdminView();
@@ -117,13 +155,10 @@ window.toggleFaq = function (btn) {
   if (!isActive) item.classList.add('active');
 };
 
-// Campus Switcher on Pricing Page (PSRU ทะเลแก้ว / วังจันทน์)
-window.setPricingCity = function (campus) {
-  const isTk = campus === 'psru_tk';
+// Campus on Pricing Page (มรพส. ทะเลแก้ว)
+window.setPricingCity = function (campus = 'psru_tk') {
   const tkBtn = document.getElementById('btn-city-bkk');
-  const wcBtn = document.getElementById('btn-city-cnx');
-  if (tkBtn) tkBtn.classList.toggle('active', isTk);
-  if (wcBtn) wcBtn.classList.toggle('active', !isTk);
+  if (tkBtn) tkBtn.classList.add('active');
 
   const priceEco = document.getElementById('price-economy');
   const priceStd = document.getElementById('price-standard');
@@ -176,7 +211,7 @@ window.openBookingModal = function (tier = null) {
   updateCartSummary();
 };
 
-// เติมข้อมูลลูกค้าอัตโนมัติเมื่อเข้าสู่ระบบ
+// เติมข้อมูลลูกค้าอัตโนมัติเมื่อเข้าสู่ระบบ (เชื่อมกับข้อมูลตอนสมัครสมาชิก)
 function prefillCustomerForms() {
   if (!state.currentUser) return;
   const u = state.currentUser;
@@ -185,17 +220,17 @@ function prefillCustomerForms() {
   const orderPhone = document.getElementById('order-cust-phone');
   const orderEmail = document.getElementById('order-cust-email');
   const orderAddr = document.getElementById('order-cust-address');
-  if (orderName && (!orderName.value || orderName.value === '')) orderName.value = u.name || '';
-  if (orderPhone && (!orderPhone.value || orderPhone.value === '')) orderPhone.value = u.phone || '';
-  if (orderEmail && (!orderEmail.value || orderEmail.value === '')) orderEmail.value = u.email || '';
-  if (orderAddr && (!orderAddr.value || orderAddr.value === '')) orderAddr.value = u.address || '';
+  if (orderName) orderName.value = u.name || '';
+  if (orderPhone) orderPhone.value = u.phone || '';
+  if (orderEmail) orderEmail.value = u.email || '';
+  if (orderAddr) orderAddr.value = u.address || '';
 
   const custName = document.getElementById('cust-name');
   const custPhone = document.getElementById('cust-phone');
   const custAddr = document.getElementById('cust-address');
-  if (custName && (!custName.value || custName.value === '')) custName.value = u.name || '';
-  if (custPhone && (!custPhone.value || custPhone.value === '')) custPhone.value = u.phone || '';
-  if (custAddr && (!custAddr.value || custAddr.value === '')) custAddr.value = u.address || '';
+  if (custName) custName.value = u.name || '';
+  if (custPhone) custPhone.value = u.phone || '';
+  if (custAddr) custAddr.value = u.address || '';
 }
 
 window.closeBookingModal = function () {
@@ -316,7 +351,7 @@ window.fillAddress = function (type) {
   } else if (type === 'home' || type === 'dorm_wc') {
     name.value = 'นายกิตติศักดิ์ ชัยชนะ (นศ. 64198765)';
     phone.value = '081-987-6543';
-    addr.value = 'หอพักนักศึกษาชาย อาคาร 1 ห้อง 205 มหาวิทยาลัยราชภัฏพิบูลสงคราม (วังจันทน์)';
+    addr.value = 'หอพักนักศึกษาชาย อาคาร 1 ห้อง 205 มหาวิทยาลัยราชภัฏพิบูลสงคราม (ทะเลแก้ว)';
   }
   showToast('กรอกข้อมูลจำลองหอพัก มรพส. เรียบร้อย ✨');
 };
@@ -411,8 +446,7 @@ const orderFlow = {
   region: 'psru_tk',
   plan: 'standard', // 'economy' | 'standard' | 'express'
   rates: {
-    psru_tk: { economy: 35, standard: 49, express: 69 },
-    psru_wc: { economy: 35, standard: 49, express: 69 }
+    psru_tk: { economy: 35, standard: 49, express: 69 }
   },
   pickupDate: 'ศ. 2 ต.ค.',
   pickupSlot: '10:00 — 12:00',
@@ -427,16 +461,13 @@ const orderFlow = {
   minCharge: 80
 };
 
-window.setOrderRegion = function (region) {
-  orderFlow.region = region;
-  const isTk = region === 'psru_tk';
+window.setOrderRegion = function (region = 'psru_tk') {
+  orderFlow.region = 'psru_tk';
   const tkBtn = document.getElementById('order-city-bkk');
-  const wcBtn = document.getElementById('order-city-cnx');
-  if (tkBtn) tkBtn.classList.toggle('active', isTk);
-  if (wcBtn) wcBtn.classList.toggle('active', !isTk);
+  if (tkBtn) tkBtn.classList.add('active');
 
   // Update rates display in plan cards
-  const rates = orderFlow.rates[region] || orderFlow.rates.psru_tk;
+  const rates = orderFlow.rates.psru_tk;
   const ecoEl = document.querySelector('#plan-opt-economy .price-num');
   const stdEl = document.querySelector('#plan-opt-standard .price-num');
   const expEl = document.querySelector('#plan-opt-express .price-num');
@@ -587,7 +618,7 @@ function setupOrderFlowForm() {
       standard: 'แบบมาตรฐาน (วันถัดไป)',
       express: 'แบบเร่งด่วน (ด่วน 4-6 ชม.)'
     };
-    const campusLabel = orderFlow.region === 'psru_tk' ? 'มรพส. ทะเลแก้ว' : 'มรพส. วังจันทน์';
+    const campusLabel = 'มรพส. ทะเลแก้ว';
 
     const orderData = {
       userId: state.currentUser ? state.currentUser.id : null,
@@ -659,6 +690,8 @@ function initAuth() {
 
 function renderAuthNavbar() {
   const container = document.getElementById('nav-auth-container');
+  const navProfile = document.getElementById('nav-link-profile');
+  if (navProfile) navProfile.style.display = state.currentUser ? 'block' : 'none';
   if (!container) return;
 
   if (state.currentUser) {
@@ -678,7 +711,7 @@ function renderAuthNavbar() {
     container.innerHTML = `
       <div class="account-dropdown">
         <button class="account-dropdown-btn" type="button">
-          <span>บัญชีของฉัน</span>
+          <span>👤 ${state.currentUser.name || state.currentUser.username}</span>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
         </button>
         <div class="account-dropdown-menu">
@@ -686,6 +719,8 @@ function renderAuthNavbar() {
             <div class="account-menu-name">👤 ${state.currentUser.name}</div>
             <div class="account-menu-role">${roleLabel}</div>
           </div>
+          <button class="account-menu-item" onclick="switchAppView('profile')">⚙️ ข้อมูลบัญชี / แก้ไขโปรไฟล์</button>
+          <button class="account-menu-item" onclick="switchAppView('tracking')">🧺 ติดตามสถานะผ้าของฉัน</button>
           ${portalItem}
           <button class="account-menu-item logout" onclick="logoutUser()">🚪 ออกจากระบบ</button>
         </div>
@@ -725,6 +760,9 @@ window.logoutUser = function () {
   state.currentUser = null;
   localStorage.removeItem('dekdry_user');
   renderAuthNavbar();
+  if (state.currentAppView === 'profile' || state.currentAppView === 'rider' || state.currentAppView === 'staff' || state.currentAppView === 'admin') {
+    switchAppView('landing');
+  }
   showToast('ออกจากระบบเรียบร้อย 👋');
 };
 
@@ -797,6 +835,8 @@ function setupAuthForms() {
 // ==========================================
 // Order Tracking View (เช็คสถานะผ้า & ขั้นตอนการทำงาน 7 ขั้น)
 // ==========================================
+// Order Tracking View (เช็คสถานะผ้า & ขั้นตอนการทำงาน 8 ขั้น)
+// ==========================================
 const TRACKING_STEPS_FLOW = [
   { key: 'ORDER_PLACED', stepNum: 1, title: 'รับคำสั่งซื้อ', icon: '📝', desc: 'ระบบบันทึกคำสั่งซื้อของคุณเรียบร้อยแล้ว' },
   { key: 'RIDER_ASSIGNED', stepNum: 2, title: 'จัดสรรไรเดอร์', icon: '🛵', desc: 'ไรเดอร์ได้รับมอบหมายงานและกำลังเดินทางไปรับผ้า' },
@@ -804,8 +844,16 @@ const TRACKING_STEPS_FLOW = [
   { key: 'IN_WASHING', stepNum: 4, title: 'กำลังซัก/อบ/รีด', icon: '🧼', desc: 'ผ้ากำลังอยู่ในกระบวนการซัก อบ และรีดตามโปรแกรมที่คุณเลือก' },
   { key: 'WASHED_READY', stepNum: 5, title: 'ซักเสร็จพร้อมส่ง', icon: '✨', desc: 'ผ้าผ่านการซักรีดและตรวจสอบคุณภาพ (QC) พร้อมนำส่ง' },
   { key: 'OUT_FOR_DELIVERY', stepNum: 6, title: 'กำลังนำส่ง', icon: '🚚', desc: 'ไรเดอร์กำลังนำส่งผ้าสะอาดกลับไปยังจุดนัดพบ/หอพัก' },
-  { key: 'DELIVERED', stepNum: 7, title: 'จัดส่งสำเร็จ', icon: '🎉', desc: 'ผ้าสะอาดส่งถึงมือคุณเรียบร้อยแล้ว ขอบคุณที่ใช้บริการ DekDry' }
+  { key: 'DELIVERED', stepNum: 7, title: 'จัดส่งแล้ว (รอตรวจรับ)', icon: '🚚', desc: 'ผ้าสะอาดส่งถึงมือคุณเรียบร้อยแล้ว กรุณาตรวจสอบผ้าและกดยืนยันการรับผ้า' },
+  { key: 'COMPLETED', stepNum: 8, title: 'เสร็จสิ้นสมบูรณ์', icon: '🎉', desc: 'คุณได้ยืนยันการรับผ้าเรียบร้อยแล้ว ขอบคุณที่ใช้บริการ DekDry @ PSRU' }
 ];
+
+window.customerOrderTab = 'active';
+
+window.switchCustomerOrderTab = function (tab) {
+  window.customerOrderTab = tab;
+  loadTrackingView();
+};
 
 async function loadTrackingView(targetOrderId = null) {
   if (!state.currentUser) {
@@ -832,26 +880,70 @@ async function loadTrackingView(targetOrderId = null) {
 
     // Filter orders belonging to the logged-in user
     const isSpecialRole = ['admin', 'rider', 'staff'].includes(state.currentUser.role);
+    const cleanUserPhone = (state.currentUser.phone || '').replace(/\D/g, '');
     const userOrders = isSpecialRole
       ? state.orders
-      : state.orders.filter(o => 
-          o.userId === state.currentUser.id || 
-          (o.customer && (o.customer.phone === state.currentUser.phone || o.customer.name === state.currentUser.name))
-        );
+      : state.orders.filter(o => {
+          if (o.userId && String(o.userId) === String(state.currentUser.id)) return true;
+          if (o.customer) {
+            const cleanCustPhone = (o.customer.phone || '').replace(/\D/g, '');
+            if (cleanUserPhone && cleanCustPhone && cleanCustPhone === cleanUserPhone) return true;
+            if (o.customer.name && state.currentUser.name && o.customer.name.trim() === state.currentUser.name.trim()) return true;
+          }
+          return false;
+        });
+
+    // Split orders into Active and History (Completed / Cancelled)
+    const activeOrders = userOrders.filter(o => o.status !== 'COMPLETED' && o.status !== 'CANCELLED');
+    const historyOrders = userOrders.filter(o => o.status === 'COMPLETED' || o.status === 'CANCELLED');
+
+    // Update Tab Badges
+    const countActiveEl = document.getElementById('cust-active-count');
+    const countHistoryEl = document.getElementById('cust-history-count');
+    if (countActiveEl) countActiveEl.innerText = activeOrders.length;
+    if (countHistoryEl) countHistoryEl.innerText = historyOrders.length;
+
+    // If targetOrderId is explicitly passed, determine which tab it belongs to
+    if (targetOrderId) {
+      const isTargetInHistory = historyOrders.some(o => o.id === targetOrderId);
+      if (isTargetInHistory) {
+        window.customerOrderTab = 'history';
+      } else {
+        window.customerOrderTab = 'active';
+      }
+    }
+
+    // Update Tab Button Styles
+    const tabActiveBtn = document.getElementById('tab-cust-active');
+    const tabHistoryBtn = document.getElementById('tab-cust-history');
+    if (tabActiveBtn && tabHistoryBtn) {
+      if (window.customerOrderTab === 'history') {
+        tabActiveBtn.className = 'btn btn-secondary btn-sm';
+        tabHistoryBtn.className = 'btn btn-primary btn-sm';
+      } else {
+        tabActiveBtn.className = 'btn btn-primary btn-sm';
+        tabHistoryBtn.className = 'btn btn-secondary btn-sm';
+      }
+    }
+
+    const currentTabOrders = window.customerOrderTab === 'history' ? historyOrders : activeOrders;
 
     let activeOrderId = targetOrderId;
     if (!activeOrderId && searchInput && searchInput.value.trim()) {
       activeOrderId = searchInput.value.trim().toUpperCase();
     }
-    if (!activeOrderId && userOrders.length > 0) {
+    if (!activeOrderId && currentTabOrders.length > 0) {
+      activeOrderId = currentTabOrders[0].id;
+    } else if (!activeOrderId && userOrders.length > 0) {
+      // If selected tab is empty but user has orders in other tab
       activeOrderId = userOrders[0].id;
     }
 
-    // Render Quick Chips for user orders
+    // Render Quick Chips for user orders according to selected tab
     if (quickContainer && quickChips) {
-      if (userOrders.length > 0) {
-        quickContainer.style.display = 'block';
-        quickChips.innerHTML = userOrders.map(o => {
+      quickContainer.style.display = 'block';
+      if (currentTabOrders.length > 0) {
+        quickChips.innerHTML = currentTabOrders.map(o => {
           const stLabel = STATUS_CONFIG[o.status] ? STATUS_CONFIG[o.status].label : o.status;
           const isActive = activeOrderId === o.id;
           return `
@@ -862,7 +954,19 @@ async function loadTrackingView(targetOrderId = null) {
           `;
         }).join('');
       } else {
-        quickContainer.style.display = 'none';
+        if (window.customerOrderTab === 'active') {
+          quickChips.innerHTML = `
+            <div style="font-size:0.88rem; color:#64748b; padding:0.4rem 0;">
+              ✨ ไม่มีรายการที่กำลังดำเนินการอยู่ ${historyOrders.length > 0 ? `(มีประวัติงานที่สำเร็จแล้ว ${historyOrders.length} รายการ)` : ''}
+            </div>
+          `;
+        } else {
+          quickChips.innerHTML = `
+            <div style="font-size:0.88rem; color:#64748b; padding:0.4rem 0;">
+              📜 ยังไม่มีประวัติคำสั่งซื้อที่เสร็จสิ้น
+            </div>
+          `;
+        }
       }
     }
 
@@ -874,7 +978,7 @@ async function loadTrackingView(targetOrderId = null) {
       contentEl.innerHTML = `
         <div class="card" style="text-align:center; padding:3.5rem 1.5rem; background:white; border-radius:16px;">
           <div style="font-size:3.5rem; margin-bottom:1rem;">🧺</div>
-          <h3 style="font-weight:800; font-size:1.3rem; color:#0f172a; margin-bottom:0.5rem;">ยังไม่มีประวัติคำสั่งซื้อของคุณ (${state.currentUser.name})</h3>
+          <h3 style="font-weight:800; font-size:1.3rem; color:#0f172a; margin-bottom:0.5rem;">ยังไม่มีรายการคำสั่งซื้อของคุณ (${state.currentUser.name})</h3>
           <p style="color:#64748b; font-size:0.95rem; margin-bottom:1.5rem;">สั่งบริการซักอบรีด DekDry ตอนนี้ เพื่อเริ่มติดตามสถานะผ้าแบบเรียลไทม์ได้ทันที</p>
           <button class="btn btn-primary" onclick="switchAppView('order')">🚀 สั่งจองบริการซักผ้าตอนนี้ &rsaquo;</button>
         </div>
@@ -900,7 +1004,7 @@ window.handleTrackingSearch = function (e) {
   selectTrackingOrder(orderId);
 };
 
-window.selectTrackingOrder = function (orderId) {
+window.selectTrackingOrder = async function (orderId) {
   const searchInput = document.getElementById('tracking-search-input');
   if (searchInput) searchInput.value = orderId;
 
@@ -908,11 +1012,19 @@ window.selectTrackingOrder = function (orderId) {
     btn.classList.toggle('active', btn.innerText.includes(orderId));
   });
 
+  try {
+    const res = await API.getOrders();
+    if (res.success && Array.isArray(res.data)) {
+      state.orders = res.data;
+    }
+  } catch (e) { }
+
   renderTrackingDetails(orderId);
 };
 
 function renderTrackingDetails(orderId) {
   const contentEl = document.getElementById('tracking-content');
+  const searchInput = document.getElementById('tracking-search-input');
   if (!contentEl) return;
 
   const order = state.orders.find(o => o.id.toUpperCase() === orderId.toUpperCase());
@@ -929,14 +1041,18 @@ function renderTrackingDetails(orderId) {
     return;
   }
 
-  // Security Check: Customer can only check their own orders
+  // Security Check: Customer can check their own orders, or view if explicitly searched by order ID
   const isSpecialRole = state.currentUser && ['admin', 'rider', 'staff'].includes(state.currentUser.role);
+  const cleanUserPhone = (state.currentUser?.phone || '').replace(/\D/g, '');
+  const cleanCustPhone = (order.customer?.phone || '').replace(/\D/g, '');
   const isOwner = state.currentUser && (
-    order.userId === state.currentUser.id || 
-    (order.customer && (order.customer.phone === state.currentUser.phone || order.customer.name === state.currentUser.name))
+    (order.userId && String(order.userId) === String(state.currentUser.id)) || 
+    (cleanUserPhone && cleanCustPhone && cleanCustPhone === cleanUserPhone) ||
+    (order.customer?.name && state.currentUser.name && order.customer.name.trim() === state.currentUser.name.trim())
   );
+  const isExplicitSearch = searchInput && searchInput.value.trim().toUpperCase() === orderId.toUpperCase();
 
-  if (!isSpecialRole && !isOwner) {
+  if (!isSpecialRole && !isOwner && !isExplicitSearch) {
     contentEl.innerHTML = `
       <div class="card" style="text-align:center; padding:3.5rem 1.5rem; background:#fff1f2; border-radius:16px; border:1px solid #fecdd3;">
         <div style="font-size:3rem; margin-bottom:0.75rem;">🔒</div>
@@ -954,16 +1070,27 @@ function renderTrackingDetails(orderId) {
 
   // Step indices
   const stepKeys = TRACKING_STEPS_FLOW.map(s => s.key);
-  const currentStepIndex = stepKeys.indexOf(currentStatus);
+  let currentStepIndex = stepKeys.indexOf(currentStatus);
+  if (currentStatus === 'WAIT_PRICE_CONFIRM') {
+    currentStepIndex = 2; // At PICKED_UP stage, waiting for weigh approval
+  } else if (currentStatus === 'COMPLETED') {
+    currentStepIndex = stepKeys.length - 1;
+  }
   const effectiveIndex = currentStepIndex >= 0 ? currentStepIndex : 0;
 
-  const currentStepObj = TRACKING_STEPS_FLOW[effectiveIndex] || TRACKING_STEPS_FLOW[0];
+  const isAllCompleted = currentStatus === 'COMPLETED';
+
+  const currentStepObj = currentStatus === 'WAIT_PRICE_CONFIRM' ? {
+    title: 'รอลูกค้ายืนยันราคาชั่งจริง',
+    icon: '⚖️',
+    desc: 'ทางร้านได้ชั่งน้ำหนักผ้าและปรับปรุงราคาใหม่ รอลูกค้ากดยืนยันเพื่อเริ่มกระบวนการซักผ้า'
+  } : (TRACKING_STEPS_FLOW[effectiveIndex] || TRACKING_STEPS_FLOW[0]);
 
   const stepperHtml = TRACKING_STEPS_FLOW.map((step, idx) => {
     let stateClass = 'upcoming';
     let iconContent = step.icon;
 
-    if (idx < effectiveIndex) {
+    if (isAllCompleted || idx < effectiveIndex) {
       stateClass = 'completed';
       iconContent = '✓';
     } else if (idx === effectiveIndex) {
@@ -1001,6 +1128,88 @@ function renderTrackingDetails(orderId) {
         </div>
       </div>
 
+      <!-- Customer Confirm Delivery Action Banner (When DELIVERED) -->
+      ${order.status === 'DELIVERED' ? `
+      <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 2px solid #22c55e; border-radius: 14px; padding: 1.35rem 1.5rem; margin: 1.25rem 1.5rem 0 1.5rem; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.2);">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:1.25rem; flex-wrap:wrap;">
+          <div style="display:flex; align-items:center; gap:1rem; flex:1; min-width:280px;">
+            <div style="font-size:2.8rem; line-height:1;">📦</div>
+            <div>
+              <h3 style="margin:0 0 0.25rem 0; font-size:1.2rem; font-weight:800; color:#15803d;">
+                🎉 ไรเดอร์จัดส่งผ้าสะอาดถึงมือคุณแล้ว!
+              </h3>
+              <p style="margin:0; font-size:0.92rem; color:#166534; line-height:1.45;">
+                กรุณาตรวจสอบความเรียบร้อยของผ้า จากนั้นกดปุ่มยืนยันว่า <strong>"ได้รับผ้าเรียบร้อยแล้ว"</strong> เพื่อเสร็จสิ้นคำสั่งซื้อ
+              </p>
+            </div>
+          </div>
+          <div>
+            <button class="btn btn-primary" style="background:#16a34a; border-color:#16a34a; font-weight:800; padding:0.8rem 1.75rem; font-size:1.05rem; box-shadow:0 4px 14px rgba(22, 163, 74, 0.35); border-radius:99px; cursor:pointer;" onclick="customerConfirmDelivery('${order.id}')">
+              ✅ ยืนยันได้รับผ้าเรียบร้อยแล้ว
+            </button>
+          </div>
+        </div>
+      </div>
+      ` : ''}
+
+      <!-- Order Completed Archive Banner (When COMPLETED) -->
+      ${order.status === 'COMPLETED' ? `
+      <div style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border: 2px solid #cbd5e1; border-radius: 14px; padding: 1.25rem 1.5rem; margin: 1.25rem 1.5rem 0 1.5rem;">
+        <div style="display:flex; align-items:center; gap:1rem; flex-wrap:wrap;">
+          <div style="font-size:2.5rem; line-height:1;">🏆</div>
+          <div style="flex:1;">
+            <h3 style="margin:0 0 0.25rem 0; font-size:1.15rem; font-weight:800; color:#0f172a;">
+              ✨ คำสั่งซื้อนี้เสร็จสิ้นสมบูรณ์แล้ว (เก็บในประวัติคำสั่งซื้อ)
+            </h3>
+            <p style="margin:0; font-size:0.9rem; color:#64748b; line-height:1.4;">
+              คุณได้กดยืนยันการรับผ้าเรียบร้อยแล้ว ทาง DekDry @ PSRU ขอขอบพระคุณที่ไว้วางใจใช้บริการครับ!
+            </p>
+          </div>
+        </div>
+      </div>
+      ` : ''}
+
+      <!-- Price Confirmation Alert Banner (Real-time Approval) -->
+      ${order.status === 'WAIT_PRICE_CONFIRM' ? `
+      <div style="background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); border: 2px solid #f97316; border-radius: 14px; padding: 1.25rem 1.5rem; margin: 1.25rem 1.5rem 0 1.5rem; box-shadow: 0 4px 15px rgba(249, 115, 22, 0.15);">
+        <div style="display:flex; align-items:flex-start; gap:1rem; flex-wrap:wrap;">
+          <div style="font-size:2.5rem; line-height:1;">⚖️</div>
+          <div style="flex:1; min-width:260px;">
+            <h3 style="margin:0 0 0.35rem 0; font-size:1.2rem; font-weight:800; color:#9a3412;">
+              🔔 ทางร้านชั่งน้ำหนักผ้าและปรับปรุงราคาใหม่
+            </h3>
+            <p style="margin:0 0 0.75rem 0; font-size:0.92rem; color:#7c2d12; line-height:1.4;">
+              ผ้าของคุณได้รับการตรวจรับและชั่งน้ำหนักจริงที่โรงซักแล้ว มีการปรับปรุงรายการและราคาตามน้ำหนักจริง กรุณาตรวจสอบยอดเงินและกดยืนยันเพื่อให้ทางร้านเริ่มดำเนินการซักได้ทันที
+            </p>
+
+            <div style="background:white; border-radius:10px; padding:0.85rem 1.15rem; border:1px solid #fed7aa; margin-bottom:0.9rem;">
+              <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.4rem;">
+                <span style="font-size:0.9rem; color:#64748b;">
+                  ${order.oldAmount ? `ราคาเดิมก่อนชั่ง: <s style="color:#ef4444;">฿${order.oldAmount}</s> &nbsp;➔&nbsp; ` : ''}
+                  <strong style="color:#0f172a;">ยอดสุทธิใหม่หลังชั่งจริง:</strong>
+                </span>
+                <span style="font-size:1.35rem; font-weight:900; color:#ea580c;">฿${order.totalAmount}</span>
+              </div>
+              ${order.priceAdjustNote || order.specialNotes ? `
+              <div style="font-size:0.88rem; color:#431407; background:#fff7ed; padding:0.5rem 0.8rem; border-radius:6px; border-left:3px solid #ea580c; margin-top:0.35rem;">
+                <strong>📝 หมายเหตุจากร้าน:</strong> ${order.priceAdjustNote || order.specialNotes}
+              </div>
+              ` : ''}
+            </div>
+
+            <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+              <button class="btn btn-primary" style="background:#16a34a; border-color:#16a34a; font-weight:800; padding:0.65rem 1.5rem; font-size:0.95rem; box-shadow:0 3px 8px rgba(22, 163, 74, 0.3);" onclick="customerApprovePrice('${order.id}')">
+                ✅ ยืนยันราคาใหม่ (เริ่มดำเนินการซักทันที)
+              </button>
+              <button class="btn btn-secondary" style="color:#dc2626; border-color:#fca5a5; font-size:0.9rem;" onclick="customerRejectPrice('${order.id}')">
+                ❌ ยกเลิกคำสั่งซื้อ
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      ` : ''}
+
       <!-- 7-Step Progress Stepper -->
       <div class="tracking-stepper-wrapper">
         <div style="text-align:center; margin-bottom:1.5rem;">
@@ -1032,12 +1241,24 @@ function renderTrackingDetails(orderId) {
           </div>
           <div class="tracking-info-row">
             <span class="label">สถานที่จัดส่ง:</span>
-            <span class="value" style="max-width:180px;">${order.customer.address || '-'}</span>
+            <span class="value" style="max-width:180px; word-break:break-word;">${order.customer.address || '-'}</span>
           </div>
+          ${order.pickupSchedule ? `
+          <div class="tracking-info-row">
+            <span class="label">เวลานัดรับผ้า:</span>
+            <span class="value" style="color:#0284c7; font-weight:700;">🕒 ${order.pickupSchedule}</span>
+          </div>
+          ` : ''}
+          ${order.returnSchedule ? `
+          <div class="tracking-info-row">
+            <span class="label">เวลานัดส่งคืน:</span>
+            <span class="value" style="color:#15803d; font-weight:700;">📦 ${order.returnSchedule}</span>
+          </div>
+          ` : ''}
           ${order.customer.note ? `
           <div class="tracking-info-row">
             <span class="label">หมายเหตุเพิ่มเติม:</span>
-            <span class="value" style="max-width:180px; color:#64748b;">${order.customer.note}</span>
+            <span class="value" style="max-width:180px; color:#475569; word-break:break-word;">${order.customer.note}</span>
           </div>
           ` : ''}
         </div>
@@ -1082,6 +1303,12 @@ function renderTrackingDetails(orderId) {
             <span class="label">อุณหภูมิน้ำ / อบผ้า:</span>
             <span class="value">${order.preferences?.temperature || '30°C'} / ${order.preferences?.drying || 'เครื่องอบ'}</span>
           </div>
+          ${order.preferences?.bedding ? `
+          <div class="tracking-info-row">
+            <span class="label">ผ้านวม / เครื่องนอน:</span>
+            <span class="value" style="color:#0284c7; font-weight:600;">${order.preferences.bedding}</span>
+          </div>
+          ` : ''}
         </div>
       </div>
     </div>
@@ -1096,7 +1323,7 @@ async function loadRiderView() {
   if (ridersRes.success) state.riders = ridersRes.data;
   if (ordersRes.success) state.orders = ordersRes.data;
 
-  const tasks = state.orders.filter(o => ['RIDER_ASSIGNED', 'PICKED_UP', 'WASHED_READY', 'OUT_FOR_DELIVERY'].includes(o.status));
+  const tasks = state.orders.filter(o => ['ORDER_PLACED', 'RIDER_ASSIGNED', 'PICKED_UP', 'WASHED_READY', 'OUT_FOR_DELIVERY'].includes(o.status));
   const container = document.getElementById('rider-tasks-list');
 
   if (tasks.length === 0) {
@@ -1111,10 +1338,12 @@ async function loadRiderView() {
         <span class="status-badge ${STATUS_CONFIG[o.status].cls}">${STATUS_CONFIG[o.status].label}</span>
       </div>
       <div style="font-size:0.85rem; color:#475569; margin-bottom:0.75rem;">${o.customer.address} (📞 ${o.customer.phone})</div>
-      <div style="display:flex; gap:0.5rem;">
-        ${o.status === 'RIDER_ASSIGNED' ? `<button class="btn btn-primary btn-sm btn-block" onclick="riderUpdateStatus('${o.id}', 'PICKED_UP')">🧺 รับผ้าจากลูกค้าแล้ว (นำเข้าร้าน)</button>` : ''}
-        ${o.status === 'WASHED_READY' ? `<button class="btn btn-primary btn-sm btn-block" onclick="riderUpdateStatus('${o.id}', 'OUT_FOR_DELIVERY')">🚚 รับผ้าไปส่งลูกค้า</button>` : ''}
-        ${o.status === 'OUT_FOR_DELIVERY' ? `<button class="btn btn-success btn-sm btn-block" onclick="riderUpdateStatus('${o.id}', 'DELIVERED')">🎉 ส่งมอบสำเร็จ</button>` : ''}
+      <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+        ${o.status === 'ORDER_PLACED' ? `<button class="btn btn-primary btn-sm btn-block" onclick="riderUpdateStatus('${o.id}', 'RIDER_ASSIGNED')">🛵 ยืนยันรับงาน (จัดสรรไรเดอร์แล้ว)</button>` : ''}
+        ${o.status === 'RIDER_ASSIGNED' ? `<button class="btn btn-primary btn-sm btn-block" style="background:#7c3aed; border-color:#7c3aed;" onclick="riderUpdateStatus('${o.id}', 'PICKED_UP')">🧺 ยืนยันรับผ้าจากลูกค้าแล้ว (นำเข้าร้าน)</button>` : ''}
+        ${o.status === 'PICKED_UP' ? `<div style="font-size:0.8rem; color:#6b21a8; font-weight:700; width:100%; text-align:center; padding:0.35rem; background:#f3e8ff; border-radius:6px;">🧺 รับผ้าแล้วและนำส่งศูนย์ซัก (Staff กำลังดำเนินการ)</div>` : ''}
+        ${o.status === 'WASHED_READY' ? `<button class="btn btn-primary btn-sm btn-block" style="background:#f59e0b; border-color:#f59e0b;" onclick="riderUpdateStatus('${o.id}', 'OUT_FOR_DELIVERY')">🚚 ยืนยันรับผ้าไปส่งลูกค้า</button>` : ''}
+        ${o.status === 'OUT_FOR_DELIVERY' ? `<button class="btn btn-success btn-sm btn-block" onclick="riderUpdateStatus('${o.id}', 'DELIVERED')">🎉 ยืนยันจัดส่งสำเร็จ (ส่งมอบผ้า)</button>` : ''}
       </div>
     </div>
   `).join('');
@@ -1124,7 +1353,16 @@ window.riderUpdateStatus = async function (orderId, status) {
   const res = await API.updateStatus(orderId, status);
   if (res.success) {
     showToast(res.message);
-    loadRiderView();
+    if (res.data) {
+      const idx = (state.orders || []).findIndex(o => o.id === orderId || o.rawId === orderId);
+      if (idx !== -1) state.orders[idx] = res.data;
+    }
+    await loadRiderView();
+    // ถ้าหน้าจอลูกค้าเปิดดูออเดอร์นี้อยู่ ให้รีเฟรชทันที
+    const searchInput = document.getElementById('tracking-search-input');
+    if (searchInput && searchInput.value.trim().toUpperCase() === String(orderId).toUpperCase()) {
+      renderTrackingDetails(orderId);
+    }
   }
 };
 
@@ -1136,19 +1374,33 @@ async function loadStaffView() {
   if (!res.success) return;
   state.orders = res.data;
 
-  const colWait = state.orders.filter(o => ['ORDER_PLACED', 'RIDER_ASSIGNED', 'PICKED_UP'].includes(o.status));
+  const colWait = state.orders.filter(o => ['ORDER_PLACED', 'RIDER_ASSIGNED', 'PICKED_UP', 'WAIT_PRICE_CONFIRM'].includes(o.status));
   const colWash = state.orders.filter(o => o.status === 'IN_WASHING');
   const colReady = state.orders.filter(o => o.status === 'WASHED_READY');
   const colDone = state.orders.filter(o => ['OUT_FOR_DELIVERY', 'DELIVERED'].includes(o.status));
 
   document.getElementById('staff-kanban-board').innerHTML = `
     <div class="kanban-col">
-      <div class="kanban-header"><span>📥 คิวรอซัก</span> <span>(${colWait.length})</span></div>
+      <div class="kanban-header"><span>📥 คิวรอซัก / ตรวจรับผ้า</span> <span>(${colWait.length})</span></div>
       ${colWait.map(o => `
         <div class="kanban-card">
-          <strong>${o.id}</strong> - ${o.customer.name}
-          <div style="font-size:0.78rem; color:#64748b; margin:0.3rem 0;">${o.items.map(i => i.serviceName).join(', ')}</div>
-          <button class="btn btn-primary btn-sm btn-block" onclick="staffAdvance('${o.id}', 'IN_WASHING')">🧼 เริ่มซัก-อบ</button>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <strong>${o.id}</strong>
+            <span class="status-badge ${STATUS_CONFIG[o.status]?.cls || ''}" style="font-size:0.7rem; padding:2px 6px;">${STATUS_CONFIG[o.status]?.label || o.status}</span>
+          </div>
+          <div style="font-size:0.85rem; font-weight:600; margin-top:2px;">${o.customer?.name || '-'}</div>
+          <div style="font-size:0.78rem; color:#64748b; margin:0.3rem 0;">${(o.items || []).map(i => `${i.serviceName} (${i.quantity} ${i.unit || 'กก.'})`).join(', ')}</div>
+          ${o.status === 'WAIT_PRICE_CONFIRM' ? `
+            <div style="background:#fff7ed; border:1px solid #fed7aa; color:#c2410c; padding:0.4rem; border-radius:6px; font-size:0.75rem; text-align:center; margin-bottom:0.4rem; font-weight:600;">
+              ⏳ ชั่งผ้าแล้ว รอลูกค้ายืนยันราคา ฿${(o.totalAmount || 0).toLocaleString()}
+            </div>
+            <button class="btn btn-secondary btn-sm btn-block" style="font-size:0.75rem;" onclick="openAdminAdjustModal('${o.id}')">⚖️ แก้ไขราคาอีกครั้ง</button>
+          ` : `
+            <div style="display:flex; gap:0.35rem; margin-top:0.4rem;">
+              <button class="btn btn-sm" style="flex:1; background:#f97316; color:white; font-size:0.75rem; font-weight:700; border:none; border-radius:6px;" onclick="openAdminAdjustModal('${o.id}')">⚖️ ชั่งผ้า/ปรับราคา</button>
+              <button class="btn btn-primary btn-sm" style="flex:1; font-size:0.75rem;" onclick="staffAdvance('${o.id}', 'IN_WASHING')">🧼 เริ่มซัก</button>
+            </div>
+          `}
         </div>
       `).join('')}
     </div>
@@ -1190,13 +1442,24 @@ window.staffAdvance = async function (orderId, status) {
   const res = await API.updateStatus(orderId, status);
   if (res.success) {
     showToast(res.message);
-    loadStaffView();
+    if (res.data) {
+      const idx = (state.orders || []).findIndex(o => o.id === orderId || o.rawId === orderId);
+      if (idx !== -1) state.orders[idx] = res.data;
+    }
+    await loadStaffView();
+    // ถ้าหน้าจอลูกค้าเปิดดูออเดอร์นี้อยู่ ให้รีเฟรชทันที
+    const searchInput = document.getElementById('tracking-search-input');
+    if (searchInput && searchInput.value.trim().toUpperCase() === String(orderId).toUpperCase()) {
+      renderTrackingDetails(orderId);
+    }
   }
 };
 
 // ==========================================
 // Admin View
 // ==========================================
+window.adminTabState = 'active';
+
 async function loadAdminView() {
   const [statsRes, ordersRes] = await Promise.all([API.getStats(), API.getOrders()]);
   if (statsRes.success) {
@@ -1216,31 +1479,104 @@ async function loadAdminView() {
       </div>
       <div class="stat-box-modern">
         <div class="stat-number">${s.completedOrders}</div>
-        <div class="stat-text">จัดส่งสำเร็จ (Completed)</div>
+        <div class="stat-text">จัดส่งสำเร็จ/ลูกค้ายืนยันแล้ว (Completed)</div>
       </div>
     `;
   }
   if (ordersRes.success) {
-    state.orders = ordersRes.data;
-    renderAdminTable(state.orders);
+    state.orders = ordersRes.data || [];
+
+    // Calculate Counts for Admin Tabs
+    const activeCount = state.orders.filter(o => o.status !== 'COMPLETED' && o.status !== 'CANCELLED').length;
+    const completedCount = state.orders.filter(o => o.status === 'COMPLETED').length;
+    const allCount = state.orders.length;
+
+    const elActive = document.getElementById('admin-active-count');
+    const elCompleted = document.getElementById('admin-completed-count');
+    const elAll = document.getElementById('admin-all-count');
+    if (elActive) elActive.innerText = activeCount;
+    if (elCompleted) elCompleted.innerText = completedCount;
+    if (elAll) elAll.innerText = allCount;
+
+    filterAdminTable();
   }
 }
 
+window.switchAdminOrderTab = function (tab) {
+  window.adminTabState = tab;
+  const tabActive = document.getElementById('tab-admin-active');
+  const tabCompleted = document.getElementById('tab-admin-completed');
+  const tabAll = document.getElementById('tab-admin-all');
+
+  if (tabActive) {
+    tabActive.className = `btn btn-sm ${tab === 'active' ? 'btn-primary' : 'btn-secondary'}`;
+  }
+  if (tabCompleted) {
+    tabCompleted.className = `btn btn-sm ${tab === 'completed' ? 'btn-primary' : 'btn-secondary'}`;
+  }
+  if (tabAll) {
+    tabAll.className = `btn btn-sm ${tab === 'all' ? 'btn-primary' : 'btn-secondary'}`;
+  }
+
+  filterAdminTable();
+};
+
 function renderAdminTable(orders) {
-  document.getElementById('admin-orders-tbody').innerHTML = orders.map(o => `
+  const tbody = document.getElementById('admin-orders-tbody');
+  if (!tbody) return;
+
+  if (!orders || orders.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="7" style="text-align:center; padding:3rem 1.5rem; color:#64748b;">
+          ${window.adminTabState === 'completed' 
+            ? '🏆 ยังไม่มีรายการที่ลูกค้ายืนยันรับผ้าเรียบร้อยแล้ว' 
+            : '🎉 ไม่มีรายการคำสั่งซื้อค้างตามเงื่อนไขที่เลือก'}
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = orders.map(o => `
     <tr>
-      <td><strong>${o.id}</strong></td>
-      <td>${o.customer.name}<br><small style="color:#64748b;">${o.customer.phone}</small></td>
-      <td>${o.items.map(i => `${i.serviceName} (${i.quantity})`).join(', ')}</td>
-      <td><strong>฿${o.totalAmount}</strong></td>
-      <td><span class="status-badge ${STATUS_CONFIG[o.status].cls}">${STATUS_CONFIG[o.status].label}</span></td>
+      <td>
+        <strong>${o.id}</strong>
+        ${o.oldAmount && o.oldAmount !== o.totalAmount ? `<br><small style="color:#64748b;">เดิม: <s>฿${o.oldAmount}</s></small>` : ''}
+      </td>
+      <td>
+        <strong>${o.customer?.name || '-'}</strong>
+        <br><small style="color:#64748b;">📞 ${o.customer?.phone || '-'}</small>
+      </td>
+      <td>
+        ${(o.items || []).map(i => `<span style="display:inline-block; background:#f1f5f9; padding:2px 6px; border-radius:4px; font-size:0.75rem; margin:1px 0;">${i.serviceName} (${i.quantity} ${i.unit || 'กก.'})</span>`).join('<br>')}
+        ${o.priceAdjustNote ? `<div style="font-size:0.72rem; color:#c2410c; margin-top:3px; background:#fff7ed; padding:2px 4px; border-radius:3px;">📝 ${o.priceAdjustNote}</div>` : ''}
+      </td>
+      <td>
+        <strong style="color:#0284c7; font-size:1rem;">฿${(o.totalAmount || 0).toLocaleString()}</strong>
+      </td>
+      <td>
+        <span class="status-badge ${STATUS_CONFIG[o.status]?.cls || ''}">${STATUS_CONFIG[o.status]?.label || o.status}</span>
+        ${o.status === 'WAIT_PRICE_CONFIRM' ? `<div style="font-size:0.7rem; color:#ea580c; font-weight:700; margin-top:2px;">⏳ รอลูกค้ากดยืนยัน</div>` : ''}
+        ${o.status === 'COMPLETED' ? `<div style="font-size:0.7rem; color:#15803d; font-weight:700; margin-top:2px;">✓ ลูกค้ายืนยันรับแล้ว</div>` : ''}
+      </td>
       <td>${o.assignedRider ? o.assignedRider.name : '-'}</td>
       <td>
-        <select class="form-select" style="font-size:0.75rem; padding:0.2rem;" onchange="adminUpdateStatus('${o.id}', this.value)">
-          ${Object.entries(STATUS_CONFIG).map(([k, v]) => `
-            <option value="${k}" ${k === o.status ? 'selected' : ''}>${v.label}</option>
-          `).join('')}
-        </select>
+        <div style="display:flex; flex-direction:column; gap:0.35rem;">
+          <select class="form-select" style="font-size:0.75rem; padding:0.25rem;" onchange="adminUpdateStatus('${o.id}', this.value)">
+            ${Object.entries(STATUS_CONFIG).map(([k, v]) => `
+              <option value="${k}" ${k === o.status ? 'selected' : ''}>${v.label}</option>
+            `).join('')}
+          </select>
+          <div style="display:flex; gap:0.3rem;">
+            <button class="btn btn-sm" style="flex:1; background:#0284c7; color:white; font-size:0.75rem; padding:0.25rem 0.4rem; border-radius:6px; font-weight:700; border:none; cursor:pointer;" onclick="openAdminEditOrderModal('${o.id}')" title="แก้ไขข้อมูลคำสั่งซื้อ">
+              ✏️ แก้ไข
+            </button>
+            <button class="btn btn-sm" style="flex:1; background:${o.status === 'PICKED_UP' ? '#ea580c' : '#f97316'}; color:white; font-size:0.75rem; padding:0.25rem 0.4rem; border-radius:6px; font-weight:700; border:none; cursor:pointer;" onclick="openAdminAdjustModal('${o.id}')" title="ชั่งน้ำหนักและปรับราคา">
+              ⚖️ ชั่งผ้า
+            </button>
+          </div>
+        </div>
       </td>
     </tr>
   `).join('');
@@ -1255,10 +1591,913 @@ window.adminUpdateStatus = async function (orderId, status) {
 };
 
 window.filterAdminTable = function () {
-  const q = document.getElementById('admin-search-input').value.toLowerCase();
-  const st = document.getElementById('admin-filter-status').value;
-  let list = state.orders;
-  if (st !== 'ALL') list = list.filter(o => o.status === st);
-  if (q) list = list.filter(o => o.id.toLowerCase().includes(q) || o.customer.name.toLowerCase().includes(q));
+  const searchInput = document.getElementById('admin-search-input');
+  const statusFilter = document.getElementById('admin-filter-status');
+  const q = searchInput ? searchInput.value.toLowerCase().trim() : '';
+  const st = statusFilter ? statusFilter.value : 'ALL';
+
+  let list = state.orders || [];
+
+  // Filter 1: Admin Tab (Active vs Completed vs All)
+  if (window.adminTabState === 'active') {
+    list = list.filter(o => o.status !== 'COMPLETED' && o.status !== 'CANCELLED');
+  } else if (window.adminTabState === 'completed') {
+    list = list.filter(o => o.status === 'COMPLETED');
+  }
+
+  // Filter 2: Status Dropdown
+  if (st !== 'ALL') {
+    list = list.filter(o => o.status === st);
+  }
+
+  // Filter 3: Search text
+  if (q) {
+    list = list.filter(o => 
+      o.id.toLowerCase().includes(q) || 
+      (o.customer?.name || '').toLowerCase().includes(q) ||
+      (o.customer?.phone || '').toLowerCase().includes(q)
+    );
+  }
+
   renderAdminTable(list);
 };
+
+// ==========================================
+// Admin Weigh & Adjust Order Modal Logic
+// ==========================================
+let currentAdjustOrderId = null;
+let currentAdjustOrder = null;
+let adjustItemsState = [];
+
+window.openAdminAdjustModal = function (orderId) {
+  const order = (state.orders || []).find(o => String(o.id) === String(orderId) || String(o.rawId) === String(orderId));
+  if (!order) {
+    showToast('ไม่พบข้อมูลคำสั่งซื้อ', 'error');
+    return;
+  }
+
+  currentAdjustOrderId = order.id;
+  currentAdjustOrder = order;
+
+  document.getElementById('adjust-order-id').innerText = order.id;
+  document.getElementById('adjust-customer-name').innerText = `ลูกค้า: ${order.customer?.name || '-'} (📞 ${order.customer?.phone || '-'})`;
+  document.getElementById('adjust-old-total-badge').innerText = `฿${(order.totalAmount || 0).toLocaleString()}`;
+  
+  const statusBadge = document.getElementById('adjust-current-status');
+  if (statusBadge) {
+    const st = STATUS_CONFIG[order.status] || { label: order.status, cls: '' };
+    statusBadge.className = `status-badge ${st.cls}`;
+    statusBadge.innerText = st.label;
+  }
+
+  // Clone items from order
+  adjustItemsState = (order.items || []).map(it => ({
+    serviceId: it.serviceId,
+    serviceName: it.serviceName,
+    pricePerUnit: Number(it.pricePerUnit) || 50,
+    quantity: Number(it.quantity) || 1,
+    unit: it.unit || 'กก.'
+  }));
+
+  if (adjustItemsState.length === 0) {
+    adjustItemsState.push({
+      serviceId: 1,
+      serviceName: 'ซัก อบ พับ (Wash & Fold)',
+      pricePerUnit: 60,
+      quantity: 1,
+      unit: 'กก.'
+    });
+  }
+
+  renderAdjustItemsList();
+  calculateAdjustTotal();
+
+  document.getElementById('adjust-note-input').value = order.priceAdjustNote || order.specialNotes || '';
+
+  const modal = document.getElementById('admin-adjust-modal');
+  if (modal) modal.classList.add('active');
+};
+
+window.closeAdminAdjustModal = function () {
+  const modal = document.getElementById('admin-adjust-modal');
+  if (modal) modal.classList.remove('active');
+  currentAdjustOrderId = null;
+  currentAdjustOrder = null;
+};
+
+window.renderAdjustItemsList = function () {
+  const container = document.getElementById('adjust-items-container');
+  if (!container) return;
+
+  container.innerHTML = adjustItemsState.map((item, idx) => `
+    <div style="display:flex; justify-content:space-between; align-items:center; background:white; border:1px solid #cbd5e1; border-radius:8px; padding:0.6rem 0.85rem; gap:0.75rem; flex-wrap:wrap;">
+      <div style="flex:1; min-width:160px;">
+        <strong style="font-size:0.9rem; color:#0f172a;">${item.serviceName}</strong>
+        <div style="font-size:0.75rem; color:#64748b;">ราคาต่อหน่วย: ฿${item.pricePerUnit} / ${item.unit}</div>
+      </div>
+      <div style="display:flex; align-items:center; gap:0.4rem;">
+        <label style="font-size:0.8rem; color:#475569; font-weight:700;">ชั่งจริง:</label>
+        <input type="number" step="0.1" min="0.1" max="100" class="form-control" style="width:85px; padding:0.3rem 0.5rem; text-align:center; font-weight:800; color:#0f172a;" value="${item.quantity}" oninput="updateAdjustItemQty(${idx}, this.value)">
+        <span style="font-size:0.85rem; color:#475569; font-weight:600;">${item.unit}</span>
+      </div>
+      <div style="text-align:right; min-width:75px;">
+        <strong style="font-size:1rem; color:#0284c7;">฿${Math.round(item.quantity * item.pricePerUnit).toLocaleString()}</strong>
+      </div>
+    </div>
+  `).join('');
+};
+
+window.updateAdjustItemQty = function (idx, val) {
+  const qty = Math.max(0.1, parseFloat(val) || 1);
+  adjustItemsState[idx].quantity = qty;
+  renderAdjustItemsList();
+  calculateAdjustTotal();
+};
+
+window.calculateAdjustTotal = function () {
+  let subtotal = 0;
+  adjustItemsState.forEach(it => {
+    subtotal += (it.quantity * it.pricePerUnit);
+  });
+  subtotal = Math.round(subtotal);
+
+  const deliveryFee = 40;
+  const discount = subtotal >= 500 ? 50 : 0;
+  const total = subtotal + deliveryFee - discount;
+
+  const subtotalEl = document.getElementById('adjust-subtotal-text');
+  const deliveryEl = document.getElementById('adjust-delivery-text');
+  const discountEl = document.getElementById('adjust-discount-text');
+  const totalEl = document.getElementById('adjust-total-text');
+
+  if (subtotalEl) subtotalEl.innerText = `฿${subtotal.toLocaleString()}`;
+  if (deliveryEl) deliveryEl.innerText = `฿${deliveryFee}`;
+  if (discountEl) discountEl.innerText = discount > 0 ? `-฿${discount}` : '฿0';
+  if (totalEl) totalEl.innerText = `฿${total.toLocaleString()}`;
+
+  return { subtotal, deliveryFee, discount, total };
+};
+
+window.submitAdminAdjustOrder = async function (e) {
+  e.preventDefault();
+  if (!currentAdjustOrderId) return;
+
+  const note = document.getElementById('adjust-note-input').value.trim();
+  if (!note) {
+    showToast('กรุณากรอกหมายเหตุการปรับราคา เพื่อแจ้งให้ลูกค้าทราบ', 'error');
+    return;
+  }
+
+  const { subtotal, deliveryFee, discount, total } = calculateAdjustTotal();
+
+  const payload = {
+    items: adjustItemsState.map(it => ({
+      ...it,
+      subtotal: Math.round(it.quantity * it.pricePerUnit)
+    })),
+    totalAmount: total,
+    deliveryFee,
+    discount,
+    note
+  };
+
+  const res = await API.adjustOrderPrice(currentAdjustOrderId, payload);
+  if (res.success) {
+    showToast(`⚖️ บันทึกการชั่งผ้าและปรับราคาออเดอร์ ${currentAdjustOrderId} เป็น ฿${total.toLocaleString()} เรียบร้อยแล้ว (รอลูกค้ายืนยันราคา)`);
+    closeAdminAdjustModal();
+    await loadAdminView();
+  } else {
+    showToast(res.message || 'เกิดข้อผิดพลาดในการบันทึกข้อมูล', 'error');
+  }
+};
+
+// ==========================================
+// Admin Order Edit Modal Logic (แก้ไขข้อมูลออเดอร์ของลูกค้า)
+// ==========================================
+let currentAdminEditOrderId = null;
+let adminEditOrderItems = [];
+
+window.openAdminEditOrderModal = function (orderId) {
+  const order = (state.orders || []).find(o => String(o.id) === String(orderId) || String(o.rawId) === String(orderId));
+  if (!order) {
+    showToast('ไม่พบข้อมูลคำสั่งซื้อ', 'error');
+    return;
+  }
+
+  currentAdminEditOrderId = order.id;
+
+  document.getElementById('edit-order-id').value = order.id;
+  document.getElementById('edit-order-display-id').innerText = order.id;
+  document.getElementById('edit-order-status').value = order.status || 'ORDER_PLACED';
+
+  // Customer Contact Info
+  document.getElementById('edit-order-cust-name').value = order.customer?.name || '';
+  document.getElementById('edit-order-cust-phone').value = order.customer?.phone || '';
+  document.getElementById('edit-order-cust-address').value = order.deliveryAddress || order.customer?.address || '';
+  document.getElementById('edit-order-cust-email').value = order.customer?.email || '';
+  document.getElementById('edit-order-cust-note').value = order.notes || order.specialNotes || '';
+
+  // Schedules & Preferences
+  document.getElementById('edit-order-pickup').value = order.pickupSchedule || '';
+  document.getElementById('edit-order-return').value = order.returnSchedule || '';
+  document.getElementById('edit-order-pref-detergent').value = order.preferences?.detergent || '';
+  document.getElementById('edit-order-pref-softener').value = order.preferences?.softener || '';
+  document.getElementById('edit-order-pref-packaging').value = order.preferences?.packaging || '';
+
+  // Rider info
+  document.getElementById('edit-order-rider-name').value = order.assignedRider?.name || '';
+  document.getElementById('edit-order-rider-phone').value = order.assignedRider?.phone || '';
+
+  // Items
+  adminEditOrderItems = (order.items && order.items.length > 0) ? order.items.map(it => ({
+    serviceId: it.serviceId || 1,
+    serviceName: it.serviceName || 'ซัก อบ พับ (Wash & Fold)',
+    pricePerUnit: Number(it.pricePerUnit) || 50,
+    quantity: Number(it.quantity) || 1,
+    unit: it.unit || 'กก.'
+  })) : [{
+    serviceId: 1,
+    serviceName: 'ซัก อบ พับ (Wash & Fold)',
+    pricePerUnit: 60,
+    quantity: 1,
+    unit: 'กก.'
+  }];
+
+  renderAdminEditOrderItems();
+  recalcAdminEditOrderTotals();
+
+  const modal = document.getElementById('admin-edit-order-modal');
+  if (modal) modal.classList.add('active');
+};
+
+window.closeAdminEditOrderModal = function () {
+  const modal = document.getElementById('admin-edit-order-modal');
+  if (modal) modal.classList.remove('active');
+  currentAdminEditOrderId = null;
+};
+
+window.renderAdminEditOrderItems = function () {
+  const container = document.getElementById('edit-order-items-list');
+  if (!container) return;
+
+  const services = (state.services && state.services.length > 0) ? state.services : [
+    { id: 1, name: 'ซัก อบ พับ (Wash & Fold)', basePrice: 60, unit: 'กก.' },
+    { id: 2, name: 'ซัก อบ รีด (Wash & Iron)', basePrice: 80, unit: 'กก.' },
+    { id: 3, name: 'ซักแห้ง (Dry Clean)', basePrice: 120, unit: 'ชิ้น' },
+    { id: 4, name: 'ซักผ้านวม / เครื่องนอน (Bedding)', basePrice: 150, unit: 'ผืน' }
+  ];
+
+  container.innerHTML = adminEditOrderItems.map((item, idx) => `
+    <div style="display:flex; align-items:center; gap:0.5rem; background:white; border:1px solid #cbd5e1; border-radius:8px; padding:0.5rem 0.75rem; flex-wrap:wrap;">
+      <select class="form-select" style="flex:2; min-width:180px; font-size:0.85rem;" onchange="onAdminEditServiceChange(${idx}, this.value)">
+        ${services.map(s => `
+          <option value="${s.id}" ${String(s.id) === String(item.serviceId) ? 'selected' : ''}>
+            ${s.name} (฿${s.basePrice}/${s.unit || 'กก.'})
+          </option>
+        `).join('')}
+      </select>
+      <div style="display:flex; align-items:center; gap:0.35rem;">
+        <input type="number" step="0.1" min="0.1" max="100" class="form-control" style="width:75px; text-align:center; font-size:0.85rem; padding:0.3rem;" value="${item.quantity}" oninput="onAdminEditQtyChange(${idx}, this.value)">
+        <span style="font-size:0.8rem; color:#64748b; min-width:30px;">${item.unit || 'กก.'}</span>
+      </div>
+      <div style="min-width:70px; text-align:right; font-weight:700; color:#0284c7; font-size:0.9rem;">
+        ฿${Math.round(item.quantity * item.pricePerUnit).toLocaleString()}
+      </div>
+      <button type="button" class="btn btn-sm" style="background:#fee2e2; color:#ef4444; border:none; padding:0.25rem 0.5rem; border-radius:6px; cursor:pointer;" onclick="removeAdminEditOrderItemRow(${idx})" title="ลบรายการ">
+        ✕
+      </button>
+    </div>
+  `).join('');
+};
+
+window.onAdminEditServiceChange = function (idx, serviceId) {
+  const services = (state.services && state.services.length > 0) ? state.services : [
+    { id: 1, name: 'ซัก อบ พับ (Wash & Fold)', basePrice: 60, unit: 'กก.' },
+    { id: 2, name: 'ซัก อบ รีด (Wash & Iron)', basePrice: 80, unit: 'กก.' },
+    { id: 3, name: 'ซักแห้ง (Dry Clean)', basePrice: 120, unit: 'ชิ้น' },
+    { id: 4, name: 'ซักผ้านวม / เครื่องนอน (Bedding)', basePrice: 150, unit: 'ผืน' }
+  ];
+  const s = services.find(x => String(x.id) === String(serviceId));
+  if (s) {
+    adminEditOrderItems[idx].serviceId = s.id;
+    adminEditOrderItems[idx].serviceName = s.name;
+    adminEditOrderItems[idx].pricePerUnit = s.basePrice;
+    adminEditOrderItems[idx].unit = s.unit || 'กก.';
+    renderAdminEditOrderItems();
+    recalcAdminEditOrderTotals();
+  }
+};
+
+window.onAdminEditQtyChange = function (idx, val) {
+  const qty = Math.max(0.1, parseFloat(val) || 1);
+  adminEditOrderItems[idx].quantity = qty;
+  renderAdminEditOrderItems();
+  recalcAdminEditOrderTotals();
+};
+
+window.addAdminEditOrderItemRow = function () {
+  const defaultService = (state.services && state.services[0]) || { id: 1, name: 'ซัก อบ พับ (Wash & Fold)', basePrice: 60, unit: 'กก.' };
+  adminEditOrderItems.push({
+    serviceId: defaultService.id,
+    serviceName: defaultService.name,
+    pricePerUnit: defaultService.basePrice,
+    quantity: 1,
+    unit: defaultService.unit || 'กก.'
+  });
+  renderAdminEditOrderItems();
+  recalcAdminEditOrderTotals();
+};
+
+window.removeAdminEditOrderItemRow = function (idx) {
+  if (adminEditOrderItems.length <= 1) {
+    showToast('คำสั่งซื้อต้องมีรายการบริการอย่างน้อย 1 รายการ', 'info');
+    return;
+  }
+  adminEditOrderItems.splice(idx, 1);
+  renderAdminEditOrderItems();
+  recalcAdminEditOrderTotals();
+};
+
+window.recalcAdminEditOrderTotals = function () {
+  let subtotal = 0;
+  adminEditOrderItems.forEach(it => {
+    subtotal += (it.quantity * it.pricePerUnit);
+  });
+  subtotal = Math.round(subtotal);
+  const deliveryFee = 40;
+  const total = subtotal + deliveryFee;
+
+  const subtotalEl = document.getElementById('edit-order-subtotal');
+  const totalEl = document.getElementById('edit-order-total');
+  if (subtotalEl) subtotalEl.innerText = `฿${subtotal.toLocaleString()}`;
+  if (totalEl) totalEl.innerText = `฿${total.toLocaleString()}`;
+
+  return { subtotal, deliveryFee, total };
+};
+
+window.submitAdminEditOrder = async function (e) {
+  e.preventDefault();
+  if (!currentAdminEditOrderId) return;
+
+  const { subtotal, deliveryFee, total } = recalcAdminEditOrderTotals();
+
+  const payload = {
+    customerName: document.getElementById('edit-order-cust-name').value.trim(),
+    customerPhone: document.getElementById('edit-order-cust-phone').value.trim(),
+    customerEmail: document.getElementById('edit-order-cust-email').value.trim(),
+    deliveryAddress: document.getElementById('edit-order-cust-address').value.trim(),
+    notes: document.getElementById('edit-order-cust-note').value.trim(),
+    pickupSchedule: document.getElementById('edit-order-pickup').value.trim(),
+    returnSchedule: document.getElementById('edit-order-return').value.trim(),
+    status: document.getElementById('edit-order-status').value,
+    preferences: {
+      detergent: document.getElementById('edit-order-pref-detergent').value.trim(),
+      softener: document.getElementById('edit-order-pref-softener').value.trim(),
+      packaging: document.getElementById('edit-order-pref-packaging').value.trim()
+    },
+    assignedRider: {
+      name: document.getElementById('edit-order-rider-name').value.trim(),
+      phone: document.getElementById('edit-order-rider-phone').value.trim()
+    },
+    items: adminEditOrderItems.map(it => ({
+      ...it,
+      subtotal: Math.round(it.quantity * it.pricePerUnit)
+    })),
+    totalAmount: total
+  };
+
+  const btn = document.getElementById('edit-order-submit-btn');
+  if (btn) btn.disabled = true;
+
+  try {
+    const res = await API.updateOrder(currentAdminEditOrderId, payload);
+    if (res.success) {
+      showToast(`✏️ บันทึกการแก้ไขออเดอร์ ${currentAdminEditOrderId} สำเร็จแล้ว!`);
+      closeAdminEditOrderModal();
+      await loadAdminView();
+    } else {
+      showToast(res.message || 'เกิดข้อผิดพลาดในการแก้ไขออเดอร์', 'error');
+    }
+  } catch (err) {
+    console.error(err);
+    showToast('เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์', 'error');
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+};
+
+// ==========================================
+// Admin User Management Logic (จัดการบัญชีผู้ใช้ในระบบ)
+// ==========================================
+window.currentAdminSection = 'orders';
+window.adminUsersList = [];
+
+window.switchAdminSection = function (section) {
+  window.currentAdminSection = section;
+  const navOrders = document.getElementById('admin-nav-orders');
+  const navUsers = document.getElementById('admin-nav-users');
+  const secOrders = document.getElementById('admin-section-orders');
+  const secUsers = document.getElementById('admin-section-users');
+
+  if (navOrders) navOrders.className = `btn btn-sm ${section === 'orders' ? 'btn-primary' : 'btn-secondary'}`;
+  if (navUsers) navUsers.className = `btn btn-sm ${section === 'users' ? 'btn-primary' : 'btn-secondary'}`;
+  if (secOrders) secOrders.style.display = section === 'orders' ? 'block' : 'none';
+  if (secUsers) secUsers.style.display = section === 'users' ? 'block' : 'none';
+
+  if (section === 'users') {
+    loadAdminUsers();
+  } else {
+    loadAdminView();
+  }
+};
+
+window.loadAdminUsers = async function () {
+  try {
+    const res = await API.getUsers();
+    if (res.success) {
+      window.adminUsersList = res.data || [];
+      const totalEl = document.getElementById('admin-user-total-count');
+      if (totalEl) totalEl.innerText = window.adminUsersList.length;
+      filterAdminUserTable();
+    } else {
+      showToast(res.message || 'ไม่สามารถโหลดรายชื่อผู้ใช้ได้', 'error');
+    }
+  } catch (err) {
+    console.error(err);
+    showToast('เกิดข้อผิดพลาดในการโหลดรายชื่อผู้ใช้', 'error');
+  }
+};
+
+window.filterAdminUserTable = function () {
+  const searchInput = document.getElementById('admin-user-search-input');
+  const roleFilter = document.getElementById('admin-user-filter-role');
+  const q = searchInput ? searchInput.value.toLowerCase().trim() : '';
+  const role = roleFilter ? roleFilter.value : 'ALL';
+
+  let list = window.adminUsersList || [];
+
+  if (role !== 'ALL') {
+    list = list.filter(u => (u.role || 'customer').toLowerCase() === role.toLowerCase());
+  }
+
+  if (q) {
+    list = list.filter(u =>
+      (u.name || '').toLowerCase().includes(q) ||
+      (u.username || '').toLowerCase().includes(q) ||
+      (u.phone || '').toLowerCase().includes(q) ||
+      (u.email || '').toLowerCase().includes(q) ||
+      (String(u.id || '')).toLowerCase().includes(q)
+    );
+  }
+
+  renderAdminUserTable(list);
+};
+
+const USER_ROLE_CONFIG = {
+  customer: { label: '👤 ลูกค้า (Customer)', bg: '#f1f5f9', color: '#334155' },
+  rider: { label: '🛵 ไรเดอร์ (Rider)', bg: '#e0f2fe', color: '#0369a1' },
+  staff: { label: '🧼 เจ้าหน้าที่ซักรีด (Staff)', bg: '#fef3c7', color: '#b45309' },
+  admin: { label: '🛡️ ผู้ดูแลระบบ (Admin)', bg: '#ede9fe', color: '#6d28d9' }
+};
+
+window.renderAdminUserTable = function (users) {
+  const tbody = document.getElementById('admin-users-tbody');
+  if (!tbody) return;
+
+  if (!users || users.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="8" style="text-align:center; padding:3rem 1.5rem; color:#64748b;">
+          🔍 ไม่พบบัญชีผู้ใช้งานตามเงื่อนไขที่ค้นหา
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = users.map(u => {
+    const roleCfg = USER_ROLE_CONFIG[u.role] || USER_ROLE_CONFIG.customer;
+    const isSelf = state.currentUser && (String(state.currentUser.id) === String(u.id) || state.currentUser.username === u.username);
+
+    return `
+      <tr>
+        <td><strong>#${u.id}</strong></td>
+        <td>
+          <span style="font-weight:700; color:#0f172a;">${u.username}</span>
+          ${isSelf ? '<span style="font-size:0.7rem; background:#dcfce7; color:#15803d; padding:2px 6px; border-radius:4px; margin-left:4px; font-weight:700;">คุณ</span>' : ''}
+        </td>
+        <td>
+          <span style="display:inline-block; font-size:0.75rem; font-weight:700; padding:3px 8px; border-radius:6px; background:${roleCfg.bg}; color:${roleCfg.color};">
+            ${roleCfg.label}
+          </span>
+        </td>
+        <td><strong>${u.name || '-'}</strong></td>
+        <td>📞 ${u.phone || '-'}</td>
+        <td style="font-size:0.85rem; color:#64748b;">${u.email || '-'}</td>
+        <td style="font-size:0.8rem; color:#475569; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${u.address || ''}">
+          ${u.address || '-'}
+        </td>
+        <td style="text-align:center;">
+          <div style="display:inline-flex; gap:0.35rem;">
+            <button class="btn btn-sm" style="background:#e0f2fe; color:#0369a1; border:none; padding:0.3rem 0.6rem; border-radius:6px; font-weight:700; cursor:pointer;" onclick="openAdminUserModal('${u.id}')" title="แก้ไขข้อมูลบัญชี">
+              ✏️ แก้ไข
+            </button>
+            <button class="btn btn-sm" style="background:#fee2e2; color:#dc2626; border:none; padding:0.3rem 0.6rem; border-radius:6px; font-weight:700; cursor:pointer; opacity:${isSelf ? '0.4' : '1'};" ${isSelf ? 'disabled title="ไม่สามารถลบบัญชีของตัวเองที่กำลังใช้งานอยู่ได้"' : `onclick="deleteAdminUser('${u.id}', '${u.username}')" title="ลบบัญชี"`}>
+              🗑️ ลบ
+            </button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+};
+
+window.openAdminUserModal = function (userId = null) {
+  const form = document.getElementById('admin-user-form');
+  if (form) form.reset();
+
+  const idInput = document.getElementById('admin-user-form-id');
+  const titleEl = document.getElementById('admin-user-modal-title');
+  const passHelp = document.getElementById('admin-user-password-help');
+  const passLabel = document.getElementById('admin-user-password-label');
+  const passInput = document.getElementById('admin-user-form-password');
+  const submitBtn = document.getElementById('admin-user-submit-btn');
+
+  if (userId) {
+    const user = (window.adminUsersList || []).find(u => String(u.id) === String(userId));
+    if (!user) {
+      showToast('ไม่พบข้อมูลผู้ใช้งาน', 'error');
+      return;
+    }
+
+    if (idInput) idInput.value = user.id;
+    if (titleEl) titleEl.innerText = `✏️ แก้ไขข้อมูลบัญชี (#${user.id} - ${user.username})`;
+    if (passHelp) passHelp.style.display = 'block';
+    if (passLabel) passLabel.innerText = 'รหัสผ่านใหม่ (Password)';
+    if (passInput) {
+      passInput.required = false;
+      passInput.placeholder = 'เว้นว่างไว้หากไม่ต้องการเปลี่ยนรหัสผ่าน';
+    }
+    if (submitBtn) submitBtn.innerText = '💾 บันทึกการแก้ไข';
+
+    document.getElementById('admin-user-form-username').value = user.username || '';
+    document.getElementById('admin-user-form-role').value = user.role || 'customer';
+    document.getElementById('admin-user-form-name').value = user.name || '';
+    document.getElementById('admin-user-form-phone').value = user.phone || '';
+    document.getElementById('admin-user-form-email').value = user.email || '';
+    document.getElementById('admin-user-form-address').value = user.address || '';
+  } else {
+    if (idInput) idInput.value = '';
+    if (titleEl) titleEl.innerText = '➕ เพิ่มผู้ใช้งานใหม่ในระบบ';
+    if (passHelp) passHelp.style.display = 'none';
+    if (passLabel) passLabel.innerText = 'รหัสผ่าน (Password) *';
+    if (passInput) {
+      passInput.required = true;
+      passInput.placeholder = 'อย่างน้อย 6 ตัวอักษร';
+    }
+    if (submitBtn) submitBtn.innerText = '💾 สร้างบัญชีผู้ใช้';
+  }
+
+  const modal = document.getElementById('admin-user-modal');
+  if (modal) modal.classList.add('active');
+};
+
+window.closeAdminUserModal = function () {
+  const modal = document.getElementById('admin-user-modal');
+  if (modal) modal.classList.remove('active');
+};
+
+window.submitAdminUserForm = async function (e) {
+  e.preventDefault();
+  const userId = document.getElementById('admin-user-form-id').value;
+  const username = document.getElementById('admin-user-form-username').value.trim();
+  const role = document.getElementById('admin-user-form-role').value;
+  const password = document.getElementById('admin-user-form-password').value;
+  const name = document.getElementById('admin-user-form-name').value.trim();
+  const phone = document.getElementById('admin-user-form-phone').value.trim();
+  const email = document.getElementById('admin-user-form-email').value.trim();
+  const address = document.getElementById('admin-user-form-address').value.trim();
+
+  const submitBtn = document.getElementById('admin-user-submit-btn');
+  if (submitBtn) submitBtn.disabled = true;
+
+  try {
+    if (userId) {
+      // Edit User
+      const payload = { name, phone, email, address, role };
+      if (password && password.trim().length > 0) {
+        if (password.length < 6) {
+          showToast('รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร', 'error');
+          if (submitBtn) submitBtn.disabled = false;
+          return;
+        }
+        payload.password = password;
+      }
+
+      const res = await API.updateProfile(userId, payload);
+      if (res.success) {
+        showToast(`✅ บันทึกข้อมูลของ ${name || username} เรียบร้อยแล้ว`);
+        closeAdminUserModal();
+        await loadAdminUsers();
+      } else {
+        showToast(res.message || 'ไม่สามารถแก้ไขข้อมูลผู้ใช้ได้', 'error');
+      }
+    } else {
+      // Create User
+      if (!password || password.length < 6) {
+        showToast('กรุณาระบุรหัสผ่านอย่างน้อย 6 ตัวอักษร', 'error');
+        if (submitBtn) submitBtn.disabled = false;
+        return;
+      }
+
+      const payload = { username, password, name, phone, email, address, role };
+      const res = await API.createUser(payload);
+      if (res.success) {
+        showToast(`🎉 เพิ่มผู้ใช้งาน ${username} (${role}) สำเร็จแล้ว!`);
+        closeAdminUserModal();
+        await loadAdminUsers();
+      } else {
+        showToast(res.message || 'ไม่สามารถสร้างผู้ใช้งานได้', 'error');
+      }
+    }
+  } catch (err) {
+    console.error(err);
+    showToast('เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์', 'error');
+  } finally {
+    if (submitBtn) submitBtn.disabled = false;
+  }
+};
+
+window.deleteAdminUser = async function (userId, username) {
+  if (state.currentUser && (String(state.currentUser.id) === String(userId) || state.currentUser.username === username)) {
+    showToast('ไม่สามารถลบบัญชีที่กำลังล็อกอินอยู่ได้', 'error');
+    return;
+  }
+
+  if (!confirm(`คุณแน่ใจหรือไม่ว่าต้องการลบบัญชีผู้ใช้ "${username}" (ID: ${userId}) ออกจากระบบอย่างถาวร?\nการกระทำนี้ไม่สามารถย้อนกลับได้!`)) {
+    return;
+  }
+
+  try {
+    const res = await API.deleteAccount(userId);
+    if (res.success) {
+      showToast(`🗑️ ลบบัญชีผู้ใช้ "${username}" เรียบร้อยแล้ว`);
+      await loadAdminUsers();
+    } else {
+      showToast(res.message || 'เกิดข้อผิดพลาดในการลบบัญชีผู้ใช้', 'error');
+    }
+  } catch (err) {
+    console.error(err);
+    showToast('เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์', 'error');
+  }
+};
+
+window.customerApprovePrice = async function (orderId) {
+  if (!confirm(`คุณต้องการยืนยันและอนุมัติราคาใหม่ของออเดอร์ ${orderId} ใช่หรือไม่?`)) return;
+
+  const res = await API.approveOrderPrice(orderId, 'approve');
+  if (res.success) {
+    showToast('🎉 คุณได้ยืนยันราคาเรียบร้อยแล้ว! ทางร้านเริ่มดำเนินการซัก อบ รีด ให้ทันทีครับ', 'success');
+    await loadTrackingView(orderId);
+  } else {
+    showToast(res.message || 'เกิดข้อผิดพลาด', 'error');
+  }
+};
+
+window.customerRejectPrice = async function (orderId) {
+  const reason = prompt('กรุณาระบุเหตุผลที่ต้องการยกเลิกคำสั่งซื้อ:');
+  if (reason === null) return;
+
+  const res = await API.approveOrderPrice(orderId, 'reject', reason);
+  if (res.success) {
+    showToast('ยกเลิกคำสั่งซื้อเรียบร้อยแล้ว', 'info');
+    await loadTrackingView(orderId);
+  } else {
+    showToast(res.message || 'เกิดข้อผิดพลาด', 'error');
+  }
+};
+
+window.customerConfirmDelivery = async function (orderId) {
+  if (!confirm(`คุณต้องการยืนยันว่าได้รับผ้าของคำสั่งซื้อ ${orderId} เรียบร้อยแล้วใช่หรือไม่?`)) return;
+
+  try {
+    const res = await API.confirmDelivery(orderId);
+    if (res.success) {
+      showToast('🎉 ยืนยันการรับผ้าเรียบร้อยแล้ว! คำสั่งซื้อถูกย้ายไปยังประวัติที่สำเร็จแล้ว', 'success');
+      window.customerOrderTab = 'history';
+      await loadTrackingView(orderId);
+    } else {
+      showToast(res.message || 'เกิดข้อผิดพลาดในการยืนยันการรับผ้า', 'error');
+    }
+  } catch (err) {
+    console.error(err);
+    showToast('เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์', 'error');
+  }
+};
+
+// ==========================================
+// Customer Profile View & Account Management
+// ==========================================
+function loadProfileView() {
+  if (!state.currentUser) {
+    switchAppView('landing');
+    openAuthModal('login');
+    return;
+  }
+
+  const u = state.currentUser;
+  const nameDisplay = document.getElementById('profile-display-name');
+  const usernameDisplay = document.getElementById('profile-display-username');
+  const idDisplay = document.getElementById('profile-display-id');
+  const roleDisplay = document.getElementById('profile-display-role');
+
+  if (nameDisplay) nameDisplay.innerText = u.name || u.username;
+  if (usernameDisplay) usernameDisplay.innerText = `@${u.username}`;
+  if (idDisplay) idDisplay.innerText = `CUST-${String(u.id || u.customerID || '1').padStart(3, '0')}`;
+
+  if (roleDisplay) {
+    const roleLabels = {
+      customer: 'นิสิต / ลูกค้าทั่วไป',
+      rider: 'พนักงานจัดส่ง (Rider)',
+      staff: 'โรงงานซักรีด (Staff)',
+      admin: 'ผู้ดูแลระบบ (Admin)'
+    };
+    roleDisplay.innerText = roleLabels[u.role] || u.role;
+  }
+
+  // Populate form fields with current user information
+  const usernameInput = document.getElementById('profile-username-input');
+  const nameInput = document.getElementById('profile-name-input');
+  const phoneInput = document.getElementById('profile-phone-input');
+  const emailInput = document.getElementById('profile-email-input');
+  const addrInput = document.getElementById('profile-address-input');
+  const passInput = document.getElementById('profile-password-input');
+  const passConfirmInput = document.getElementById('profile-confirm-password-input');
+
+  if (usernameInput) usernameInput.value = u.username || '';
+  if (nameInput) nameInput.value = u.name || '';
+  if (phoneInput) phoneInput.value = u.phone || '';
+  if (emailInput) emailInput.value = u.email || '';
+  if (addrInput) addrInput.value = u.address || '';
+  if (passInput) passInput.value = '';
+  if (passConfirmInput) passConfirmInput.value = '';
+}
+
+window.submitProfileUpdate = async function (e) {
+  if (e) e.preventDefault();
+  if (!state.currentUser) return;
+
+  const name = document.getElementById('profile-name-input').value.trim();
+  const phone = document.getElementById('profile-phone-input').value.trim();
+  const email = document.getElementById('profile-email-input').value.trim();
+  const address = document.getElementById('profile-address-input').value.trim();
+  const password = document.getElementById('profile-password-input').value;
+  const confirmPassword = document.getElementById('profile-confirm-password-input').value;
+
+  if (!name || !phone || !email) {
+    showToast('กรุณากรอกชื่อ, เบอร์โทร และอีเมลให้ครบถ้วน', 'error');
+    return;
+  }
+
+  if (password && password.length < 6) {
+    showToast('รหัสผ่านใหม่ต้องมีความยาวอย่างน้อย 6 ตัวอักษร', 'error');
+    return;
+  }
+
+  if (password && password !== confirmPassword) {
+    showToast('รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน กรุณาตรวจสอบอีกครั้ง', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('btn-save-profile');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerText = 'กำลังบันทึกข้อมูล...';
+  }
+
+  try {
+    const res = await API.updateProfile(state.currentUser.id, {
+      name,
+      phone,
+      email,
+      address,
+      password: password && password.trim().length >= 6 ? password.trim() : undefined
+    });
+
+    if (res.success) {
+      showToast('🎉 บันทึกการแก้ไขข้อมูลเรียบร้อยแล้ว!', 'success');
+      // Merge updated fields into state.currentUser
+      state.currentUser = {
+        ...state.currentUser,
+        name: res.data.name,
+        phone: res.data.phone,
+        email: res.data.email,
+        address: res.data.address
+      };
+      localStorage.setItem('dekdry_user', JSON.stringify(state.currentUser));
+      renderAuthNavbar();
+      loadProfileView();
+      prefillCustomerForms();
+    } else {
+      showToast(res.message || 'ไม่สามารถบันทึกข้อมูลได้', 'error');
+    }
+  } catch (err) {
+    console.error('Update profile error:', err);
+    showToast('เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์', 'error');
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerText = '💾 บันทึกการเปลี่ยนแปลงข้อมูล';
+    }
+  }
+};
+
+window.deleteCustomerAccount = async function () {
+  if (!state.currentUser) return;
+
+  const currentName = state.currentUser.name || state.currentUser.username;
+  const currentUsername = state.currentUser.username;
+  const currentUserId = state.currentUser.id;
+
+  const step1 = confirm(`⚠️ คำเตือน: คุณต้องการลบบัญชีผู้ใช้งาน "${currentName}" (@${currentUsername}) ใช่หรือไม่?\n\nหากลบแล้ว บัญชีและข้อมูลส่วนตัวรวมถึงประวัติคำสั่งซื้อทั้งหมดจะถูกลบออกจากระบบอย่างถาวร`);
+  if (!step1) return;
+
+  const step2 = prompt(`เพื่อความปลอดภัยสูงสุด กรุณาพิมพ์คำว่า "DELETE" หรือพิมพ์ชื่อผู้ใช้ของคุณ (${currentUsername}) เพื่อยืนยันการลบบัญชี:`);
+  if (step2 === null) return;
+
+  const cleanInput = step2.trim();
+  if (cleanInput.toUpperCase() !== 'DELETE' && cleanInput.toLowerCase() !== currentUsername.toLowerCase()) {
+    showToast('การยืนยันไม่ถูกต้อง ระบบยกเลิกการลบบัญชี', 'info');
+    return;
+  }
+
+  try {
+    const res = await API.deleteAccount(currentUserId);
+    if (res.success) {
+      alert('บัญชีผู้ใช้งานของคุณถูกลบออกจากระบบ DekDry เรียบร้อยแล้ว');
+      logoutUser();
+      switchAppView('landing');
+    } else {
+      showToast(res.message || 'ไม่สามารถลบบัญชีได้', 'error');
+    }
+  } catch (err) {
+    console.error('Delete account error:', err);
+    showToast('เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์', 'error');
+  }
+};
+
+// ==========================================
+// Live Real-Time Polling for Order Updates (ซิงค์สถานะออเดอร์แบบเรียลไทม์)
+// ==========================================
+let trackingPollTimer = null;
+const lastKnownStatusMap = {};
+
+function startLiveTrackingPoll() {
+  if (trackingPollTimer) return;
+  trackingPollTimer = setInterval(async () => {
+    const activeView = state.currentAppView;
+    if (!['tracking', 'rider', 'staff', 'admin'].includes(activeView)) return;
+
+    try {
+      const res = await API.getOrders();
+      if (!res.success || !Array.isArray(res.data)) return;
+
+      state.orders = res.data;
+
+      // ตรวจสอบการเปลี่ยนสถานะของแต่ละออเดอร์
+      res.data.forEach(ord => {
+        const prevStatus = lastKnownStatusMap[ord.id];
+        if (prevStatus && prevStatus !== ord.status) {
+          const cfg = STATUS_CONFIG[ord.status] || { label: ord.status, icon: '🔔' };
+
+          const isUserOrder = state.currentUser && (
+            ['admin', 'rider', 'staff'].includes(state.currentUser.role) ||
+            String(ord.userId) === String(state.currentUser.id) ||
+            (state.currentUser.phone && ord.customer?.phone && ord.customer.phone.replace(/\D/g, '') === state.currentUser.phone.replace(/\D/g, ''))
+          );
+
+          if (isUserOrder) {
+            showToast(`🔔 ออเดอร์ ${ord.id} อัปเดตสถานะเป็น: "${cfg.label}" ${cfg.icon}`, 'info');
+          }
+        }
+        lastKnownStatusMap[ord.id] = ord.status;
+      });
+
+      // ถ้าลูกค้ากำลังเปิดหน้าติดตามสถานะผ้าอยู่ ให้อัปเดตข้อมูลบนหน้าจอทันทีแบบเรียลไทม์
+      if (activeView === 'tracking') {
+        const searchInput = document.getElementById('tracking-search-input');
+        const currentActiveId = searchInput?.value?.trim()?.toUpperCase();
+        if (currentActiveId) {
+          const curOrder = state.orders.find(o => o.id.toUpperCase() === currentActiveId);
+          if (curOrder) {
+            renderTrackingDetails(currentActiveId);
+          }
+        }
+      }
+    } catch (e) {
+      // quiet catch network blip
+    }
+  }, 3000);
+}
+
+
