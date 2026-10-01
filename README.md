@@ -1,6 +1,6 @@
 # DekDry - Laundry Delivery System @ PSRU (ระบบบริการซักอบรีดออนไลน์)
 
-**วิชา:** COMP252 วิศวกรรมซอฟต์แวร์ (Software Engineering)  
+**วิชา:** COMP342 วิศวกรรมซอฟต์แวร์เบื้องต้น (Software Engineering)  
 **ใบงานที่ 4:** Implementation + Git
 
 ---
@@ -10,13 +10,13 @@
 
 ---
 
-## 👥 สมาชิกในกลุ่มและการแบ่งหน้าที่ (Team Members & Module Division)
+## 👥 สมาชิกในทีมและบทบาทหน้าที่ (Team Members & Roles)
 
-| ลำดับ | ชื่อ-นามสกุล / รหัสนักศึกษา | บทบาทหน้าที่ (Role) | โมดูลที่รับผิดชอบ (Module Responsibility) |
+| ลำดับ | ชื่อ-นามสกุล | บทบาทหน้าที่ (Role) | รายละเอียดความรับผิดชอบ (Responsibilities) |
 |:---:|:---|:---|:---|
-| 1 | **[ นายมาร์ค 1]** | **Frontend Developer & UI/UX** | ออกแบบหน้าเว็บ (`index.html`), ตกแต่งสไตล์ CSS (`styles.css`, `booking.css`), ระบบสั่งจอง 6 ขั้นตอน และ Responsive Design |
-| 2 | **[ นายเบสท์ 2]** | **Backend & Database Developer** | พัฒนา Express RESTful API (`routes/api.js`), จัดการฐานข้อมูล MySQL/JSON (`db.js`, `schema.sql`), ระบบคำนวณราคาและส่วนลด |
-| 3 | **[นายอัน 3]** | **Fullstack & Authentication** | พัฒนาระบบยืนยันตัวตน (`bcryptjs`), ระบบจัดการสิทธิ์ผู้ใช้งาน (Customer, Rider, Staff, Admin) และเชื่อมต่อ API (`app.js`) |
+| 1 | **พีรพล แก้วพูลสุข** | **Database & System Architecture (คนที่ 1)** | รับผิดชอบการออกแบบและจัดการฐานข้อมูล (Database Schema/MySQL/JSON Engine), ออกแบบระบบพื้นฐาน และจัดการ Data Access Layer ของโปรเจกต์ |
+| 2 | **ธิเบศ พรมมา** | **Core Developer & Debugger (คนที่ 2)** | รับผิดชอบการพัฒนาระบบหลังบ้าน (Backend API), ตรวจสอบแก้ไขบั๊ก (Bug Fixes), เก็บรายละเอียดการทำงานของระบบ และพัฒนาฟังก์ชันหลัก |
+| 3 | **พงษ์อนันต์ ชนะสแบง** | **QA Tester & Documentation (คนที่ 3)** | รับผิดชอบการทดสอบระบบ (Software Testing / Test Cases), บันทึก Defect Report, จัดทำเอกสารประกอบโครงงาน และเตรียมสไลด์นำเสนอ |
 
 ---
 
